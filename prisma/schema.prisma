@@ -1,0 +1,153 @@
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+enum Company {
+    ORM
+    GP2
+}
+
+enum UserRole {
+    ADMIN
+    IT
+    SECURITY
+}
+
+enum EquipmentType {
+    LAPTOP
+    DESKTOP
+}
+
+enum EquipmentStatus {
+    ASSIGNED
+    AVAILABLE
+    STORAGE
+    MAINTENANCE
+    RETIRED
+}
+
+enum PermitStatus {
+    ACTIVE
+    EXPIRED
+    CANCELLED
+}
+
+enum ScanResult {
+    ALLOWED
+    DENIED
+}
+
+model User {
+    id           Int      @id @default(autoincrement())
+    username     String   @unique
+    passwordHash String
+    firstName    String?
+    lastName     String?
+    role         UserRole
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model Employee {
+    id          Int          @id @default(autoincrement())
+    sapNumber   String       @unique
+    firstName   String
+    lastName    String
+    department  String?
+    position    String?
+    company     Company
+    photoPath   String?
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    assignments Assignment[]
+    permits     Permit[]
+}
+
+model Equipment {
+    id              Int             @id @default(autoincrement())
+    assetTag        String          @unique
+    barcode         String?         @unique
+    type            EquipmentType?
+    inventoryNumber String?         @unique 
+    serialNumber    String?         @unique
+    brand           String?
+    model           String?
+    company         Company
+    status          EquipmentStatus
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    assignments     Assignment[]
+    permits         Permit[]
+    maintenances    Maintenance[]
+}
+
+model Assignment {
+    id                Int       @id @default(autoincrement())
+    employeeId        Int
+    equipmentId       Int
+    assignedAt        DateTime
+    returnedAt        DateTime?
+    replacementReason String?
+    generatedPdfPath  String?
+    signedPdfPath     String?
+    employee          Employee  @relation(fields: [employeeId], references: [id])
+    equipment         Equipment @relation(fields: [equipmentId], references: [id])
+    createdAt         DateTime  @default(now())
+
+    @@index([employeeId])
+    @@index([equipmentId])
+}
+
+model Permit {
+    id               Int          @id @default(autoincrement())
+    folio            String       @unique
+    employeeId       Int
+    equipmentId      Int
+    startDate        DateTime
+    expirationDate   DateTime
+    status           PermitStatus
+    generatedPdfPath String?
+    signedPdfPath    String?
+    employee         Employee     @relation(fields: [employeeId], references: [id])
+    equipment        Equipment    @relation(fields: [equipmentId], references: [id])
+    scanLogs         ScanLog[]
+    createdAt        DateTime     @default(now())
+    updatedAt        DateTime     @updatedAt
+
+    @@index([employeeId])
+    @@index([equipmentId])
+    @@index([status])
+}
+
+model ScanLog {
+    id        Int        @id @default(autoincrement())
+    permitId  Int
+    scannedAt DateTime   @default(now())
+    result    ScanResult
+    notes     String?
+    permit    Permit     @relation(fields: [permitId], references: [id])
+
+    @@index([permitId])
+    @@index([scannedAt])
+}
+
+model Maintenance {
+    id               Int       @id @default(autoincrement())
+    equipmentId      Int
+    maintenanceDate  DateTime
+    provider         String?
+    folio            String?
+    generatedPdfPath String?
+    signedPdfPath    String?
+    notes            String?
+    equipment        Equipment @relation(fields: [equipmentId], references: [id])
+    createdAt        DateTime  @default(now())
+
+    @@index([equipmentId])
+    @@index([maintenanceDate])
+}
