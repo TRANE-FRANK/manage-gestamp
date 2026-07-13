@@ -1,7 +1,7 @@
+import PageHeader from "@/components/ui/PageHeader"
+import AssignmentForm from "@/components/assignment/AssignmentForm"
+
 import { prisma } from "@/lib/prisma"
-import { createAssignmentAction } from "@/actions/assignment-actions"
-
-
 
 interface Props {
   searchParams: Promise<{
@@ -27,25 +27,28 @@ export default async function NewAssignmentPage({ searchParams }: Props) {
     },
   })
 
+  const employeeOptions = employees.map((employee) => ({
+    id: employee.id,
+    label: `${employee.firstName} ${employee.lastName}`,
+    description: employee.position ?? "",
+  }))
 
+  const equipmentOptions = equipment.map((item) => ({
+    id: item.id,
+    label: item.assetTag,
+    description: `${item.brand ?? ""} ${item.model ?? ""}`.trim(),
+  }))
 
   return (
     <main className="p-6">
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-6 text-3xl font-bold">Agregar Asignación</h1>
+        <PageHeader title="Nueva asignación" />
 
-        <form action={createAssignmentAction} className="space-y-4">
-
-
-
-
-          <button
-            type="submit"
-            className="rounded-lg bg-black px-4 py-2 text-white"
-          >
-            Guardar Asignación
-          </button>
-        </form>
+        <AssignmentForm
+          employees={employeeOptions}
+          equipment={equipmentOptions}
+          employeeId={employeeId}
+        />
       </div>
     </main>
   )
