@@ -1,5 +1,9 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useTransition } from "react"
+import { toast } from "sonner"
+
 import * as React from "react"
 
 import type { EmployeeOption, EquipmentOption } from "./types"
@@ -29,8 +33,27 @@ export default function AssignmentForm({
   const [selectedEquipment, setSelectedEquipment] =
     React.useState<EquipmentOption | null>(null)
 
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
+
+  async function submit(formData: FormData) {
+    startTransition(async () => {
+      const result = await createAssignmentAction(formData)
+
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+
+      toast.success("Asignación creada correctamente.")
+
+      router.push("/assignments")
+      router.refresh()
+    })
+  }
+
   return (
-    <form action={createAssignmentAction} className="space-y-6">
+    <form action={submit} className="space-y-6">
       <input
         type="hidden"
         name="employeeId"
@@ -44,9 +67,7 @@ export default function AssignmentForm({
       />
 
       <div>
-        <label className="mb-2 block text-sm font-medium">
-          Empleado
-        </label>
+        <label className="mb-2 block text-sm font-medium">Empleado</label>
 
         <EmployeeSelector
           employees={employees}
@@ -57,9 +78,7 @@ export default function AssignmentForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium">
-          Equipo
-        </label>
+        <label className="mb-2 block text-sm font-medium">Equipo</label>
 
         <EquipmentSelector
           equipment={equipment}
@@ -70,9 +89,10 @@ export default function AssignmentForm({
 
       <button
         type="submit"
-        className="rounded-lg bg-black px-4 py-2 text-white"
+        disabled={pending}
+        className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-50"
       >
-        Guardar asignación
+        {pending ? "Guardando..." : "Guardar asignación"}
       </button>
     </form>
   )
