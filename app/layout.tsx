@@ -9,7 +9,7 @@ import Header from "@/components/layout/Header";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const poppins = Poppins({
   subsets: ["latin"],

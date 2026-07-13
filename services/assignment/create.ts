@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma"
-import { AssignmentDetails } from "./types"
+import { CreateAssignmentDto } from "./types"
 import { ConflictError } from "../shared/errors"
 import { findActiveAssignmentByEquipment } from "./repository"
 
-export async function createAssignment(dto: AssignmentDetails) {
+export async function createAssignment(dto: CreateAssignmentDto) {
   const { employeeId, equipmentId } = dto
 
   const activeAssignment = await findActiveAssignmentByEquipment(equipmentId)

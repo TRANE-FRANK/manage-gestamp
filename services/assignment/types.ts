@@ -4,3 +4,23 @@ export interface AssignmentDetails extends Assignment {
   employee: Employee
   equipment: Equipment
 }
+
+export interface AssignmentListItem extends Assignment {
+  employee: Employee
+  equipment: Equipment
+}
+
+export interface CreateAssignmentDto {
+  employeeId: number
+  equipmentId: number
+}
+
+export interface UpdateAssignmentDto {
+  employeeId: number
+  equipmentId: number
+}
+
+export interface ReturnAssignmentDto {
+  returnedAt?: Date
+  replacementReason?: string
+}
