@@ -9,7 +9,6 @@ export async function findAssignmentById(id: number) {
     where: {
       id,
     },
-
     include: assignmentInclude,
   })
 }
@@ -29,9 +28,7 @@ export async function findActiveAssignments() {
     where: {
       returnedAt: null,
     },
-
     include: assignmentInclude,
-
     orderBy: {
       assignedAt: "desc",
     },
@@ -41,7 +38,6 @@ export async function findActiveAssignments() {
 export async function findAssignmentHistory() {
   return prisma.assignment.findMany({
     include: assignmentInclude,
-
     orderBy: {
       assignedAt: "desc",
     },

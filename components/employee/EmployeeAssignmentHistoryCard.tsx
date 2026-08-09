@@ -1,7 +1,7 @@
 import { formatDate } from "@/lib/format-date"
 
 import SectionCard from "@/components/ui/SectionCard"
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 import type { EmployeeDetails } from "@/services/employee"
 
@@ -15,7 +15,7 @@ export default function EmployeeAssignmentHistoryCard({ employee }: Props) {
       <div className="flex items-center justify-between p-2">
         <h2 className="text-lg font-semibold">Historial de asignaciones</h2>
 
-        <Badge variant="danger">{employee.assignments.length}</Badge>
+        <Badge variant="destructive">{employee.assignments.length}</Badge>
       </div>
 
       {employee.assignments.length === 0 ? (
@@ -34,7 +34,7 @@ export default function EmployeeAssignmentHistoryCard({ employee }: Props) {
                   {assignment.equipment.brand} {assignment.equipment.model}
                 </h3>
 
-                <Badge variant={assignment.returnedAt ? "success" : "success"}>
+                <Badge variant={assignment.returnedAt ? "outline" : "default"}>
                   {assignment.returnedAt ? "Devuelta" : "Activa"}
                 </Badge>
               </div>

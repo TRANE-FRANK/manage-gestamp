@@ -1,5 +1,5 @@
 import Card from "@/components/ui/Card"
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 import DetailGrid from "@/components/ui/DetailGrid"
 import DetailItem from "@/components/ui/DetailItem"
 
@@ -22,7 +22,7 @@ export default function EmployeeInformationCard({ employee }: Props) {
         </DetailItem>
         <DetailItem label="SAP">{employee.sapNumber}</DetailItem>
         <DetailItem label="Empresa">
-          <Badge variant={employee.company === "ORM" ? "ORM" : "GP2"}>
+          <Badge variant={employee.company === "ORM" ? "secondary" : "default"}>
             {employee.company}
           </Badge>
         </DetailItem>

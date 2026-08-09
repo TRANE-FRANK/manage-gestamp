@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import Card from "@/components/ui/Card"
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 interface Props {
   assignment: {
@@ -80,15 +80,15 @@ export default function AssignmentHistoryCard({ assignment }: Props) {
 
       <div className="mt-5 flex flex-wrap gap-2">
         {assignment.generatedPdfPath ? (
-          <Badge variant="success">PDF generado</Badge>
+          <Badge variant="default">PDF generado</Badge>
         ) : (
-          <Badge variant="danger">Sin PDF</Badge>
+          <Badge variant="destructive">Sin PDF</Badge>
         )}
 
         {assignment.signedPdfPath ? (
-          <Badge variant="success">Firmada</Badge>
+          <Badge variant="default">Firmada</Badge>
         ) : (
-          <Badge variant="warning">Pendiente firma</Badge>
+          <Badge variant="outline">Pendiente firma</Badge>
         )}
       </div>
     </Card>

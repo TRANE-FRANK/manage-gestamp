@@ -1,14 +1,15 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import Link from "next/link"
+import { prisma } from "@/lib/prisma"
+import { getDaysUntil } from "@/lib/date"
 
-export default async function SecuritySearchPage({
-  searchParams,
-}: {
+type Props = {
   searchParams: Promise<{
-    assetTag?: string;
-  }>;
-}) {
-  const { assetTag } = await searchParams;
+    assetTag?: string
+  }>
+}
+
+export default async function SecuritySearchPage({ searchParams }: Props) {
+  const { assetTag } = await searchParams
 
   if (!assetTag) {
     return (
@@ -21,14 +22,14 @@ export default async function SecuritySearchPage({
           </div>
         </div>
       </main>
-    );
+    )
   }
 
   const equipment = await prisma.equipment.findUnique({
     where: {
       assetTag,
     },
-  });
+  })
 
   if (!equipment) {
     return (
@@ -53,7 +54,7 @@ export default async function SecuritySearchPage({
           </div>
         </div>
       </main>
-    );
+    )
   }
 
   const permit = await prisma.permit.findFirst({
@@ -68,7 +69,7 @@ export default async function SecuritySearchPage({
     orderBy: {
       expirationDate: "desc",
     },
-  });
+  })
 
   if (!permit) {
     return (
@@ -93,14 +94,12 @@ export default async function SecuritySearchPage({
           </div>
         </div>
       </main>
-    );
+    )
   }
 
-  const daysLeft = Math.ceil(
-    (permit.expirationDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-  );
+  const daysLeft = getDaysUntil(permit.expirationDate)
 
-  const isAllowed = daysLeft >= 0;
+  const isAllowed = daysLeft >= 0
 
   return (
     <main className="p-6">
@@ -191,5 +190,5 @@ export default async function SecuritySearchPage({
         </div>
       </div>
     </main>
-  );
+  )
 }

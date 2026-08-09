@@ -1,7 +1,7 @@
-import PageHeader from "@/components/ui/PageHeader"
 import Card from "@/components/ui/Card"
-
-import AssignmentHistoryTable from "@/components/assignment/AssignmentHistoryTable"
+import PageHeader from "@/components/ui/PageHeader"
+import { DataTable } from "@/components/ui/data-table"
+import { assignmentHistoryColumns } from "@/app/assignments/history-columns"
 
 import { listAssignmentHistory } from "@/services/assignment"
 
@@ -13,7 +13,11 @@ export default async function AssignmentHistoryPage() {
       <PageHeader title="Historial de asignaciones" />
 
       <Card>
-        <AssignmentHistoryTable assignments={assignments} />
+        <DataTable
+          columns={assignmentHistoryColumns}
+          data={assignments}
+          toolbarPlaceholder="Buscar historial..."
+        />
       </Card>
     </>
   )

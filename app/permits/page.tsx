@@ -6,7 +6,7 @@ import SearchForm from "./search-form";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/badge";
 
 export default async function PermitsPage({
   searchParams,
@@ -187,11 +187,11 @@ export default async function PermitsPage({
 
                     <td className="p-4">
                       {daysLeft < 0 ? (
-                        <Badge variant="danger">Expirado</Badge>
+                        <Badge variant="destructive">Expirado</Badge>
                       ) : daysLeft <= 30 ? (
-                        <Badge variant="warning">Por vencer</Badge>
+                        <Badge variant="outline">Por vencer</Badge>
                       ) : (
-                        <Badge variant="success">Activo</Badge>
+                        <Badge variant="default">Activo</Badge>
                       )}
                     </td>
 
@@ -203,9 +203,9 @@ export default async function PermitsPage({
 
                     <td className="p-4">
                       {permit.signedPdfPath ? (
-                        <Badge variant="success">Sí</Badge>
+                        <Badge variant="default">Sí</Badge>
                       ) : (
-                        <Badge variant="warning">Pendiente</Badge>
+                        <Badge variant="outline">Pendiente</Badge>
                       )}
                     </td>
 

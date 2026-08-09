@@ -1,4 +1,4 @@
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 interface Props {
   generatedPdfPath: string | null
@@ -10,12 +10,12 @@ export default function AssignmentStatus({
   signedPdfPath,
 }: Props) {
   if (!generatedPdfPath) {
-    return <Badge variant="danger">Sin generar</Badge>
+    return <Badge variant="destructive">Sin generar</Badge>
   }
 
   if (!signedPdfPath) {
-    return <Badge variant="warning">Pendiente firma</Badge>
+    return <Badge variant="ghost">Pendiente firma</Badge>
   }
 
-  return <Badge variant="success">Firmada</Badge>
+  return <Badge variant="default">Generada y firmada</Badge>
 }

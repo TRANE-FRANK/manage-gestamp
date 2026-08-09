@@ -1,9 +1,9 @@
-import PageHeader from "@/components/ui/PageHeader"
-import Card from "@/components/ui/Card"
-
 import Link from "next/link"
 
-import EmployeeTable from "@/components/employee/EmployeeTable"
+import Card from "@/components/ui/Card"
+import PageHeader from "@/components/ui/PageHeader"
+import { DataTable } from "@/components/ui/data-table"
+import { employeeColumns } from "@/app/employees/columns"
 
 import { listEmployees } from "@/services/employee"
 
@@ -25,7 +25,11 @@ export default async function EmployeesPage() {
       />
 
       <Card>
-        <EmployeeTable employees={employees} />
+        <DataTable
+          columns={employeeColumns}
+          data={employees}
+          toolbarPlaceholder="Buscar empleado..."
+        />
       </Card>
     </>
   )

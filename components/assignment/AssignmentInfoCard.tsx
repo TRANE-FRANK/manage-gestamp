@@ -1,5 +1,5 @@
 import Card from "@/components/ui/Card"
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 interface Props {
   assignedAt: Date
@@ -31,12 +31,12 @@ export default function AssignmentInformationCard({
 
         <div className="flex gap-2">
           {generated ? (
-            <Badge variant="success">PDF generado</Badge>
+            <Badge variant="default">PDF generado</Badge>
           ) : (
-            <Badge variant="danger">Sin PDF</Badge>
+            <Badge variant="destructive">Sin PDF</Badge>
           )}
 
-          {signed && <Badge variant="success">Firmado</Badge>}
+          {signed && <Badge variant="default">Firmado</Badge>}
         </div>
       </div>
     </Card>

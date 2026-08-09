@@ -1,5 +1,5 @@
 import Card from "@/components/ui/Card"
-import Badge from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 import DetailGrid from "@/components/ui/DetailGrid"
 import DetailItem from "@/components/ui/DetailItem"
 
@@ -36,7 +36,7 @@ export default function EmployeeCurrentEquipmentCard({ employee }: Props) {
         <DetailItem label="Activo fijo">{equipment.assetTag}</DetailItem>
 
         <DetailItem label="Empresa">
-          <Badge variant={equipment.company === "ORM" ? "ORM" : "GP2"}>
+          <Badge variant={equipment.company === "ORM" ? "secondary" : "default"}>
             {equipment.company}
           </Badge>
         </DetailItem>
@@ -48,7 +48,7 @@ export default function EmployeeCurrentEquipmentCard({ employee }: Props) {
         <DetailItem label="Serie">{equipment.serialNumber}</DetailItem>
 
         <DetailItem label="Estado">
-          <Badge variant="success">En uso</Badge>
+          <Badge variant="default">En uso</Badge>
         </DetailItem>
       </DetailGrid>
     </Card>

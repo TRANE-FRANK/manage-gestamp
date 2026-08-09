@@ -1,9 +1,9 @@
-import PageHeader from "@/components/ui/PageHeader"
-import Card from "@/components/ui/Card"
-
 import Link from "next/link"
 
-import AssignmentTable from "@/components/assignment/AssignmentTable"
+import Card from "@/components/ui/Card"
+import PageHeader from "@/components/ui/PageHeader"
+import { DataTable } from "@/components/ui/data-table"
+import { assignmentColumns } from "@/app/assignments/assignment-columns"
 
 import { listActiveAssignments } from "@/services/assignment"
 
@@ -34,7 +34,11 @@ export default async function AssignmentsPage() {
       />
 
       <Card>
-        <AssignmentTable assignments={assignments} />
+        <DataTable
+          columns={assignmentColumns}
+          data={assignments}
+          toolbarPlaceholder="Buscar asignación..."
+        />
       </Card>
     </>
   )

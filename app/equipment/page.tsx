@@ -1,16 +1,16 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma"
 
-import EquipmentToast from "./equipment-toast";
-import PageHeader from "@/components/ui/PageHeader";
-import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
+import EquipmentToast from "./equipment-toast"
+import PageHeader from "@/components/ui/PageHeader"
+import Card from "@/components/ui/Card"
+import { Badge } from "@/components/ui/badge"
 
 export default async function EquipmentPage() {
   const equipment = await prisma.equipment.findMany({
     orderBy: {
       assetTag: "asc",
     },
-  });
+  })
 
   return (
     <>
@@ -52,9 +52,9 @@ export default async function EquipmentPage() {
 
                     <td className="p-4">
                       {item.type === "LAPTOP" ? (
-                        <Badge variant="laptop">Laptop</Badge>
+                        <Badge variant="default">Laptop</Badge>
                       ) : (
-                        <Badge variant="desktop">Desktop</Badge>
+                        <Badge variant="ghost">Desktop</Badge>
                       )}
                     </td>
 
@@ -66,27 +66,27 @@ export default async function EquipmentPage() {
 
                     <td className="p-4">
                       {item.company === "ORM" ? (
-                        <Badge variant="ORM">ORM</Badge>
+                        <Badge variant="default">ORM</Badge>
                       ) : (
-                        <Badge variant="GP2">GP2</Badge>
+                        <Badge variant="ghost">GP2</Badge>
                       )}
                     </td>
 
                     <td className="p-4">
                       {item.status === "AVAILABLE" && (
-                        <Badge variant="success">Disponible</Badge>
+                        <Badge variant="default">Disponible</Badge>
                       )}
 
                       {item.status === "ASSIGNED" && (
-                        <Badge variant="warning">Asignado</Badge>
+                        <Badge variant="destructive">Asignado</Badge>
                       )}
 
                       {item.status === "MAINTENANCE" && (
-                        <Badge variant="danger">Reparación</Badge>
+                        <Badge variant="outline">Reparación</Badge>
                       )}
 
                       {item.status === "RETIRED" && (
-                        <Badge variant="danger">Retirado</Badge>
+                        <Badge variant="secondary">Retirado</Badge>
                       )}
                     </td>
                   </tr>
@@ -98,5 +98,5 @@ export default async function EquipmentPage() {
       </Card>
       <EquipmentToast />
     </>
-  );
+  )
 }
