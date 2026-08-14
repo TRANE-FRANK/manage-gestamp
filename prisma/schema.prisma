@@ -42,6 +42,17 @@ enum ScanResult {
     DENIED
 }
 
+enum ScanReason {
+    ALLOWED
+    INVALID_ASSET_TAG
+    EQUIPMENT_NOT_FOUND
+    NO_PERMIT
+    CANCELLED
+    EXPIRED
+    NOT_STARTED
+    NOT_ACTIVE
+}
+
 model User {
     id           Int      @id @default(autoincrement())
     username     String   @unique
@@ -73,7 +84,7 @@ model Equipment {
     assetTag        String          @unique
     barcode         String?         @unique
     type            EquipmentType?
-    inventoryNumber String?         @unique 
+    inventoryNumber String?         @unique
     serialNumber    String?         @unique
     brand           String?
     model           String?
@@ -104,20 +115,23 @@ model Assignment {
 }
 
 model Permit {
-    id               Int          @id @default(autoincrement())
-    folio            String       @unique
-    employeeId       Int
-    equipmentId      Int
-    startDate        DateTime
-    expirationDate   DateTime
-    status           PermitStatus
-    generatedPdfPath String?
-    signedPdfPath    String?
-    employee         Employee     @relation(fields: [employeeId], references: [id])
-    equipment        Equipment    @relation(fields: [equipmentId], references: [id])
-    scanLogs         ScanLog[]
-    createdAt        DateTime     @default(now())
-    updatedAt        DateTime     @updatedAt
+    id                 Int          @id @default(autoincrement())
+    folio              String       @unique
+    employeeId         Int
+    equipmentId        Int
+    startDate          DateTime
+    expirationDate     DateTime
+    status             PermitStatus
+    generatedPdfPath   String?
+    signedPdfPath      String?
+    cancelledAt        DateTime?
+    cancellationReason String?
+
+    employee  Employee  @relation(fields: [employeeId], references: [id])
+    equipment Equipment @relation(fields: [equipmentId], references: [id])
+    scanLogs  ScanLog[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 
     @@index([employeeId])
     @@index([equipmentId])
@@ -126,14 +140,17 @@ model Permit {
 
 model ScanLog {
     id        Int        @id @default(autoincrement())
-    permitId  Int
+    permitId  Int?
     scannedAt DateTime   @default(now())
+    assetTag  String?
     result    ScanResult
+    reason    ScanReason
     notes     String?
-    permit    Permit     @relation(fields: [permitId], references: [id])
+    permit    Permit?    @relation(fields: [permitId], references: [id])
 
     @@index([permitId])
     @@index([scannedAt])
+    @@index([result])
 }
 
 model Maintenance {

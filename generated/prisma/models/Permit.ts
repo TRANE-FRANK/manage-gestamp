@@ -48,6 +48,8 @@ export type PermitMinAggregateOutputType = {
   status: $Enums.PermitStatus | null
   generatedPdfPath: string | null
   signedPdfPath: string | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +64,8 @@ export type PermitMaxAggregateOutputType = {
   status: $Enums.PermitStatus | null
   generatedPdfPath: string | null
   signedPdfPath: string | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -76,6 +80,8 @@ export type PermitCountAggregateOutputType = {
   status: number
   generatedPdfPath: number
   signedPdfPath: number
+  cancelledAt: number
+  cancellationReason: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -104,6 +110,8 @@ export type PermitMinAggregateInputType = {
   status?: true
   generatedPdfPath?: true
   signedPdfPath?: true
+  cancelledAt?: true
+  cancellationReason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +126,8 @@ export type PermitMaxAggregateInputType = {
   status?: true
   generatedPdfPath?: true
   signedPdfPath?: true
+  cancelledAt?: true
+  cancellationReason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -132,6 +142,8 @@ export type PermitCountAggregateInputType = {
   status?: true
   generatedPdfPath?: true
   signedPdfPath?: true
+  cancelledAt?: true
+  cancellationReason?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -233,6 +245,8 @@ export type PermitGroupByOutputType = {
   status: $Enums.PermitStatus
   generatedPdfPath: string | null
   signedPdfPath: string | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   createdAt: Date
   updatedAt: Date
   _count: PermitCountAggregateOutputType | null
@@ -270,6 +284,8 @@ export type PermitWhereInput = {
   status?: Prisma.EnumPermitStatusFilter<"Permit"> | $Enums.PermitStatus
   generatedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Permit"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Permit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -287,6 +303,8 @@ export type PermitOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   employee?: Prisma.EmployeeOrderByWithRelationInput
@@ -307,6 +325,8 @@ export type PermitWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumPermitStatusFilter<"Permit"> | $Enums.PermitStatus
   generatedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Permit"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Permit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -324,6 +344,8 @@ export type PermitOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PermitCountOrderByAggregateInput
@@ -346,6 +368,8 @@ export type PermitScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumPermitStatusWithAggregatesFilter<"Permit"> | $Enums.PermitStatus
   generatedPdfPath?: Prisma.StringNullableWithAggregatesFilter<"Permit"> | string | null
   signedPdfPath?: Prisma.StringNullableWithAggregatesFilter<"Permit"> | string | null
+  cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Permit"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableWithAggregatesFilter<"Permit"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Permit"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Permit"> | Date | string
 }
@@ -357,6 +381,8 @@ export type PermitCreateInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutPermitsInput
@@ -374,6 +400,8 @@ export type PermitUncheckedCreateInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   scanLogs?: Prisma.ScanLogUncheckedCreateNestedManyWithoutPermitInput
@@ -386,6 +414,8 @@ export type PermitUpdateInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPermitsNestedInput
@@ -403,6 +433,8 @@ export type PermitUncheckedUpdateInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scanLogs?: Prisma.ScanLogUncheckedUpdateManyWithoutPermitNestedInput
@@ -418,6 +450,8 @@ export type PermitCreateManyInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -429,6 +463,8 @@ export type PermitUpdateManyMutationInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -443,6 +479,8 @@ export type PermitUncheckedUpdateManyInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -467,6 +505,8 @@ export type PermitCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -487,6 +527,8 @@ export type PermitMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -501,6 +543,8 @@ export type PermitMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -511,9 +555,9 @@ export type PermitSumOrderByAggregateInput = {
   equipmentId?: Prisma.SortOrder
 }
 
-export type PermitScalarRelationFilter = {
-  is?: Prisma.PermitWhereInput
-  isNot?: Prisma.PermitWhereInput
+export type PermitNullableScalarRelationFilter = {
+  is?: Prisma.PermitWhereInput | null
+  isNot?: Prisma.PermitWhereInput | null
 }
 
 export type PermitCreateNestedManyWithoutEmployeeInput = {
@@ -610,10 +654,12 @@ export type PermitCreateNestedOneWithoutScanLogsInput = {
   connect?: Prisma.PermitWhereUniqueInput
 }
 
-export type PermitUpdateOneRequiredWithoutScanLogsNestedInput = {
+export type PermitUpdateOneWithoutScanLogsNestedInput = {
   create?: Prisma.XOR<Prisma.PermitCreateWithoutScanLogsInput, Prisma.PermitUncheckedCreateWithoutScanLogsInput>
   connectOrCreate?: Prisma.PermitCreateOrConnectWithoutScanLogsInput
   upsert?: Prisma.PermitUpsertWithoutScanLogsInput
+  disconnect?: Prisma.PermitWhereInput | boolean
+  delete?: Prisma.PermitWhereInput | boolean
   connect?: Prisma.PermitWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.PermitUpdateToOneWithWhereWithoutScanLogsInput, Prisma.PermitUpdateWithoutScanLogsInput>, Prisma.PermitUncheckedUpdateWithoutScanLogsInput>
 }
@@ -625,6 +671,8 @@ export type PermitCreateWithoutEmployeeInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment: Prisma.EquipmentCreateNestedOneWithoutPermitsInput
@@ -640,6 +688,8 @@ export type PermitUncheckedCreateWithoutEmployeeInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   scanLogs?: Prisma.ScanLogUncheckedCreateNestedManyWithoutPermitInput
@@ -684,6 +734,8 @@ export type PermitScalarWhereInput = {
   status?: Prisma.EnumPermitStatusFilter<"Permit"> | $Enums.PermitStatus
   generatedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Permit"> | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Permit"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Permit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Permit"> | Date | string
 }
@@ -695,6 +747,8 @@ export type PermitCreateWithoutEquipmentInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutPermitsInput
@@ -710,6 +764,8 @@ export type PermitUncheckedCreateWithoutEquipmentInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   scanLogs?: Prisma.ScanLogUncheckedCreateNestedManyWithoutPermitInput
@@ -748,6 +804,8 @@ export type PermitCreateWithoutScanLogsInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutPermitsInput
@@ -764,6 +822,8 @@ export type PermitUncheckedCreateWithoutScanLogsInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -791,6 +851,8 @@ export type PermitUpdateWithoutScanLogsInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPermitsNestedInput
@@ -807,6 +869,8 @@ export type PermitUncheckedUpdateWithoutScanLogsInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -820,6 +884,8 @@ export type PermitCreateManyEmployeeInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -831,6 +897,8 @@ export type PermitUpdateWithoutEmployeeInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.EquipmentUpdateOneRequiredWithoutPermitsNestedInput
@@ -846,6 +914,8 @@ export type PermitUncheckedUpdateWithoutEmployeeInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scanLogs?: Prisma.ScanLogUncheckedUpdateManyWithoutPermitNestedInput
@@ -860,6 +930,8 @@ export type PermitUncheckedUpdateManyWithoutEmployeeInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -873,6 +945,8 @@ export type PermitCreateManyEquipmentInput = {
   status: $Enums.PermitStatus
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -884,6 +958,8 @@ export type PermitUpdateWithoutEquipmentInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPermitsNestedInput
@@ -899,6 +975,8 @@ export type PermitUncheckedUpdateWithoutEquipmentInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scanLogs?: Prisma.ScanLogUncheckedUpdateManyWithoutPermitNestedInput
@@ -913,6 +991,8 @@ export type PermitUncheckedUpdateManyWithoutEquipmentInput = {
   status?: Prisma.EnumPermitStatusFieldUpdateOperationsInput | $Enums.PermitStatus
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -958,6 +1038,8 @@ export type PermitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   status?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -976,6 +1058,8 @@ export type PermitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   status?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -992,6 +1076,8 @@ export type PermitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   status?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -1008,11 +1094,13 @@ export type PermitSelectScalar = {
   status?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PermitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "folio" | "employeeId" | "equipmentId" | "startDate" | "expirationDate" | "status" | "generatedPdfPath" | "signedPdfPath" | "createdAt" | "updatedAt", ExtArgs["result"]["permit"]>
+export type PermitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "folio" | "employeeId" | "equipmentId" | "startDate" | "expirationDate" | "status" | "generatedPdfPath" | "signedPdfPath" | "cancelledAt" | "cancellationReason" | "createdAt" | "updatedAt", ExtArgs["result"]["permit"]>
 export type PermitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
@@ -1045,6 +1133,8 @@ export type $PermitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     status: $Enums.PermitStatus
     generatedPdfPath: string | null
     signedPdfPath: string | null
+    cancelledAt: Date | null
+    cancellationReason: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["permit"]>
@@ -1482,6 +1572,8 @@ export interface PermitFieldRefs {
   readonly status: Prisma.FieldRef<"Permit", 'PermitStatus'>
   readonly generatedPdfPath: Prisma.FieldRef<"Permit", 'String'>
   readonly signedPdfPath: Prisma.FieldRef<"Permit", 'String'>
+  readonly cancelledAt: Prisma.FieldRef<"Permit", 'DateTime'>
+  readonly cancellationReason: Prisma.FieldRef<"Permit", 'String'>
   readonly createdAt: Prisma.FieldRef<"Permit", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Permit", 'DateTime'>
 }

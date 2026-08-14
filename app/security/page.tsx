@@ -1,26 +1,22 @@
+import SecurityScanner from "@/components/security/SecurityScanner"
+
 export default function SecurityPage() {
   return (
-    <main className="p-6">
-      <div className="mx-auto max-w-xl">
-        <h1 className="mb-6 text-3xl font-bold">Control de Vigilancia</h1>
+    <main className="mx-auto max-w-2xl p-6">
+      <div className="rounded-xl bg-white p-8 shadow-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Control de Vigilancia
+          </h1>
 
-        <form action="/security/search" method="GET" className="space-y-4">
-          <input
-            type="text"
-            name="assetTag"
-            placeholder="Escanear equipo..."
-            className="w-full rounded border p-3"
-            autoFocus
-          />
+          <p className="mt-2 text-slate-500">
+            Escanee la etiqueta del equipo para verificar si está autorizado
+            para salir.
+          </p>
+        </div>
 
-          <button
-            type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-white"
-          >
-            Buscar
-          </button>
-        </form>
+        <SecurityScanner />
       </div>
     </main>
-  );
+  )
 }

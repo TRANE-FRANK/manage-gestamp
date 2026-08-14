@@ -1,46 +1,29 @@
-import Link from "next/link";
+import Link from "next/link"
 
-import { prisma } from "@/lib/prisma";
+import PageHeader from "@/components/ui/PageHeader"
+import Card from "@/components/ui/Card"
+import { DataTable } from "@/components/ui/data-table"
+import { permitColumns } from "./columns"
+import SearchForm from "./search-form"
 
-import SearchForm from "./search-form";
-
-import PageHeader from "@/components/ui/PageHeader";
-import Card from "@/components/ui/Card";
-import { Badge } from "@/components/ui/badge";
+import { getPermitDisplayStatus, listPermits } from "@/services/permit"
 
 export default async function PermitsPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    status?: string;
-    search?: string;
-  }>;
+    status?: string
+    search?: string
+  }>
 }) {
-  const { status, search } = await searchParams;
+  const { status, search } = await searchParams
 
-  const permits = await prisma.permit.findMany({
-    include: {
-      employee: true,
-      equipment: true,
-    },
+  const permits = await listPermits()
 
-    orderBy: {
-      expirationDate: "asc",
-    },
-  });
-
-  function calculateDaysRemaining(expirationDate: Date) {
-    const now = new Date();
-
-    const difference = expirationDate.getTime() - now.getTime();
-
-    return Math.ceil(difference / (1000 * 60 * 60 * 24));
-  }
-
-  let filteredPermits = permits;
+  let filteredPermits = permits
 
   if (search) {
-    const searchTerm = search.toLowerCase();
+    const searchTerm = search.toLowerCase()
 
     filteredPermits = filteredPermits.filter(
       (permit) =>
@@ -48,39 +31,52 @@ export default async function PermitsPage({
         permit.equipment.assetTag.toLowerCase().includes(searchTerm) ||
         permit.employee.firstName.toLowerCase().includes(searchTerm) ||
         permit.employee.lastName.toLowerCase().includes(searchTerm),
-    );
+    )
   }
 
   if (status === "active") {
-    filteredPermits = filteredPermits.filter((permit) => {
-      const daysLeft = calculateDaysRemaining(permit.expirationDate);
-
-      return daysLeft > 30;
-    });
+    filteredPermits = filteredPermits.filter(
+      (permit) =>
+        permit.status === "ACTIVE" &&
+        getPermitDisplayStatus(permit.expirationDate) === "active",
+    )
   }
 
   if (status === "expiring") {
-    filteredPermits = filteredPermits.filter((permit) => {
-      const daysLeft = calculateDaysRemaining(permit.expirationDate);
-
-      return daysLeft >= 0 && daysLeft <= 30;
-    });
+    filteredPermits = filteredPermits.filter(
+      (permit) =>
+        permit.status === "ACTIVE" &&
+        getPermitDisplayStatus(permit.expirationDate) === "expiring",
+    )
   }
 
   if (status === "expired") {
-    filteredPermits = filteredPermits.filter((permit) => {
-      const daysLeft = calculateDaysRemaining(permit.expirationDate);
+    filteredPermits = filteredPermits.filter(
+      (permit) =>
+        permit.status === "EXPIRED" ||
+        (permit.status === "ACTIVE" &&
+          getPermitDisplayStatus(permit.expirationDate) === "expired"),
+    )
+  }
 
-      return daysLeft < 0;
-    });
+  if (status === "cancelled") {
+    filteredPermits = filteredPermits.filter(
+      (permit) => permit.status === "CANCELLED",
+    )
   }
 
   return (
     <>
       <PageHeader
-        title="Permisos de Salida"
-        buttonText="Nuevo Permiso"
-        buttonHref="/permits/new"
+        title="Permisos"
+        actions={
+          <Link
+            href="/permits/new"
+            className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Nuevo permiso
+          </Link>
+        }
       />
 
       <Card>
@@ -113,117 +109,26 @@ export default async function PermitsPage({
             Expirados
           </Link>
 
+          <Link
+            href="/permits?status=cancelled"
+            className="rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+          >
+            Cancelados
+          </Link>
           <div className="ml-auto">
             <SearchForm />
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-slate-50">
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Folio
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Usuario
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Empresa
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Equipo
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Expiración
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Estado
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Días Restantes
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  PDF Firmado
-                </th>
-
-                <th className="p-4 text-left font-semibold text-slate-700">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredPermits.map((permit) => {
-                const daysLeft = calculateDaysRemaining(permit.expirationDate);
-
-                return (
-                  <tr
-                    key={permit.id}
-                    className="border-b transition hover:bg-slate-50"
-                  >
-                    <td className="p-4 font-medium">{permit.folio}</td>
-
-                    <td className="p-4">
-                      {permit.employee.firstName} {permit.employee.lastName}
-                    </td>
-
-                    <td className="p-4">{permit.equipment.company}</td>
-
-                    <td className="p-4 font-medium">
-                      {permit.equipment.assetTag}
-                    </td>
-
-                    <td className="p-4">
-                      {permit.expirationDate.toLocaleDateString("es-MX")}
-                    </td>
-
-                    <td className="p-4">
-                      {daysLeft < 0 ? (
-                        <Badge variant="destructive">Expirado</Badge>
-                      ) : daysLeft <= 30 ? (
-                        <Badge variant="outline">Por vencer</Badge>
-                      ) : (
-                        <Badge variant="default">Activo</Badge>
-                      )}
-                    </td>
-
-                    <td className="p-4">
-                      {daysLeft < 0
-                        ? `Vencido hace ${Math.abs(daysLeft)} días`
-                        : `${daysLeft} días`}
-                    </td>
-
-                    <td className="p-4">
-                      {permit.signedPdfPath ? (
-                        <Badge variant="default">Sí</Badge>
-                      ) : (
-                        <Badge variant="outline">Pendiente</Badge>
-                      )}
-                    </td>
-
-                    <td className="p-4">
-                      <Link
-                        href={`/permits/${permit.id}/renew`}
-                        className="rounded-lg bg-blue-700 px-3 py-2 text-white transition hover:bg-blue-800"
-                      >
-                        Renovar
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <DataTable
+            columns={permitColumns}
+            data={filteredPermits}
+            toolbarPlaceholder="Buscar permiso..."
+            emptyMessage="No existen permisos registrados."
+          />
         </div>
       </Card>
     </>
-  );
+  )
 }

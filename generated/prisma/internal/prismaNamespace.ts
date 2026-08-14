@@ -1040,6 +1040,8 @@ export const PermitScalarFieldEnum = {
   status: 'status',
   generatedPdfPath: 'generatedPdfPath',
   signedPdfPath: 'signedPdfPath',
+  cancelledAt: 'cancelledAt',
+  cancellationReason: 'cancellationReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1051,7 +1053,9 @@ export const ScanLogScalarFieldEnum = {
   id: 'id',
   permitId: 'permitId',
   scannedAt: 'scannedAt',
+  assetTag: 'assetTag',
   result: 'result',
+  reason: 'reason',
   notes: 'notes'
 } as const
 
@@ -1226,6 +1230,20 @@ export type EnumScanResultFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'ScanResult[]'
  */
 export type ListEnumScanResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScanResult[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ScanReason'
+ */
+export type EnumScanReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScanReason'>
+    
+
+
+/**
+ * Reference to a field of type 'ScanReason[]'
+ */
+export type ListEnumScanReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScanReason[]'>
     
 
 

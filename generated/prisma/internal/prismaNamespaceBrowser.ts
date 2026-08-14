@@ -149,6 +149,8 @@ export const PermitScalarFieldEnum = {
   status: 'status',
   generatedPdfPath: 'generatedPdfPath',
   signedPdfPath: 'signedPdfPath',
+  cancelledAt: 'cancelledAt',
+  cancellationReason: 'cancellationReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -160,7 +162,9 @@ export const ScanLogScalarFieldEnum = {
   id: 'id',
   permitId: 'permitId',
   scannedAt: 'scannedAt',
+  assetTag: 'assetTag',
   result: 'result',
+  reason: 'reason',
   notes: 'notes'
 } as const
 

@@ -44,11 +44,33 @@ export async function findAssignmentHistory() {
   })
 }
 
+export async function findActiveAssignmentsByEmployeeId(employeeId: number) {
+  return prisma.assignment.findMany({
+    where: {
+      employeeId,
+      returnedAt: null,
+    },
+    include: {
+      equipment: true,
+    },
+    orderBy: {
+      assignedAt: "desc",
+    },
+  })
+}
+
 export async function findActiveAssignmentByEquipment(equipmentId: number) {
   return prisma.assignment.findFirst({
     where: {
       equipmentId,
       returnedAt: null,
+    },
+    include: {
+      employee: true,
+      equipment: true,
+    },
+    orderBy: {
+      assignedAt: "desc",
     },
   })
 }

@@ -40,7 +40,9 @@ export type ScanLogMinAggregateOutputType = {
   id: number | null
   permitId: number | null
   scannedAt: Date | null
+  assetTag: string | null
   result: $Enums.ScanResult | null
+  reason: $Enums.ScanReason | null
   notes: string | null
 }
 
@@ -48,7 +50,9 @@ export type ScanLogMaxAggregateOutputType = {
   id: number | null
   permitId: number | null
   scannedAt: Date | null
+  assetTag: string | null
   result: $Enums.ScanResult | null
+  reason: $Enums.ScanReason | null
   notes: string | null
 }
 
@@ -56,7 +60,9 @@ export type ScanLogCountAggregateOutputType = {
   id: number
   permitId: number
   scannedAt: number
+  assetTag: number
   result: number
+  reason: number
   notes: number
   _all: number
 }
@@ -76,7 +82,9 @@ export type ScanLogMinAggregateInputType = {
   id?: true
   permitId?: true
   scannedAt?: true
+  assetTag?: true
   result?: true
+  reason?: true
   notes?: true
 }
 
@@ -84,7 +92,9 @@ export type ScanLogMaxAggregateInputType = {
   id?: true
   permitId?: true
   scannedAt?: true
+  assetTag?: true
   result?: true
+  reason?: true
   notes?: true
 }
 
@@ -92,7 +102,9 @@ export type ScanLogCountAggregateInputType = {
   id?: true
   permitId?: true
   scannedAt?: true
+  assetTag?: true
   result?: true
+  reason?: true
   notes?: true
   _all?: true
 }
@@ -185,9 +197,11 @@ export type ScanLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type ScanLogGroupByOutputType = {
   id: number
-  permitId: number
+  permitId: number | null
   scannedAt: Date
+  assetTag: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes: string | null
   _count: ScanLogCountAggregateOutputType | null
   _avg: ScanLogAvgAggregateOutputType | null
@@ -216,18 +230,22 @@ export type ScanLogWhereInput = {
   OR?: Prisma.ScanLogWhereInput[]
   NOT?: Prisma.ScanLogWhereInput | Prisma.ScanLogWhereInput[]
   id?: Prisma.IntFilter<"ScanLog"> | number
-  permitId?: Prisma.IntFilter<"ScanLog"> | number
+  permitId?: Prisma.IntNullableFilter<"ScanLog"> | number | null
   scannedAt?: Prisma.DateTimeFilter<"ScanLog"> | Date | string
+  assetTag?: Prisma.StringNullableFilter<"ScanLog"> | string | null
   result?: Prisma.EnumScanResultFilter<"ScanLog"> | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFilter<"ScanLog"> | $Enums.ScanReason
   notes?: Prisma.StringNullableFilter<"ScanLog"> | string | null
-  permit?: Prisma.XOR<Prisma.PermitScalarRelationFilter, Prisma.PermitWhereInput>
+  permit?: Prisma.XOR<Prisma.PermitNullableScalarRelationFilter, Prisma.PermitWhereInput> | null
 }
 
 export type ScanLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  permitId?: Prisma.SortOrder
+  permitId?: Prisma.SortOrderInput | Prisma.SortOrder
   scannedAt?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrderInput | Prisma.SortOrder
   result?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   permit?: Prisma.PermitOrderByWithRelationInput
 }
@@ -237,18 +255,22 @@ export type ScanLogWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ScanLogWhereInput | Prisma.ScanLogWhereInput[]
   OR?: Prisma.ScanLogWhereInput[]
   NOT?: Prisma.ScanLogWhereInput | Prisma.ScanLogWhereInput[]
-  permitId?: Prisma.IntFilter<"ScanLog"> | number
+  permitId?: Prisma.IntNullableFilter<"ScanLog"> | number | null
   scannedAt?: Prisma.DateTimeFilter<"ScanLog"> | Date | string
+  assetTag?: Prisma.StringNullableFilter<"ScanLog"> | string | null
   result?: Prisma.EnumScanResultFilter<"ScanLog"> | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFilter<"ScanLog"> | $Enums.ScanReason
   notes?: Prisma.StringNullableFilter<"ScanLog"> | string | null
-  permit?: Prisma.XOR<Prisma.PermitScalarRelationFilter, Prisma.PermitWhereInput>
+  permit?: Prisma.XOR<Prisma.PermitNullableScalarRelationFilter, Prisma.PermitWhereInput> | null
 }, "id">
 
 export type ScanLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  permitId?: Prisma.SortOrder
+  permitId?: Prisma.SortOrderInput | Prisma.SortOrder
   scannedAt?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrderInput | Prisma.SortOrder
   result?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ScanLogCountOrderByAggregateInput
   _avg?: Prisma.ScanLogAvgOrderByAggregateInput
@@ -262,61 +284,77 @@ export type ScanLogScalarWhereWithAggregatesInput = {
   OR?: Prisma.ScanLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ScanLogScalarWhereWithAggregatesInput | Prisma.ScanLogScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"ScanLog"> | number
-  permitId?: Prisma.IntWithAggregatesFilter<"ScanLog"> | number
+  permitId?: Prisma.IntNullableWithAggregatesFilter<"ScanLog"> | number | null
   scannedAt?: Prisma.DateTimeWithAggregatesFilter<"ScanLog"> | Date | string
+  assetTag?: Prisma.StringNullableWithAggregatesFilter<"ScanLog"> | string | null
   result?: Prisma.EnumScanResultWithAggregatesFilter<"ScanLog"> | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonWithAggregatesFilter<"ScanLog"> | $Enums.ScanReason
   notes?: Prisma.StringNullableWithAggregatesFilter<"ScanLog"> | string | null
 }
 
 export type ScanLogCreateInput = {
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
-  permit: Prisma.PermitCreateNestedOneWithoutScanLogsInput
+  permit?: Prisma.PermitCreateNestedOneWithoutScanLogsInput
 }
 
 export type ScanLogUncheckedCreateInput = {
   id?: number
-  permitId: number
+  permitId?: number | null
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
 }
 
 export type ScanLogUpdateInput = {
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  permit?: Prisma.PermitUpdateOneRequiredWithoutScanLogsNestedInput
+  permit?: Prisma.PermitUpdateOneWithoutScanLogsNestedInput
 }
 
 export type ScanLogUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  permitId?: Prisma.IntFieldUpdateOperationsInput | number
+  permitId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScanLogCreateManyInput = {
   id?: number
-  permitId: number
+  permitId?: number | null
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
 }
 
 export type ScanLogUpdateManyMutationInput = {
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScanLogUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  permitId?: Prisma.IntFieldUpdateOperationsInput | number
+  permitId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -334,7 +372,9 @@ export type ScanLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   permitId?: Prisma.SortOrder
   scannedAt?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrder
   result?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   notes?: Prisma.SortOrder
 }
 
@@ -347,7 +387,9 @@ export type ScanLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   permitId?: Prisma.SortOrder
   scannedAt?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrder
   result?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   notes?: Prisma.SortOrder
 }
 
@@ -355,7 +397,9 @@ export type ScanLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   permitId?: Prisma.SortOrder
   scannedAt?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrder
   result?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   notes?: Prisma.SortOrder
 }
 
@@ -410,16 +454,32 @@ export type EnumScanResultFieldUpdateOperationsInput = {
   set?: $Enums.ScanResult
 }
 
+export type EnumScanReasonFieldUpdateOperationsInput = {
+  set?: $Enums.ScanReason
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ScanLogCreateWithoutPermitInput = {
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
 }
 
 export type ScanLogUncheckedCreateWithoutPermitInput = {
   id?: number
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
 }
 
@@ -454,36 +514,46 @@ export type ScanLogScalarWhereInput = {
   OR?: Prisma.ScanLogScalarWhereInput[]
   NOT?: Prisma.ScanLogScalarWhereInput | Prisma.ScanLogScalarWhereInput[]
   id?: Prisma.IntFilter<"ScanLog"> | number
-  permitId?: Prisma.IntFilter<"ScanLog"> | number
+  permitId?: Prisma.IntNullableFilter<"ScanLog"> | number | null
   scannedAt?: Prisma.DateTimeFilter<"ScanLog"> | Date | string
+  assetTag?: Prisma.StringNullableFilter<"ScanLog"> | string | null
   result?: Prisma.EnumScanResultFilter<"ScanLog"> | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFilter<"ScanLog"> | $Enums.ScanReason
   notes?: Prisma.StringNullableFilter<"ScanLog"> | string | null
 }
 
 export type ScanLogCreateManyPermitInput = {
   id?: number
   scannedAt?: Date | string
+  assetTag?: string | null
   result: $Enums.ScanResult
+  reason: $Enums.ScanReason
   notes?: string | null
 }
 
 export type ScanLogUpdateWithoutPermitInput = {
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScanLogUncheckedUpdateWithoutPermitInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScanLogUncheckedUpdateManyWithoutPermitInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   result?: Prisma.EnumScanResultFieldUpdateOperationsInput | $Enums.ScanResult
+  reason?: Prisma.EnumScanReasonFieldUpdateOperationsInput | $Enums.ScanReason
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -493,58 +563,68 @@ export type ScanLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   permitId?: boolean
   scannedAt?: boolean
+  assetTag?: boolean
   result?: boolean
+  reason?: boolean
   notes?: boolean
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }, ExtArgs["result"]["scanLog"]>
 
 export type ScanLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   permitId?: boolean
   scannedAt?: boolean
+  assetTag?: boolean
   result?: boolean
+  reason?: boolean
   notes?: boolean
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }, ExtArgs["result"]["scanLog"]>
 
 export type ScanLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   permitId?: boolean
   scannedAt?: boolean
+  assetTag?: boolean
   result?: boolean
+  reason?: boolean
   notes?: boolean
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }, ExtArgs["result"]["scanLog"]>
 
 export type ScanLogSelectScalar = {
   id?: boolean
   permitId?: boolean
   scannedAt?: boolean
+  assetTag?: boolean
   result?: boolean
+  reason?: boolean
   notes?: boolean
 }
 
-export type ScanLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "permitId" | "scannedAt" | "result" | "notes", ExtArgs["result"]["scanLog"]>
+export type ScanLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "permitId" | "scannedAt" | "assetTag" | "result" | "reason" | "notes", ExtArgs["result"]["scanLog"]>
 export type ScanLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }
 export type ScanLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }
 export type ScanLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  permit?: boolean | Prisma.PermitDefaultArgs<ExtArgs>
+  permit?: boolean | Prisma.ScanLog$permitArgs<ExtArgs>
 }
 
 export type $ScanLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ScanLog"
   objects: {
-    permit: Prisma.$PermitPayload<ExtArgs>
+    permit: Prisma.$PermitPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    permitId: number
+    permitId: number | null
     scannedAt: Date
+    assetTag: string | null
     result: $Enums.ScanResult
+    reason: $Enums.ScanReason
     notes: string | null
   }, ExtArgs["result"]["scanLog"]>
   composites: {}
@@ -940,7 +1020,7 @@ readonly fields: ScanLogFieldRefs;
  */
 export interface Prisma__ScanLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  permit<T extends Prisma.PermitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PermitDefaultArgs<ExtArgs>>): Prisma.Prisma__PermitClient<runtime.Types.Result.GetResult<Prisma.$PermitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  permit<T extends Prisma.ScanLog$permitArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScanLog$permitArgs<ExtArgs>>): Prisma.Prisma__PermitClient<runtime.Types.Result.GetResult<Prisma.$PermitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -973,7 +1053,9 @@ export interface ScanLogFieldRefs {
   readonly id: Prisma.FieldRef<"ScanLog", 'Int'>
   readonly permitId: Prisma.FieldRef<"ScanLog", 'Int'>
   readonly scannedAt: Prisma.FieldRef<"ScanLog", 'DateTime'>
+  readonly assetTag: Prisma.FieldRef<"ScanLog", 'String'>
   readonly result: Prisma.FieldRef<"ScanLog", 'ScanResult'>
+  readonly reason: Prisma.FieldRef<"ScanLog", 'ScanReason'>
   readonly notes: Prisma.FieldRef<"ScanLog", 'String'>
 }
     
@@ -1373,6 +1455,25 @@ export type ScanLogDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many ScanLogs to delete.
    */
   limit?: number
+}
+
+/**
+ * ScanLog.permit
+ */
+export type ScanLog$permitArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Permit
+   */
+  select?: Prisma.PermitSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Permit
+   */
+  omit?: Prisma.PermitOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PermitInclude<ExtArgs> | null
+  where?: Prisma.PermitWhereInput
 }
 
 /**

@@ -1,40 +1,178 @@
-"use server";
+"use server"
 
-import { prisma } from "@/lib/prisma";
-import { PermitStatus } from "@/generated/prisma/enums";
+import { revalidatePath } from "next/cache"
 
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import {
+  cancelPermit as cancelPermitService,
+  createPermit as createPermitService,
+  renewPermit,
+} from "@/services/permit"
 
-export async function createPermit(formData: FormData) {
-  const folio = formData.get("folio") as string;
-  const employeeId = Number(formData.get("employeeId"));
-  const equipmentId = Number(formData.get("equipmentId"));
-  const startDate = formData.get("startDate") as string;
-  const expirationDate = formData.get("expirationDate") as string;
+import { BusinessError } from "@/services/shared/errors"
 
-  const activePermit = await prisma.permit.findFirst({
-    where: {
-      equipmentId,
-      status: PermitStatus.ACTIVE,
-    },
-  });
+import type { ActionResult } from "@/services/shared/types/action-result"
 
-  if (activePermit) {
-    throw new Error("Este equipo ya cuenta con un permiso activo.");
-  }
+export async function createPermit(
+  formData: FormData,
+): Promise<ActionResult<void>> {
+  try {
+    const folio = formData.get("folio")
+    const employeeIdValue = formData.get("employeeId")
+    const equipmentIdValue = formData.get("equipmentId")
+    const startDateValue = formData.get("startDate")
+    const expirationDateValue = formData.get("expirationDate")
 
-  await prisma.permit.create({
-    data: {
+    if (
+      typeof folio !== "string" ||
+      typeof employeeIdValue !== "string" ||
+      typeof equipmentIdValue !== "string" ||
+      typeof startDateValue !== "string" ||
+      typeof expirationDateValue !== "string"
+    ) {
+      throw new BusinessError("Todos los campos son obligatorios.")
+    }
+
+    const employeeId = Number(employeeIdValue)
+    const equipmentId = Number(equipmentIdValue)
+
+    if (!Number.isInteger(employeeId) || !Number.isInteger(equipmentId)) {
+      throw new BusinessError("El empleado o equipo seleccionado no es válido.")
+    }
+
+    const startDate = new Date(`${startDateValue}T00:00:00`)
+
+    const expirationDate = new Date(`${expirationDateValue}T00:00:00`)
+
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(expirationDate.getTime())
+    ) {
+      throw new BusinessError("Las fechas proporcionadas no son válidas.")
+    }
+
+    await createPermitService({
       folio,
       employeeId,
       equipmentId,
-      startDate: new Date(startDate),
-      expirationDate: new Date(expirationDate),
-      status: PermitStatus.ACTIVE,
-    },
-  });
+      startDate,
+      expirationDate,
+    })
 
-  revalidatePath("/permits");
-  redirect("/permits");
+    revalidatePath("/permits")
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+export async function renewPermitAction(
+  permitId: number,
+  formData: FormData,
+): Promise<ActionResult<void>> {
+  try {
+    const startDateValue = formData.get("startDate")
+    const expirationDateValue = formData.get("expirationDate")
+
+    if (
+      typeof startDateValue !== "string" ||
+      typeof expirationDateValue !== "string"
+    ) {
+      throw new BusinessError("Las fechas de renovación son obligatorias.")
+    }
+
+    const startDate = new Date(`${startDateValue}T00:00:00`)
+
+    const expirationDate = new Date(`${expirationDateValue}T00:00:00`)
+
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(expirationDate.getTime())
+    ) {
+      throw new BusinessError("Las fechas proporcionadas no son válidas.")
+    }
+
+    await renewPermit({
+      permitId,
+      startDate,
+      expirationDate,
+    })
+
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}/renew`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+export async function cancelPermitAction(
+  permitId: number,
+  reason: string,
+): Promise<ActionResult<void>> {
+  try {
+    const cancellationReason = reason.trim()
+
+    if (!cancellationReason) {
+      throw new BusinessError("Debes indicar el motivo de cancelación.")
+    }
+
+    if (cancellationReason.length < 5) {
+      throw new BusinessError(
+        "El motivo de cancelación debe tener al menos 5 caracteres.",
+      )
+    }
+
+    await cancelPermitService(permitId, cancellationReason)
+
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
 }

@@ -8,3 +8,5 @@ export * from "./details"
 export * from "./history"
 export * from "./list"
 export * from "./queries"
+
+export { getActiveAssignmentsByEmployeeId } from "./service"

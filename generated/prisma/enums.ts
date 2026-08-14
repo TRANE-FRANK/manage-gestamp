@@ -60,3 +60,17 @@ export const ScanResult = {
 } as const
 
 export type ScanResult = (typeof ScanResult)[keyof typeof ScanResult]
+
+
+export const ScanReason = {
+  ALLOWED: 'ALLOWED',
+  INVALID_ASSET_TAG: 'INVALID_ASSET_TAG',
+  EQUIPMENT_NOT_FOUND: 'EQUIPMENT_NOT_FOUND',
+  NO_PERMIT: 'NO_PERMIT',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  NOT_STARTED: 'NOT_STARTED',
+  NOT_ACTIVE: 'NOT_ACTIVE'
+} as const
+
+export type ScanReason = (typeof ScanReason)[keyof typeof ScanReason]
