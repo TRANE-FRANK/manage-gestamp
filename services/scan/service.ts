@@ -267,12 +267,24 @@ export async function listScanLogs(filters?: {
   return findScanLogs(filters)
 }
 
-export async function getScanStats(startDate: Date, endDate: Date) {
-  return getScanLogStats(startDate, endDate)
+export async function getScanStats(filters: {
+  startDate: Date
+  endDate: Date
+  result?: "ALLOWED" | "DENIED"
+  search?: string
+}) {
+  return getScanLogStats(filters)
 }
 
-export async function getEquipmentUsage(startDate: Date, endDate: Date) {
-  const scans = await getAllowedScansByEquipment(startDate, endDate)
+export async function getEquipmentUsage(filters: {
+  startDate: Date
+  endDate: Date
+  search?: string
+}) {
+  const scans = await getAllowedScansByEquipment(
+    filters.startDate,
+    filters.endDate,
+  )
 
   const usage = new Map<
     string,
@@ -284,7 +296,9 @@ export async function getEquipmentUsage(startDate: Date, endDate: Date) {
   >()
 
   for (const scan of scans) {
-    if (!scan.assetTag) {
+    const assetTag = scan.assetTag ?? scan.permit?.equipment.assetTag
+
+    if (!assetTag) {
       continue
     }
 
@@ -292,25 +306,31 @@ export async function getEquipmentUsage(startDate: Date, endDate: Date) {
       ? `${scan.permit.employee.firstName} ${scan.permit.employee.lastName}`
       : "Sin empleado"
 
-    const existing = usage.get(scan.assetTag)
+    const existing = usage.get(assetTag)
 
     if (existing) {
       existing.count += 1
       continue
     }
 
-    usage.set(scan.assetTag, {
-      assetTag: scan.assetTag,
+    usage.set(assetTag, {
+      assetTag,
       employee,
       count: 1,
     })
   }
 
-  return Array.from(usage.values()).sort((a, b) => b.count - a.count)
+  return Array.from(usage.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 }
 
-export async function getEmployeeUsage(startDate: Date, endDate: Date) {
-  const scans = await getAllowedScansByEmployee(startDate, endDate)
+export async function getEmployeeUsage(filters: {
+  startDate: Date
+  endDate: Date
+  search?: string
+}) {
+  const scans = await getAllowedScansByEmployee(filters)
 
   const usage = new Map<
     number,
@@ -342,11 +362,18 @@ export async function getEmployeeUsage(startDate: Date, endDate: Date) {
     })
   }
 
-  return Array.from(usage.values()).sort((a, b) => b.count - a.count)
+  return Array.from(usage.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 }
 
-export async function getValidationStats(startDate: Date, endDate: Date) {
-  const stats = await getScanReasonStats(startDate, endDate)
+export async function getValidationStats(filters: {
+  startDate: Date
+  endDate: Date
+  result?: "ALLOWED" | "DENIED"
+  search?: string
+}) {
+  const stats = await getScanReasonStats(filters)
 
   return stats.map((item) => ({
     reason: item.reason,

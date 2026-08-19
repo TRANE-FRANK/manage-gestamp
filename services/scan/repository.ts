@@ -161,12 +161,64 @@ export async function findScanLogs(filters?: {
   }
 }
 
-export async function getScanLogStats(startDate: Date, endDate: Date) {
+export async function getScanLogStats(filters: {
+  startDate: Date
+  endDate: Date
+  result?: "ALLOWED" | "DENIED"
+  search?: string
+}) {
   const where = {
     scannedAt: {
-      gte: startDate,
-      lt: endDate,
+      gte: filters.startDate,
+      lt: filters.endDate,
     },
+
+    ...(filters.result
+      ? {
+          result: filters.result,
+        }
+      : {}),
+
+    ...(filters.search
+      ? {
+          OR: [
+            {
+              assetTag: {
+                contains: filters.search,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              permit: {
+                employee: {
+                  firstName: {
+                    contains: filters.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              },
+            },
+            {
+              permit: {
+                employee: {
+                  lastName: {
+                    contains: filters.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              },
+            },
+            {
+              permit: {
+                folio: {
+                  contains: filters.search,
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          ],
+        }
+      : {}),
   }
 
   const [total, allowed, denied, equipmentLogs] = await Promise.all([
@@ -231,6 +283,11 @@ export async function getAllowedScansByEquipment(
       assetTag: true,
       permit: {
         select: {
+          equipment: {
+            select: {
+              assetTag: true,
+            },
+          },
           employee: {
             select: {
               firstName: true,
@@ -246,21 +303,65 @@ export async function getAllowedScansByEquipment(
   })
 }
 
-export async function getAllowedScansByEmployee(
-  startDate: Date,
-  endDate: Date,
-) {
+export async function getAllowedScansByEmployee(filters: {
+  startDate: Date
+  endDate: Date
+  search?: string
+}) {
   return prisma.scanLog.findMany({
     where: {
       scannedAt: {
-        gte: startDate,
-        lt: endDate,
+        gte: filters.startDate,
+        lt: filters.endDate,
       },
       result: "ALLOWED",
+
       permitId: {
         not: null,
       },
+
+      ...(filters.search
+        ? {
+            OR: [
+              {
+                assetTag: {
+                  contains: filters.search,
+                  mode: "insensitive",
+                },
+              },
+              {
+                permit: {
+                  employee: {
+                    firstName: {
+                      contains: filters.search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              },
+              {
+                permit: {
+                  employee: {
+                    lastName: {
+                      contains: filters.search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              },
+              {
+                permit: {
+                  folio: {
+                    contains: filters.search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
     },
+
     select: {
       permit: {
         select: {
@@ -274,21 +375,76 @@ export async function getAllowedScansByEmployee(
         },
       },
     },
+
     orderBy: {
       scannedAt: "desc",
     },
   })
 }
 
-export async function getScanReasonStats(startDate: Date, endDate: Date) {
+export async function getScanReasonStats(filters: {
+  startDate: Date
+  endDate: Date
+  result?: "ALLOWED" | "DENIED"
+  search?: string
+}) {
+  const where = {
+    scannedAt: {
+      gte: filters.startDate,
+      lt: filters.endDate,
+    },
+
+    ...(filters.result
+      ? {
+          result: filters.result,
+        }
+      : {}),
+
+    ...(filters.search
+      ? {
+          OR: [
+            {
+              assetTag: {
+                contains: filters.search,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              permit: {
+                employee: {
+                  firstName: {
+                    contains: filters.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              },
+            },
+            {
+              permit: {
+                employee: {
+                  lastName: {
+                    contains: filters.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              },
+            },
+            {
+              permit: {
+                folio: {
+                  contains: filters.search,
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          ],
+        }
+      : {}),
+  }
+
   return prisma.scanLog.groupBy({
     by: ["reason"],
-    where: {
-      scannedAt: {
-        gte: startDate,
-        lt: endDate,
-      },
-    },
+    where,
     _count: {
       reason: true,
     },
