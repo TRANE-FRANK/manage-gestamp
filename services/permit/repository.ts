@@ -102,3 +102,64 @@ export async function findPermitForScan(folio: string) {
     },
   })
 }
+
+export async function authorizeExceptionalDeparture(
+  permitId: number,
+  reason: string,
+) {
+  return prisma.permit.update({
+    where: {
+      id: permitId,
+    },
+    data: {
+      departureAuthorized: true,
+      departureAuthorizedAt: new Date(),
+      departureAuthorizationReason: reason,
+    },
+    include: permitInclude,
+  })
+}
+
+export async function updatePermitGeneratedDocument(
+  permitId: number,
+  generatedPdfPath: string,
+) {
+  return prisma.permit.update({
+    where: {
+      id: permitId,
+    },
+    data: {
+      generatedPdfPath,
+    },
+  })
+}
+
+export async function updatePermitSignedDocument(
+  permitId: number,
+  signedPdfPath: string,
+) {
+  return prisma.permit.update({
+    where: {
+      id: permitId,
+    },
+    data: {
+      signedPdfPath,
+      departureAuthorized: true,
+    },
+  })
+}
+
+export async function updatePermitDepartureAuthorization(
+  permitId: number,
+  departureAuthorized: boolean,
+) {
+  return prisma.permit.update({
+    where: {
+      id: permitId,
+    },
+    data: {
+      departureAuthorized,
+    },
+  })
+}
+

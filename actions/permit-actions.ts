@@ -6,7 +6,12 @@ import {
   cancelPermit as cancelPermitService,
   createPermit as createPermitService,
   renewPermit,
+  authorizeExceptionalDeparture,
+  uploadSignedPermitPdf,
+  setPermitDepartureAuthorization,
 } from "@/services/permit"
+
+
 
 import { BusinessError } from "@/services/shared/errors"
 
@@ -176,3 +181,123 @@ export async function cancelPermitAction(
     }
   }
 }
+
+export async function authorizeExceptionalDepartureAction(
+  permitId: number,
+  formData: FormData,
+): Promise<ActionResult<void>> {
+  try {
+    const reason = formData.get("reason")
+
+    if (typeof reason !== "string") {
+      throw new BusinessError(
+        "Debes indicar el motivo de la autorización excepcional.",
+      )
+    }
+
+    const authorizationReason = reason.trim()
+
+    if (!authorizationReason) {
+      throw new BusinessError(
+        "Debes indicar el motivo de la autorización excepcional.",
+      )
+    }
+
+    if (authorizationReason.length < 5) {
+      throw new BusinessError(
+        "El motivo de la autorización debe tener al menos 5 caracteres.",
+      )
+    }
+
+    await authorizeExceptionalDeparture(permitId, authorizationReason)
+
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+export async function uploadSignedPermitPdfAction(
+  permitId: number,
+  formData: FormData,
+): Promise<ActionResult<void>> {
+  try {
+    const file = formData.get("file")
+
+    if (!(file instanceof File)) {
+      throw new BusinessError("Debes seleccionar un archivo PDF.")
+    }
+
+    await uploadSignedPermitPdf(permitId, file)
+
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+export async function setPermitDepartureAuthorizationAction(
+  permitId: number,
+  departureAuthorized: boolean,
+): Promise<ActionResult<void>> {
+  try {
+    await setPermitDepartureAuthorization(permitId, departureAuthorized)
+
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+

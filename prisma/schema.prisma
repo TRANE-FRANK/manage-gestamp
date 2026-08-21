@@ -115,15 +115,21 @@ model Assignment {
 }
 
 model Permit {
-    id                 Int          @id @default(autoincrement())
-    folio              String       @unique
-    employeeId         Int
-    equipmentId        Int
-    startDate          DateTime
-    expirationDate     DateTime
-    status             PermitStatus
-    generatedPdfPath   String?
-    signedPdfPath      String?
+    id             Int          @id @default(autoincrement())
+    folio          String       @unique
+    employeeId     Int
+    equipmentId    Int
+    startDate      DateTime
+    expirationDate DateTime
+    status         PermitStatus
+
+    generatedPdfPath String?
+    signedPdfPath    String?
+
+    departureAuthorized          Boolean   @default(false)
+    departureAuthorizedAt        DateTime?
+    departureAuthorizationReason String?
+
     cancelledAt        DateTime?
     cancellationReason String?
 

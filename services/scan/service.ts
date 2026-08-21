@@ -240,6 +240,24 @@ export async function scanEquipment(
   }
 
   /*
+   * Salida no autorizada
+   */
+  if (!permit.departureAuthorized) {
+    await createScanLog({
+      permitId: permit.id,
+      assetTag: equipment.assetTag,
+      result: "DENIED",
+      reason: "NOT_ACTIVE",
+      notes: "La salida del equipo todavía no ha sido autorizada.",
+    })
+
+    return {
+      ...permitResult,
+      message: "La salida del equipo todavía no ha sido autorizada.",
+    }
+  }
+
+  /*
    * Salida autorizada
    */
   await createScanLog({

@@ -237,6 +237,11 @@ export type EnumPermitStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel> | $Enums.PermitStatus
 }
 
+export type BoolFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
+}
+
 export type EnumPermitStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.PermitStatus | Prisma.EnumPermitStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PermitStatus[] | Prisma.ListEnumPermitStatusFieldRefInput<$PrismaModel>
@@ -245,6 +250,14 @@ export type EnumPermitStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel>
+}
+
+export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
 export type IntNullableFilter<$PrismaModel = never> = {
@@ -544,6 +557,11 @@ export type NestedEnumPermitStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel> | $Enums.PermitStatus
 }
 
+export type NestedBoolFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
+}
+
 export type NestedEnumPermitStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.PermitStatus | Prisma.EnumPermitStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PermitStatus[] | Prisma.ListEnumPermitStatusFieldRefInput<$PrismaModel>
@@ -552,6 +570,14 @@ export type NestedEnumPermitStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPermitStatusFilter<$PrismaModel>
+}
+
+export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
 export type NestedEnumScanResultFilter<$PrismaModel = never> = {

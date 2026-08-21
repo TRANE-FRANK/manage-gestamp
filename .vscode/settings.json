@@ -5,6 +5,8 @@
         "esnext",
         "exceljs",
         "gestamp",
+        "libreoffice",
+        "outdir",
         "postgresql",
         "tailwindcss"
     ]

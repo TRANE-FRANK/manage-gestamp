@@ -18,6 +18,12 @@ export const permitActionsColumn: ColumnDef<PermitRow> = {
 
     return (
       <div className="flex flex-wrap gap-2">
+        <Link
+          href={`/permits/${permit.id}`}
+          className="inline-flex h-8 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+        >
+          Ver detalle
+        </Link>
         {permit.status !== "CANCELLED" && (
           <Link
             href={`/permits/${permit.id}/renew`}

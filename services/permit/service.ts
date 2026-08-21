@@ -3,13 +3,17 @@ import { prisma } from "@/lib/prisma"
 import { BusinessError } from "@/services/shared/errors"
 
 import {
+  authorizeExceptionalDeparture as authorizeExceptionalDepartureRepository,
   cancelPermit as cancelPermitRepository,
   createPermit as createPermitRepository,
   findActivePermitByEquipmentId,
   findPermitByFolio,
   findPermitById,
   findPermits,
+  updatePermitDepartureAuthorization,
 } from "./repository"
+
+import { uploadSignedPermitPdf as uploadSignedPermitPdfService } from "./upload"
 
 import { generateNextPermitFolio } from "./folio"
 
@@ -144,4 +148,74 @@ export async function cancelPermit(permitId: number, reason: string) {
   }
 
   return cancelPermitRepository(permitId, cancellationReason)
+}
+
+export async function authorizeExceptionalDeparture(
+  permitId: number,
+  reason: string,
+) {
+  const permit = await findPermitById(permitId)
+
+  if (!permit) {
+    throw new BusinessError("El permiso no existe.")
+  }
+
+  if (permit.status === "CANCELLED") {
+    throw new BusinessError(
+      "No se puede autorizar la salida de un permiso cancelado.",
+    )
+  }
+
+  if (permit.status === "EXPIRED") {
+    throw new BusinessError(
+      "No se puede autorizar la salida de un permiso expirado.",
+    )
+  }
+
+  if (permit.departureAuthorized) {
+    throw new BusinessError("La salida de este permiso ya está autorizada.")
+  }
+
+  const authorizationReason = reason.trim()
+
+  if (!authorizationReason) {
+    throw new BusinessError(
+      "El motivo de la autorización excepcional es obligatorio.",
+    )
+  }
+
+  return authorizeExceptionalDepartureRepository(permitId, authorizationReason)
+}
+
+export async function uploadSignedPermitPdf(permitId: number, file: File) {
+  const permit = await findPermitById(permitId)
+
+  if (!permit) {
+    throw new BusinessError("El permiso no existe.")
+  }
+
+  if (permit.status === "CANCELLED") {
+    throw new BusinessError(
+      "No se puede subir un documento a un permiso cancelado.",
+    )
+  }
+
+  return uploadSignedPermitPdfService(permitId, file)
+}
+
+export async function setPermitDepartureAuthorization(
+  permitId: number,
+  departureAuthorized: boolean,
+) {
+  const permit = await findPermitById(permitId)
+
+  if (!permit) {
+    throw new BusinessError("El permiso no existe.")
+  }
+
+  if (permit.status === "CANCELLED") {
+    throw new BusinessError("No se puede modificar un permiso cancelado.")
+  }
+
+  return updatePermitDepartureAuthorization(permitId, departureAuthorized)
 }

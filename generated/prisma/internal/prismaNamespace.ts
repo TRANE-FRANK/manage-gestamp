@@ -1040,6 +1040,9 @@ export const PermitScalarFieldEnum = {
   status: 'status',
   generatedPdfPath: 'generatedPdfPath',
   signedPdfPath: 'signedPdfPath',
+  departureAuthorized: 'departureAuthorized',
+  departureAuthorizedAt: 'departureAuthorizedAt',
+  departureAuthorizationReason: 'departureAuthorizationReason',
   cancelledAt: 'cancelledAt',
   cancellationReason: 'cancellationReason',
   createdAt: 'createdAt',
@@ -1216,6 +1219,13 @@ export type EnumPermitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'PermitStatus[]'
  */
 export type ListEnumPermitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermitStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
