@@ -7,7 +7,6 @@ import * as React from "react"
 import {
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   flexRender,
   useReactTable,
@@ -29,52 +28,32 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   emptyMessage = "No hay registros disponibles.",
-  pageSize = 10,
   className,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [globalFilter, setGlobalFilter] = React.useState("")
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize,
-  })
 
   const table = useReactTable({
     data,
     columns,
+
     state: {
       sorting,
-      globalFilter,
       columnVisibility,
-      pagination,
     },
+
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
+
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    globalFilterFn: (row, filterValue) => {
-      const search = String(filterValue).toLowerCase()
-      const values = row.original as Record<string, unknown>
-
-      return Object.values(values).some((value) => {
-        if (value == null) return false
-
-        return String(value).toLowerCase().includes(search)
-      })
-    },
   })
 
   return (
     <div className={className}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        {/* <DataTableToolbar table={table} placeholder={toolbarPlaceholder} /> */}
-        {/* <DataTableViewOptions table={table} /> */}
       </div>
 
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -82,8 +61,6 @@ export function DataTable<TData, TValue>({
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => {
-                console.log(headerGroup)
-
                 return (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
@@ -129,8 +106,6 @@ export function DataTable<TData, TValue>({
           </Table>
         </div>
       </div>
-
-      {/* <DataTablePagination table={table} /> */}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@/generated/prisma/client"
 
 import { NotFoundError } from "../shared/errors"
 
@@ -35,6 +36,45 @@ export async function findActiveAssignments() {
   })
 }
 
+export async function findActiveAssignmentsPaginated({
+  page,
+  pageSize,
+  where,
+}: {
+  page: number
+  pageSize: number
+  where?: Prisma.AssignmentWhereInput
+}) {
+  const skip = (page - 1) * pageSize
+
+  const [data, total] = await prisma.$transaction([
+    prisma.assignment.findMany({
+      where: {
+        returnedAt: null,
+        ...where,
+      },
+      include: assignmentInclude,
+      orderBy: {
+        assignedAt: "desc",
+      },
+      skip,
+      take: pageSize,
+    }),
+
+    prisma.assignment.count({
+      where: {
+        returnedAt: null,
+        ...where,
+      },
+    }),
+  ])
+
+  return {
+    data,
+    total,
+  }
+}
+
 export async function findAssignmentHistory() {
   return prisma.assignment.findMany({
     include: assignmentInclude,
@@ -42,6 +82,39 @@ export async function findAssignmentHistory() {
       assignedAt: "desc",
     },
   })
+}
+
+export async function findAssignmentHistoryPaginated({
+  page,
+  pageSize,
+  where,
+}: {
+  page: number
+  pageSize: number
+  where?: Prisma.AssignmentWhereInput
+}) {
+  const skip = (page - 1) * pageSize
+
+  const [data, total] = await prisma.$transaction([
+    prisma.assignment.findMany({
+      where,
+      include: assignmentInclude,
+      orderBy: {
+        assignedAt: "desc",
+      },
+      skip,
+      take: pageSize,
+    }),
+
+    prisma.assignment.count({
+      where,
+    }),
+  ])
+
+  return {
+    data,
+    total,
+  }
 }
 
 export async function findActiveAssignmentsByEmployeeId(employeeId: number) {

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 
 import {
+  authorizePermitDeparture,
   cancelPermit as cancelPermitService,
   createPermit as createPermitService,
   renewPermit,
@@ -10,8 +11,6 @@ import {
   uploadSignedPermitPdf,
   setPermitDepartureAuthorization,
 } from "@/services/permit"
-
-
 
 import { BusinessError } from "@/services/shared/errors"
 
@@ -300,4 +299,31 @@ export async function setPermitDepartureAuthorizationAction(
   }
 }
 
+export async function authorizePermitDepartureAction(
+  permitId: number,
+): Promise<ActionResult<void>> {
+  try {
+    await authorizePermitDeparture(permitId)
 
+    revalidatePath("/permits")
+    revalidatePath(`/permits/${permitId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}

@@ -8,11 +8,13 @@ export {
   authorizeExceptionalDeparture,
   uploadSignedPermitPdf,
   setPermitDepartureAuthorization,
+  authorizePermitDeparture,
+  listPermitsPaginated
 } from "./service"
 
 export { calculateDaysRemaining, getPermitDisplayStatus } from "./utils"
 
-export type { RenewPermitInput } from "./types"
+export type { RenewPermitInput, PermitProcess} from "./types"
 
 export type { PermitDisplayStatus } from "./utils"
 

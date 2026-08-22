@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@/generated/prisma/client"
 
 import { BusinessError } from "@/services/shared/errors"
 
 import {
+  authorizePermitDeparture as authorizePermitDepartureRepository,
   authorizeExceptionalDeparture as authorizeExceptionalDepartureRepository,
   cancelPermit as cancelPermitRepository,
   createPermit as createPermitRepository,
@@ -11,13 +13,14 @@ import {
   findPermitById,
   findPermits,
   updatePermitDepartureAuthorization,
+  findPermitsPaginated,
 } from "./repository"
 
 import { uploadSignedPermitPdf as uploadSignedPermitPdfService } from "./upload"
 
 import { generateNextPermitFolio } from "./folio"
 
-import type { RenewPermitInput } from "./types"
+import type { RenewPermitInput, ListPermitsInput } from "./types"
 
 export async function listPermits() {
   return findPermits()
@@ -218,4 +221,144 @@ export async function setPermitDepartureAuthorization(
   }
 
   return updatePermitDepartureAuthorization(permitId, departureAuthorized)
+}
+
+export async function authorizePermitDeparture(permitId: number) {
+  const permit = await findPermitById(permitId)
+
+  if (!permit) {
+    throw new BusinessError("El permiso no existe.")
+  }
+
+  if (permit.status !== "ACTIVE") {
+    throw new BusinessError(
+      "Solo se puede autorizar la salida de un permiso activo.",
+    )
+  }
+
+  if (permit.departureAuthorized) {
+    throw new BusinessError("La salida de este equipo ya está autorizada.")
+  }
+
+  return authorizePermitDepartureRepository(permitId)
+}
+
+export async function listPermitsPaginated({
+  page = 1,
+  pageSize = 20,
+  status,
+  process,
+  search,
+}: ListPermitsInput = {}) {
+  const where: Prisma.PermitWhereInput = {}
+
+  if (search?.trim()) {
+    const searchTerm = search.trim()
+
+    where.OR = [
+      {
+        folio: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      {
+        equipment: {
+          assetTag: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        employee: {
+          firstName: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        employee: {
+          lastName: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+      },
+    ]
+  }
+
+  switch (status) {
+    case "active":
+      where.status = "ACTIVE"
+      break
+
+    case "expired":
+      where.status = "EXPIRED"
+      break
+
+    case "cancelled":
+      where.status = "CANCELLED"
+      break
+  }
+
+  switch (process) {
+    case "pending-generation":
+      where.generatedPdfPath = null
+      break
+
+    case "pending-signature":
+      where.AND = [
+        {
+          generatedPdfPath: {
+            not: null,
+          },
+        },
+        {
+          signedPdfPath: null,
+        },
+        {
+          departureAuthorized: false,
+        },
+      ]
+      break
+
+    case "exception-authorized":
+      where.AND = [
+        {
+          departureAuthorized: true,
+        },
+        {
+          signedPdfPath: null,
+        },
+      ]
+      break
+
+    case "complete":
+      where.AND = [
+        {
+          signedPdfPath: {
+            not: null,
+          },
+        },
+        {
+          departureAuthorized: true,
+        },
+      ]
+      break
+  }
+
+  const result = await findPermitsPaginated({
+    page,
+    pageSize,
+    where,
+  })
+
+  return {
+    ...result,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(result.total / pageSize)),
+  }
 }

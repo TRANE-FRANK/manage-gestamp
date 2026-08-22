@@ -28,7 +28,6 @@ export default async function EmployeesPage() {
         <DataTable
           columns={employeeColumns}
           data={employees}
-          toolbarPlaceholder="Buscar empleado..."
         />
       </Card>
     </>

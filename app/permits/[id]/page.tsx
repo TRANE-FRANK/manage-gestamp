@@ -4,8 +4,10 @@ import { notFound } from "next/navigation"
 import Card from "@/components/ui/Card"
 import GeneratePermitDocumentButton from "./GeneratePermitDocumentButton"
 import ViewPermitDocumentButton from "./ViewPermitDocumentButton"
-
-import { getPermitDetails } from "@/services/permit"
+import UploadSignedPermitForm from "./UploadSignedPermitForm"
+import ViewSignedPermitDocumentButton from "./ViewSignedPermitDocumentButton"
+import AuthorizeDepartureButton from "./AuthorizeDepartureButton"
+import { getPermitDetails} from "@/services/permit"
 
 interface Props {
   params: Promise<{
@@ -45,6 +47,13 @@ export default async function PermitPage({ params }: Props) {
         <div className="flex flex-wrap gap-2">
           <GeneratePermitDocumentButton permitId={permit.id} />
           <ViewPermitDocumentButton permitId={permit.id} />
+
+          {isSigned && <ViewSignedPermitDocumentButton permitId={permit.id} />}
+
+          {permit.status === "ACTIVE" && !permit.departureAuthorized && (
+            <AuthorizeDepartureButton permitId={permit.id} />
+          )}
+
           <Link
             href="/permits"
             className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
@@ -140,39 +149,101 @@ export default async function PermitPage({ params }: Props) {
             </p>
           </div>
         </Card>
-
         <Card>
           <h2 className="mb-4 text-lg font-semibold">Estado del proceso</h2>
 
           <div className="space-y-4">
+            {/* 1. FORMATO */}
             <div className="rounded-lg border border-slate-200 p-4">
-              <p className="font-medium">1. Formato generado</p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-medium">1. Formato del permiso</p>
 
-              <p className="mt-1 text-sm text-slate-500">
-                {isGenerated
-                  ? "El formato del permiso ya fue generado."
-                  : "Pendiente de generar."}
-              </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {isGenerated
+                      ? "El formato fue generado y está listo para imprimir."
+                      : "Pendiente de generar el formato."}
+                  </p>
+                </div>
+
+                {isGenerated && (
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                    Generado
+                  </span>
+                )}
+              </div>
             </div>
 
+            {/* 2. FIRMAS */}
             <div className="rounded-lg border border-slate-200 p-4">
-              <p className="font-medium">2. Documento firmado</p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-medium">2. Documento firmado</p>
 
-              <p className="mt-1 text-sm text-slate-500">
-                {isSigned
-                  ? "El PDF firmado ya fue cargado."
-                  : "Pendiente de recibir y cargar el documento firmado."}
-              </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {isSigned
+                      ? "El documento firmado fue recibido y cargado correctamente."
+                      : "Pendiente de recibir el documento con las firmas correspondientes."}
+                  </p>
+                </div>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    isSigned
+                      ? "bg-green-100 text-green-700"
+                      : "bg-orange-100 text-orange-700"
+                  }`}
+                >
+                  {isSigned ? "Firmado" : "Pendiente"}
+                </span>
+              </div>
+
+              {!isSigned && isGenerated && (
+                <div className="mt-4 border-t border-slate-200 pt-4">
+                  <UploadSignedPermitForm permitId={permit.id} />
+                </div>
+              )}
+
+              {!isSigned && !isGenerated && (
+                <p className="mt-3 text-xs text-slate-400">
+                  Primero debes generar el formato del permiso antes de cargar
+                  el documento firmado.
+                </p>
+              )}
             </div>
 
+            {/* 3. SALIDA */}
             <div className="rounded-lg border border-slate-200 p-4">
-              <p className="font-medium">3. Salida del equipo</p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-medium">3. Salida del equipo</p>
 
-              <p className="mt-1 text-sm text-slate-500">
-                {permit.departureAuthorized
-                  ? "La salida del equipo está autorizada."
-                  : "La salida todavía no está autorizada."}
-              </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {permit.departureAuthorized
+                      ? isSigned
+                        ? "Salida autorizada y documento firmado registrado."
+                        : "Salida autorizada temporalmente. Falta cargar posteriormente el documento firmado."
+                      : "La salida todavía no está autorizada."}
+                  </p>
+                </div>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    permit.departureAuthorized
+                      ? "bg-green-100 text-green-700"
+                      : "bg-slate-100 text-slate-600"
+                  }`}
+                >
+                  {permit.departureAuthorized ? "Autorizada" : "No autorizada"}
+                </span>
+              </div>
+
+              {permit.departureAuthorized && !isSigned && (
+                <p className="mt-3 rounded-md bg-orange-50 p-3 text-sm text-orange-700">
+                  La salida fue autorizada como excepción, pero el PDF firmado
+                  sigue pendiente de cargar.
+                </p>
+              )}
             </div>
           </div>
         </Card>

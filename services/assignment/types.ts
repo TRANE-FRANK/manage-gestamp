@@ -24,3 +24,17 @@ export interface ReturnAssignmentDto {
   returnedAt?: Date
   replacementReason?: string
 }
+
+export interface ListAssignmentsInput {
+  page?: number
+  pageSize?: number
+  search?: string
+}
+
+export interface PaginatedResult<T> {
+  data: T[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}

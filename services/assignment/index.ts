@@ -9,4 +9,8 @@ export * from "./history"
 export * from "./list"
 export * from "./queries"
 
-export { getActiveAssignmentsByEmployeeId } from "./service"
+export {
+  getActiveAssignmentsByEmployeeId,
+  listActiveAssignmentsPaginated,
+  listAssignmentHistoryPaginated,
+} from "./service"

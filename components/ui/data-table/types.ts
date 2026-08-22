@@ -9,9 +9,7 @@ import type {
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  toolbarPlaceholder?: string
   emptyMessage?: ReactNode
-  pageSize?: number
   className?: string
 }
 

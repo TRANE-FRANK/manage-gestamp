@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-
+import { Prisma } from "@/generated/prisma/client"
 const permitInclude = {
   employee: true,
   equipment: true,
@@ -163,3 +163,47 @@ export async function updatePermitDepartureAuthorization(
   })
 }
 
+export async function authorizePermitDeparture(id: number) {
+  return prisma.permit.update({
+    where: {
+      id,
+    },
+    data: {
+      departureAuthorized: true,
+    },
+    include: permitInclude,
+  })
+}
+
+export async function findPermitsPaginated({
+  page,
+  pageSize,
+  where,
+}: {
+  page: number
+  pageSize: number
+  where?: Prisma.PermitWhereInput
+}) {
+  const skip = (page - 1) * pageSize
+
+  const [data, total] = await prisma.$transaction([
+    prisma.permit.findMany({
+      where,
+      include: permitInclude,
+      orderBy: {
+        expirationDate: "asc",
+      },
+      skip,
+      take: pageSize,
+    }),
+
+    prisma.permit.count({
+      where,
+    }),
+  ])
+
+  return {
+    data,
+    total,
+  }
+}

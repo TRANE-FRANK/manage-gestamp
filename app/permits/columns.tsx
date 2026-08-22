@@ -1,9 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { Badge } from "@/components/ui/badge"
 import { DataTableColumnHeader } from "@/components/ui/data-table/DataTableColumnHeader"
+
 import { permitActionsColumn } from "./Columns/actions"
 
 import {
@@ -12,10 +14,19 @@ import {
 } from "@/services/permit/utils"
 
 import type { PermitDisplayStatus } from "@/services/permit/utils"
-
 import type { PermitRow } from "./permit-table-types"
 
 type PermitStatusDisplay = PermitDisplayStatus | "cancelled"
+
+type PermitProcess =
+  | "pending-generation"
+  | "pending-signature"
+  | "exception-authorized"
+  | "complete"
+
+/*
+ * ESTADO GENERAL DEL PERMISO
+ */
 
 function getStatusLabel(status: PermitStatusDisplay) {
   switch (status) {
@@ -51,6 +62,74 @@ function getStatusVariant(
   }
 }
 
+/*
+ * ESTADO DEL PROCESO DEL PERMISO
+ */
+
+function getPermitProcess(permit: PermitRow): PermitProcess {
+  // Todavía no se ha generado el formato
+  if (!permit.generatedPdfPath) {
+    return "pending-generation"
+  }
+
+  // Se autorizó una salida excepcional,
+  // pero todavía falta cargar el documento firmado
+  if (permit.departureAuthorized && !permit.signedPdfPath) {
+    return "exception-authorized"
+  }
+
+  // Ya existe el formato, pero falta recibir las firmas
+  if (!permit.signedPdfPath) {
+    return "pending-signature"
+  }
+
+  // El documento firmado está cargado
+  // y la salida fue autorizada
+  if (permit.signedPdfPath && permit.departureAuthorized) {
+    return "complete"
+  }
+
+  return "pending-signature"
+}
+
+function getPermitProcessLabel(process: PermitProcess) {
+  switch (process) {
+    case "pending-generation":
+      return "Pendiente generar"
+
+    case "pending-signature":
+      return "Pendiente firmas"
+
+    case "exception-authorized":
+      return "Salida excepcional"
+
+    case "complete":
+      return "Completo"
+  }
+}
+
+function getPermitProcessVariant(
+  process: PermitProcess,
+): "default" | "outline" | "secondary" | "destructive" {
+  switch (process) {
+    case "pending-generation":
+      return "destructive"
+
+    case "pending-signature":
+      return "outline"
+
+    case "exception-authorized":
+      return "secondary"
+
+    case "complete":
+      return "default"
+  }
+}
+
+/*
+ * COLUMNAS
+ */
+
 export const permitColumns: ColumnDef<PermitRow>[] = [
   {
     accessorKey: "folio",
@@ -60,7 +139,12 @@ export const permitColumns: ColumnDef<PermitRow>[] = [
     ),
 
     cell: ({ row }) => (
-      <span className="font-medium">{row.original.folio}</span>
+      <Link
+        href={`/permits/${row.original.id}`}
+        className="font-medium text-blue-700 transition hover:text-blue-900 hover:underline"
+      >
+        {row.original.folio}
+      </Link>
     ),
 
     meta: {
@@ -175,6 +259,34 @@ export const permitColumns: ColumnDef<PermitRow>[] = [
 
     meta: {
       title: "Estado",
+    },
+  },
+
+  /*
+   * PROCESO DEL PERMISO
+   */
+
+  {
+    id: "process",
+
+    accessorFn: (row) => getPermitProcess(row),
+
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Proceso" />
+    ),
+
+    cell: ({ row }) => {
+      const process = getPermitProcess(row.original)
+
+      return (
+        <Badge variant={getPermitProcessVariant(process)}>
+          {getPermitProcessLabel(process)}
+        </Badge>
+      )
+    },
+
+    meta: {
+      title: "Proceso",
     },
   },
 

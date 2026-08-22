@@ -1,101 +1,111 @@
-import { prisma } from "@/lib/prisma"
+import Link from "next/link"
+
+import type {
+  Company,
+  EquipmentStatus,
+  EquipmentType,
+} from "@/generated/prisma/client"
+
+import Card from "@/components/ui/Card"
+import PageHeader from "@/components/ui/PageHeader"
+import { DataTable } from "@/components/ui/data-table"
+import Pagination from "@/components/ui/Pagination"
+import EquipmentSearchForm from "./search-form"
+import EquipmentFilters from "./filters"
+
+import { listEquipmentPaginated } from "@/services/equipment"
 
 import EquipmentToast from "./equipment-toast"
-import PageHeader from "@/components/ui/PageHeader"
-import Card from "@/components/ui/Card"
-import { Badge } from "@/components/ui/badge"
+import { equipmentColumns } from "./equipment-columns"
 
-export default async function EquipmentPage() {
-  const equipment = await prisma.equipment.findMany({
-    orderBy: {
-      assetTag: "asc",
-    },
+export default async function EquipmentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    page?: string
+    search?: string
+    company?: string
+    status?: string
+    type?: string
+  }>
+}) {
+  function isCompany(value: string | undefined): value is Company {
+    return value === "ORM" || value === "GP2"
+  }
+
+  function isEquipmentStatus(
+    value: string | undefined,
+  ): value is EquipmentStatus {
+    return (
+      value === "AVAILABLE" ||
+      value === "ASSIGNED" ||
+      value === "MAINTENANCE" ||
+      value === "STORAGE" ||
+      value === "RETIRED"
+    )
+  }
+
+  function isEquipmentType(value: string | undefined): value is EquipmentType {
+    return value === "LAPTOP" || value === "DESKTOP"
+  }
+
+  const { page, search, company, status, type } = await searchParams
+
+  const validCompany = isCompany(company) ? company : undefined
+
+  const validStatus = isEquipmentStatus(status) ? status : undefined
+
+  const validType = isEquipmentType(type) ? type : undefined
+
+  const currentPage = Math.max(1, Number(page) || 1)
+
+  const result = await listEquipmentPaginated({
+    page: currentPage,
+    pageSize: 5,
+    search,
+    company: validCompany,
+    status: validStatus,
+    type: validType,
   })
 
   return (
     <>
       <PageHeader
         title="Equipos"
-        buttonText="Nuevo Equipo"
-        buttonHref="/equipment/new"
+        actions={
+          <Link
+            href="/equipment/new"
+            className="rounded-xl bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800"
+          >
+            Nuevo Equipo
+          </Link>
+        }
       />
 
       <Card>
-        <div className="overflow-x-auto rounded-2xl">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-slate-50">
-                <th className="p-4 font-semibold text-slate-700">Equipo</th>
-                <th className="p-4 font-semibold text-slate-700">Tipo</th>
-                <th className="p-4 font-semibold text-slate-700">Marca</th>
-                <th className="p-4 font-semibold text-slate-700">Modelo</th>
-                <th className="p-4 font-semibold text-slate-700">Serial</th>
-                <th className="p-4 font-semibold text-slate-700">Empresa</th>
-                <th className="p-4 font-semibold text-slate-700">Estado</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {equipment.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-500">
-                    No hay equipos registrados.
-                  </td>
-                </tr>
-              ) : (
-                equipment.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b transition hover:bg-slate-50 text-center"
-                  >
-                    <td className="p-4 font-medium">{item.assetTag}</td>
-
-                    <td className="p-4">
-                      {item.type === "LAPTOP" ? (
-                        <Badge variant="default">Laptop</Badge>
-                      ) : (
-                        <Badge variant="ghost">Desktop</Badge>
-                      )}
-                    </td>
-
-                    <td className="p-4">{item.brand ?? "-"}</td>
-
-                    <td className="p-4">{item.model ?? "-"}</td>
-
-                    <td className="p-4">{item.serialNumber ?? "-"}</td>
-
-                    <td className="p-4">
-                      {item.company === "ORM" ? (
-                        <Badge variant="default">ORM</Badge>
-                      ) : (
-                        <Badge variant="ghost">GP2</Badge>
-                      )}
-                    </td>
-
-                    <td className="p-4">
-                      {item.status === "AVAILABLE" && (
-                        <Badge variant="default">Disponible</Badge>
-                      )}
-
-                      {item.status === "ASSIGNED" && (
-                        <Badge variant="destructive">Asignado</Badge>
-                      )}
-
-                      {item.status === "MAINTENANCE" && (
-                        <Badge variant="outline">Reparación</Badge>
-                      )}
-
-                      {item.status === "RETIRED" && (
-                        <Badge variant="secondary">Retirado</Badge>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="mb-6">
+          <EquipmentSearchForm />
         </div>
+
+        <div className="mb-6">
+          <EquipmentFilters />
+        </div>
+
+        <DataTable
+          columns={equipmentColumns}
+          data={result.data}
+          emptyMessage="No hay equipos registrados."
+        />
+
+        <Pagination
+          page={result.page}
+          totalPages={result.totalPages}
+          total={result.total}
+          pageSize={result.pageSize}
+          search={search}
+        />
       </Card>
+
       <EquipmentToast />
     </>
   )
