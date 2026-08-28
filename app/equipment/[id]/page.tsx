@@ -28,7 +28,7 @@ export default async function EquipmentDetailsPage({
 
   return (
     <>
-      <PageHeader title={equipment.assetTag} />
+      <PageHeader title={equipment.assetTag ?? `Equipo #${equipmentId}`} />
 
       <div className="space-y-6">
         <Card>

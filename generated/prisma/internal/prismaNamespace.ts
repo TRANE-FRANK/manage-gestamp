@@ -1009,7 +1009,9 @@ export const EquipmentScalarFieldEnum = {
   company: 'company',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  ownership: 'ownership',
+  warrantyExpiresAt: 'warrantyExpiresAt'
 } as const
 
 export type EquipmentScalarFieldEnum = (typeof EquipmentScalarFieldEnum)[keyof typeof EquipmentScalarFieldEnum]
@@ -1205,6 +1207,20 @@ export type EnumEquipmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'EquipmentStatus[]'
  */
 export type ListEnumEquipmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EquipmentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EquipmentOwnership'
+ */
+export type EnumEquipmentOwnershipFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EquipmentOwnership'>
+    
+
+
+/**
+ * Reference to a field of type 'EquipmentOwnership[]'
+ */
+export type ListEnumEquipmentOwnershipFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EquipmentOwnership[]'>
     
 
 

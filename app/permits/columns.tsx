@@ -198,16 +198,25 @@ export const permitColumns: ColumnDef<PermitRow>[] = [
 
   {
     id: "equipment",
-
-    accessorFn: (row) => row.equipment.assetTag,
+    accessorFn: (row) =>
+      row.equipment.assetTag ??
+      row.equipment.serialNumber ??
+      row.equipment.id.toString(),
 
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Equipo" />
     ),
 
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.equipment.assetTag}</span>
-    ),
+    cell: ({ row }) => {
+      const equipment = row.original.equipment
+
+      const identifier =
+        equipment.assetTag ??
+        equipment.serialNumber ??
+        `Equipo #${equipment.id}`
+
+      return <span className="font-medium">{identifier}</span>
+    },
 
     meta: {
       title: "Equipo",

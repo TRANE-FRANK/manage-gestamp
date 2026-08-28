@@ -11,6 +11,19 @@ import {
 
 import type { ScanEquipmentInput, ScanEquipmentResult } from "./types"
 
+function getEquipmentIdentifier(equipment: {
+  assetTag: string | null
+  barcode: string | null
+  inventoryNumber: string | null
+}) {
+  return (
+    equipment.assetTag ??
+    equipment.barcode ??
+    equipment.inventoryNumber ??
+    "SIN-IDENTIFICADOR"
+  )
+}
+
 function buildPermitResult(
   permit: NonNullable<
     Awaited<ReturnType<typeof findLatestPermitByEquipmentId>>
@@ -26,7 +39,7 @@ function buildPermitResult(
 
     equipment: {
       id: permit.equipment.id,
-      assetTag: permit.equipment.assetTag,
+      assetTag: getEquipmentIdentifier(permit.equipment),
       company: permit.equipment.company,
     },
 
@@ -53,9 +66,6 @@ export async function scanEquipment(
 ): Promise<ScanEquipmentResult> {
   const assetTag = data.assetTag.trim()
 
-  /*
-   * Asset Tag vacío
-   */
   if (!assetTag) {
     await createScanLog({
       assetTag,
@@ -73,14 +83,8 @@ export async function scanEquipment(
     }
   }
 
-  /*
-   * Buscar equipo
-   */
   const equipment = await findEquipmentByAssetTag(assetTag)
 
-  /*
-   * Equipo no registrado
-   */
   if (!equipment) {
     await createScanLog({
       assetTag,
@@ -98,9 +102,8 @@ export async function scanEquipment(
     }
   }
 
-  /*
-   * Buscar último permiso del equipo
-   */
+  const equipmentIdentifier = getEquipmentIdentifier(equipment)
+
   const permit = await findLatestPermitByEquipmentId(equipment.id)
 
   /*
@@ -108,7 +111,7 @@ export async function scanEquipment(
    */
   if (!permit) {
     await createScanLog({
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "NO_PERMIT",
       notes: "El equipo no tiene ningún permiso registrado.",
@@ -121,7 +124,7 @@ export async function scanEquipment(
 
       equipment: {
         id: equipment.id,
-        assetTag: equipment.assetTag,
+        assetTag: equipmentIdentifier,
         company: equipment.company,
       },
 
@@ -140,7 +143,7 @@ export async function scanEquipment(
   if (permit.status === "CANCELLED") {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "CANCELLED",
       notes: "El permiso está cancelado.",
@@ -158,7 +161,7 @@ export async function scanEquipment(
   if (permit.status === "EXPIRED") {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "EXPIRED",
       notes: "El permiso está expirado.",
@@ -191,7 +194,7 @@ export async function scanEquipment(
   if (today < startDate) {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "NOT_STARTED",
       notes: "El permiso todavía no está vigente.",
@@ -209,7 +212,7 @@ export async function scanEquipment(
   if (today > expirationDate) {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "EXPIRED",
       notes: "El permiso ha expirado.",
@@ -227,7 +230,7 @@ export async function scanEquipment(
   if (permit.status !== "ACTIVE") {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "NOT_ACTIVE",
       notes: "El permiso no está activo.",
@@ -245,7 +248,7 @@ export async function scanEquipment(
   if (!permit.departureAuthorized) {
     await createScanLog({
       permitId: permit.id,
-      assetTag: equipment.assetTag,
+      assetTag: equipmentIdentifier,
       result: "DENIED",
       reason: "NOT_ACTIVE",
       notes: "La salida del equipo todavía no ha sido autorizada.",
@@ -262,7 +265,7 @@ export async function scanEquipment(
    */
   await createScanLog({
     permitId: permit.id,
-    assetTag: equipment.assetTag,
+    assetTag: equipmentIdentifier,
     result: "ALLOWED",
     reason: "ALLOWED",
     notes: "Salida autorizada.",

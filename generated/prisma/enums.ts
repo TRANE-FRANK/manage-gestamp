@@ -28,7 +28,11 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 export const EquipmentType = {
   LAPTOP: 'LAPTOP',
-  DESKTOP: 'DESKTOP'
+  DESKTOP: 'DESKTOP',
+  SMARTPHONE: 'SMARTPHONE',
+  TABLET: 'TABLET',
+  RADIO: 'RADIO',
+  PRINTER: 'PRINTER'
 } as const
 
 export type EquipmentType = (typeof EquipmentType)[keyof typeof EquipmentType]
@@ -74,3 +78,11 @@ export const ScanReason = {
 } as const
 
 export type ScanReason = (typeof ScanReason)[keyof typeof ScanReason]
+
+
+export const EquipmentOwnership = {
+  OWNED: 'OWNED',
+  RENTED: 'RENTED'
+} as const
+
+export type EquipmentOwnership = (typeof EquipmentOwnership)[keyof typeof EquipmentOwnership]

@@ -35,7 +35,11 @@ export default async function NewAssignmentPage({ searchParams }: Props) {
 
   const equipmentOptions = equipment.map((item) => ({
     id: item.id,
-    label: item.assetTag,
+    label:
+      item.assetTag ??
+      item.inventoryNumber ??
+      item.serialNumber ??
+      `Equipo #${item.id}`,
     description: `${item.brand ?? ""} ${item.model ?? ""}`.trim(),
   }))
 

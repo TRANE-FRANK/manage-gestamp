@@ -13,6 +13,7 @@ export async function listEquipmentPaginated({
   company,
   status,
   type,
+  ownership,
 }: ListEquipmentInput = {}): Promise<PaginatedEquipmentResult<Equipment>> {
   const where: Prisma.EquipmentWhereInput = {}
 
@@ -63,6 +64,10 @@ export async function listEquipmentPaginated({
 
   if (type) {
     where.type = type
+  }
+
+  if (ownership) {
+    where.ownership = ownership
   }
 
   const result = await findEquipmentPaginated({

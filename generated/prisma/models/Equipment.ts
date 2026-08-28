@@ -47,6 +47,8 @@ export type EquipmentMinAggregateOutputType = {
   status: $Enums.EquipmentStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  ownership: $Enums.EquipmentOwnership | null
+  warrantyExpiresAt: Date | null
 }
 
 export type EquipmentMaxAggregateOutputType = {
@@ -62,6 +64,8 @@ export type EquipmentMaxAggregateOutputType = {
   status: $Enums.EquipmentStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  ownership: $Enums.EquipmentOwnership | null
+  warrantyExpiresAt: Date | null
 }
 
 export type EquipmentCountAggregateOutputType = {
@@ -77,6 +81,8 @@ export type EquipmentCountAggregateOutputType = {
   status: number
   createdAt: number
   updatedAt: number
+  ownership: number
+  warrantyExpiresAt: number
   _all: number
 }
 
@@ -102,6 +108,8 @@ export type EquipmentMinAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  ownership?: true
+  warrantyExpiresAt?: true
 }
 
 export type EquipmentMaxAggregateInputType = {
@@ -117,6 +125,8 @@ export type EquipmentMaxAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  ownership?: true
+  warrantyExpiresAt?: true
 }
 
 export type EquipmentCountAggregateInputType = {
@@ -132,6 +142,8 @@ export type EquipmentCountAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  ownership?: true
+  warrantyExpiresAt?: true
   _all?: true
 }
 
@@ -223,7 +235,7 @@ export type EquipmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type EquipmentGroupByOutputType = {
   id: number
-  assetTag: string
+  assetTag: string | null
   barcode: string | null
   type: $Enums.EquipmentType | null
   inventoryNumber: string | null
@@ -234,6 +246,8 @@ export type EquipmentGroupByOutputType = {
   status: $Enums.EquipmentStatus
   createdAt: Date
   updatedAt: Date
+  ownership: $Enums.EquipmentOwnership
+  warrantyExpiresAt: Date | null
   _count: EquipmentCountAggregateOutputType | null
   _avg: EquipmentAvgAggregateOutputType | null
   _sum: EquipmentSumAggregateOutputType | null
@@ -261,7 +275,7 @@ export type EquipmentWhereInput = {
   OR?: Prisma.EquipmentWhereInput[]
   NOT?: Prisma.EquipmentWhereInput | Prisma.EquipmentWhereInput[]
   id?: Prisma.IntFilter<"Equipment"> | number
-  assetTag?: Prisma.StringFilter<"Equipment"> | string
+  assetTag?: Prisma.StringNullableFilter<"Equipment"> | string | null
   barcode?: Prisma.StringNullableFilter<"Equipment"> | string | null
   type?: Prisma.EnumEquipmentTypeNullableFilter<"Equipment"> | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.StringNullableFilter<"Equipment"> | string | null
@@ -272,6 +286,8 @@ export type EquipmentWhereInput = {
   status?: Prisma.EnumEquipmentStatusFilter<"Equipment"> | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFilter<"Equipment"> | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.DateTimeNullableFilter<"Equipment"> | Date | string | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
   maintenances?: Prisma.MaintenanceListRelationFilter
@@ -279,7 +295,7 @@ export type EquipmentWhereInput = {
 
 export type EquipmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  assetTag?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrderInput | Prisma.SortOrder
   inventoryNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -290,6 +306,8 @@ export type EquipmentOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ownership?: Prisma.SortOrder
+  warrantyExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   permits?: Prisma.PermitOrderByRelationAggregateInput
   maintenances?: Prisma.MaintenanceOrderByRelationAggregateInput
@@ -311,6 +329,8 @@ export type EquipmentWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumEquipmentStatusFilter<"Equipment"> | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFilter<"Equipment"> | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.DateTimeNullableFilter<"Equipment"> | Date | string | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
   maintenances?: Prisma.MaintenanceListRelationFilter
@@ -318,7 +338,7 @@ export type EquipmentWhereUniqueInput = Prisma.AtLeast<{
 
 export type EquipmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  assetTag?: Prisma.SortOrder
+  assetTag?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrderInput | Prisma.SortOrder
   inventoryNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -329,6 +349,8 @@ export type EquipmentOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ownership?: Prisma.SortOrder
+  warrantyExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EquipmentCountOrderByAggregateInput
   _avg?: Prisma.EquipmentAvgOrderByAggregateInput
   _max?: Prisma.EquipmentMaxOrderByAggregateInput
@@ -341,7 +363,7 @@ export type EquipmentScalarWhereWithAggregatesInput = {
   OR?: Prisma.EquipmentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EquipmentScalarWhereWithAggregatesInput | Prisma.EquipmentScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Equipment"> | number
-  assetTag?: Prisma.StringWithAggregatesFilter<"Equipment"> | string
+  assetTag?: Prisma.StringNullableWithAggregatesFilter<"Equipment"> | string | null
   barcode?: Prisma.StringNullableWithAggregatesFilter<"Equipment"> | string | null
   type?: Prisma.EnumEquipmentTypeNullableWithAggregatesFilter<"Equipment"> | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.StringNullableWithAggregatesFilter<"Equipment"> | string | null
@@ -352,10 +374,12 @@ export type EquipmentScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumEquipmentStatusWithAggregatesFilter<"Equipment"> | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Equipment"> | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipWithAggregatesFilter<"Equipment"> | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Equipment"> | Date | string | null
 }
 
 export type EquipmentCreateInput = {
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -366,6 +390,8 @@ export type EquipmentCreateInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
@@ -373,7 +399,7 @@ export type EquipmentCreateInput = {
 
 export type EquipmentUncheckedCreateInput = {
   id?: number
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -384,13 +410,15 @@ export type EquipmentUncheckedCreateInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceUncheckedCreateNestedManyWithoutEquipmentInput
 }
 
 export type EquipmentUpdateInput = {
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -401,6 +429,8 @@ export type EquipmentUpdateInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
@@ -408,7 +438,7 @@ export type EquipmentUpdateInput = {
 
 export type EquipmentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -419,6 +449,8 @@ export type EquipmentUncheckedUpdateInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput
@@ -426,7 +458,7 @@ export type EquipmentUncheckedUpdateInput = {
 
 export type EquipmentCreateManyInput = {
   id?: number
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -437,10 +469,12 @@ export type EquipmentCreateManyInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
 }
 
 export type EquipmentUpdateManyMutationInput = {
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -451,11 +485,13 @@ export type EquipmentUpdateManyMutationInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EquipmentUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -466,6 +502,8 @@ export type EquipmentUncheckedUpdateManyInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EquipmentCountOrderByAggregateInput = {
@@ -481,6 +519,8 @@ export type EquipmentCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ownership?: Prisma.SortOrder
+  warrantyExpiresAt?: Prisma.SortOrder
 }
 
 export type EquipmentAvgOrderByAggregateInput = {
@@ -500,6 +540,8 @@ export type EquipmentMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ownership?: Prisma.SortOrder
+  warrantyExpiresAt?: Prisma.SortOrder
 }
 
 export type EquipmentMinOrderByAggregateInput = {
@@ -515,6 +557,8 @@ export type EquipmentMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ownership?: Prisma.SortOrder
+  warrantyExpiresAt?: Prisma.SortOrder
 }
 
 export type EquipmentSumOrderByAggregateInput = {
@@ -532,6 +576,14 @@ export type NullableEnumEquipmentTypeFieldUpdateOperationsInput = {
 
 export type EnumEquipmentStatusFieldUpdateOperationsInput = {
   set?: $Enums.EquipmentStatus
+}
+
+export type EnumEquipmentOwnershipFieldUpdateOperationsInput = {
+  set?: $Enums.EquipmentOwnership
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type EquipmentCreateNestedOneWithoutAssignmentsInput = {
@@ -577,7 +629,7 @@ export type EquipmentUpdateOneRequiredWithoutMaintenancesNestedInput = {
 }
 
 export type EquipmentCreateWithoutAssignmentsInput = {
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -588,13 +640,15 @@ export type EquipmentCreateWithoutAssignmentsInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
 }
 
 export type EquipmentUncheckedCreateWithoutAssignmentsInput = {
   id?: number
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -605,6 +659,8 @@ export type EquipmentUncheckedCreateWithoutAssignmentsInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceUncheckedCreateNestedManyWithoutEquipmentInput
 }
@@ -626,7 +682,7 @@ export type EquipmentUpdateToOneWithWhereWithoutAssignmentsInput = {
 }
 
 export type EquipmentUpdateWithoutAssignmentsInput = {
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -637,13 +693,15 @@ export type EquipmentUpdateWithoutAssignmentsInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
 }
 
 export type EquipmentUncheckedUpdateWithoutAssignmentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -654,12 +712,14 @@ export type EquipmentUncheckedUpdateWithoutAssignmentsInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput
 }
 
 export type EquipmentCreateWithoutPermitsInput = {
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -670,13 +730,15 @@ export type EquipmentCreateWithoutPermitsInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
 }
 
 export type EquipmentUncheckedCreateWithoutPermitsInput = {
   id?: number
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -687,6 +749,8 @@ export type EquipmentUncheckedCreateWithoutPermitsInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceUncheckedCreateNestedManyWithoutEquipmentInput
 }
@@ -708,7 +772,7 @@ export type EquipmentUpdateToOneWithWhereWithoutPermitsInput = {
 }
 
 export type EquipmentUpdateWithoutPermitsInput = {
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -719,13 +783,15 @@ export type EquipmentUpdateWithoutPermitsInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
 }
 
 export type EquipmentUncheckedUpdateWithoutPermitsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -736,12 +802,14 @@ export type EquipmentUncheckedUpdateWithoutPermitsInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput
 }
 
 export type EquipmentCreateWithoutMaintenancesInput = {
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -752,13 +820,15 @@ export type EquipmentCreateWithoutMaintenancesInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
 }
 
 export type EquipmentUncheckedCreateWithoutMaintenancesInput = {
   id?: number
-  assetTag: string
+  assetTag?: string | null
   barcode?: string | null
   type?: $Enums.EquipmentType | null
   inventoryNumber?: string | null
@@ -769,6 +839,8 @@ export type EquipmentUncheckedCreateWithoutMaintenancesInput = {
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEquipmentInput
 }
@@ -790,7 +862,7 @@ export type EquipmentUpdateToOneWithWhereWithoutMaintenancesInput = {
 }
 
 export type EquipmentUpdateWithoutMaintenancesInput = {
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -801,13 +873,15 @@ export type EquipmentUpdateWithoutMaintenancesInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
 }
 
 export type EquipmentUncheckedUpdateWithoutMaintenancesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  assetTag?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
   inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -818,6 +892,8 @@ export type EquipmentUncheckedUpdateWithoutMaintenancesInput = {
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
 }
@@ -884,6 +960,8 @@ export type EquipmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ownership?: boolean
+  warrantyExpiresAt?: boolean
   assignments?: boolean | Prisma.Equipment$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Equipment$permitsArgs<ExtArgs>
   maintenances?: boolean | Prisma.Equipment$maintenancesArgs<ExtArgs>
@@ -903,6 +981,8 @@ export type EquipmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ownership?: boolean
+  warrantyExpiresAt?: boolean
 }, ExtArgs["result"]["equipment"]>
 
 export type EquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -918,6 +998,8 @@ export type EquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ownership?: boolean
+  warrantyExpiresAt?: boolean
 }, ExtArgs["result"]["equipment"]>
 
 export type EquipmentSelectScalar = {
@@ -933,9 +1015,11 @@ export type EquipmentSelectScalar = {
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ownership?: boolean
+  warrantyExpiresAt?: boolean
 }
 
-export type EquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "assetTag" | "barcode" | "type" | "inventoryNumber" | "serialNumber" | "brand" | "model" | "company" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["equipment"]>
+export type EquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "assetTag" | "barcode" | "type" | "inventoryNumber" | "serialNumber" | "brand" | "model" | "company" | "status" | "createdAt" | "updatedAt" | "ownership" | "warrantyExpiresAt", ExtArgs["result"]["equipment"]>
 export type EquipmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignments?: boolean | Prisma.Equipment$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Equipment$permitsArgs<ExtArgs>
@@ -954,7 +1038,7 @@ export type $EquipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    assetTag: string
+    assetTag: string | null
     barcode: string | null
     type: $Enums.EquipmentType | null
     inventoryNumber: string | null
@@ -965,6 +1049,8 @@ export type $EquipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     status: $Enums.EquipmentStatus
     createdAt: Date
     updatedAt: Date
+    ownership: $Enums.EquipmentOwnership
+    warrantyExpiresAt: Date | null
   }, ExtArgs["result"]["equipment"]>
   composites: {}
 }
@@ -1403,6 +1489,8 @@ export interface EquipmentFieldRefs {
   readonly status: Prisma.FieldRef<"Equipment", 'EquipmentStatus'>
   readonly createdAt: Prisma.FieldRef<"Equipment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Equipment", 'DateTime'>
+  readonly ownership: Prisma.FieldRef<"Equipment", 'EquipmentOwnership'>
+  readonly warrantyExpiresAt: Prisma.FieldRef<"Equipment", 'DateTime'>
 }
     
 

@@ -1,5 +1,6 @@
 import type {
   Company,
+  EquipmentOwnership,
   EquipmentStatus,
   EquipmentType,
 } from "@/generated/prisma/client"
@@ -11,6 +12,7 @@ export interface ListEquipmentInput {
   company?: Company
   status?: EquipmentStatus
   type?: EquipmentType
+  ownership?: EquipmentOwnership
 }
 
 export interface PaginatedEquipmentResult<T> {

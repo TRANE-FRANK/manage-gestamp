@@ -118,7 +118,9 @@ export const EquipmentScalarFieldEnum = {
   company: 'company',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  ownership: 'ownership',
+  warrantyExpiresAt: 'warrantyExpiresAt'
 } as const
 
 export type EquipmentScalarFieldEnum = (typeof EquipmentScalarFieldEnum)[keyof typeof EquipmentScalarFieldEnum]

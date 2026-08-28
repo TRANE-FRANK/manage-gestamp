@@ -2,7 +2,7 @@ import Card from "@/components/ui/Card"
 
 interface Props {
   equipment: {
-    assetTag: string
+    assetTag: string | null
     brand: string | null
     model: string | null
     serialNumber: string | null
@@ -19,7 +19,7 @@ export default function AssignmentEquipmentCard({ equipment }: Props) {
 
       <div className="space-y-2">
         <p>
-          <span className="font-semibold">Activo:</span> {equipment.assetTag}
+          <span className="font-semibold">Activo:</span> {equipment.assetTag ?? "Sin Asset Tag"}
         </p>
 
         <p>

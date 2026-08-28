@@ -21,6 +21,10 @@ enum UserRole {
 enum EquipmentType {
     LAPTOP
     DESKTOP
+    SMARTPHONE
+    TABLET
+    RADIO
+    PRINTER
 }
 
 enum EquipmentStatus {
@@ -53,6 +57,11 @@ enum ScanReason {
     NOT_ACTIVE
 }
 
+enum EquipmentOwnership {
+    OWNED
+    RENTED
+}
+
 model User {
     id           Int      @id @default(autoincrement())
     username     String   @unique
@@ -80,21 +89,23 @@ model Employee {
 }
 
 model Equipment {
-    id              Int             @id @default(autoincrement())
-    assetTag        String          @unique
-    barcode         String?         @unique
-    type            EquipmentType?
-    inventoryNumber String?         @unique
-    serialNumber    String?         @unique
-    brand           String?
-    model           String?
-    company         Company
-    status          EquipmentStatus
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
-    assignments     Assignment[]
-    permits         Permit[]
-    maintenances    Maintenance[]
+    id                Int                @id @default(autoincrement())
+    assetTag          String?            @unique
+    barcode           String?            @unique
+    type              EquipmentType?
+    inventoryNumber   String?            @unique
+    serialNumber      String?            @unique
+    brand             String?
+    model             String?
+    company           Company
+    status            EquipmentStatus
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
+    assignments       Assignment[]
+    permits           Permit[]
+    maintenances      Maintenance[]
+    ownership         EquipmentOwnership @default(OWNED)
+    warrantyExpiresAt DateTime?
 }
 
 model Assignment {

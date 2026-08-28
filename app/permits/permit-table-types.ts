@@ -6,7 +6,6 @@ export interface PermitRow {
   startDate: Date
   expirationDate: Date
   status: PermitStatus
-
   generatedPdfPath: string | null
   signedPdfPath: string | null
   departureAuthorized: boolean
@@ -22,7 +21,7 @@ export interface PermitRow {
 
   equipment: {
     id: number
-    assetTag: string
+    assetTag: string | null
     company: Company
     type: string | null
     brand: string | null

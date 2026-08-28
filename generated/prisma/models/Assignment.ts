@@ -544,10 +544,6 @@ export type AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput = {
   deleteMany?: Prisma.AssignmentScalarWhereInput | Prisma.AssignmentScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type AssignmentCreateWithoutEmployeeInput = {
   assignedAt: Date | string
   returnedAt?: Date | string | null
