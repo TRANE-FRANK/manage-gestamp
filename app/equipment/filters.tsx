@@ -69,7 +69,7 @@ export default function EquipmentFilters() {
         onChange={(event) => updateFilter("ownership", event.target.value)}
         className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       >
-        <option value="">Toda la propiedad</option>
+        <option value="">Todas</option>
         <option value="OWNED">Propio</option>
         <option value="RENTED">Rentado</option>
       </select>

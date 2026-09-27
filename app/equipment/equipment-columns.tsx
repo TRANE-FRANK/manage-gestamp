@@ -1,8 +1,12 @@
 "use client"
 
+import Link from "next/link"
+
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { Badge } from "@/components/ui/badge"
+
+import { equipmentTypeConfig } from "@/lib/equipment/config"
 
 import { DataTableColumnHeader } from "@/components/ui/data-table/DataTableColumnHeader"
 
@@ -10,7 +14,6 @@ import type {
   Equipment,
   EquipmentOwnership,
   EquipmentStatus,
-  EquipmentType,
 } from "@/generated/prisma/client"
 
 type BadgeVariant =
@@ -20,37 +23,16 @@ type BadgeVariant =
   | "outline"
   | "ghost"
 
-const equipmentTypeConfig: Record<
-  EquipmentType,
-  {
-    label: string
-    variant: BadgeVariant
-  }
+const equipmentTypeVariant: Record<
+  Exclude<Equipment["type"], null>,
+  BadgeVariant
 > = {
-  LAPTOP: {
-    label: "Laptop",
-    variant: "default",
-  },
-  DESKTOP: {
-    label: "Desktop",
-    variant: "secondary",
-  },
-  SMARTPHONE: {
-    label: "Smartphone",
-    variant: "outline",
-  },
-  TABLET: {
-    label: "Tablet",
-    variant: "ghost",
-  },
-  RADIO: {
-    label: "Radio",
-    variant: "secondary",
-  },
-  PRINTER: {
-    label: "Impresora",
-    variant: "outline",
-  },
+  LAPTOP: "default",
+  DESKTOP: "secondary",
+  SMARTPHONE: "outline",
+  TABLET: "ghost",
+  RADIO: "secondary",
+  PRINTER: "outline",
 }
 
 const ownershipConfig: Record<
@@ -107,9 +89,16 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
       <DataTableColumnHeader column={column} title="Equipo" />
     ),
 
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.assetTag}</span>
-    ),
+    cell: ({ row }) => {
+      const equipment = row.original
+      const identifier =
+        equipment.assetTag ??
+        equipment.inventoryNumber ??
+        equipment.serialNumber ??
+        `Equipo #${equipment.id}`
+
+      return <span className="font-medium">{identifier}</span>
+    },
 
     meta: {
       title: "Equipo",
@@ -131,8 +120,7 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
       }
 
       const config = equipmentTypeConfig[type]
-
-      return <Badge variant={config.variant}>{config.label}</Badge>
+      return <Badge variant={equipmentTypeVariant[type]}>{config.label}</Badge>
     },
 
     meta: {
@@ -236,9 +224,12 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
     ),
 
     cell: ({ row }) => {
-      const date = row.original.warrantyExpiresAt
+      const equipment = row.original
+      const hasWarranty =
+        equipment.type !== null &&
+        equipmentTypeConfig[equipment.type].hasWarranty
 
-      if (!date) {
+      if (!hasWarranty || !equipment.warrantyExpiresAt) {
         return <span className="text-slate-400">—</span>
       }
 
@@ -248,7 +239,7 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          }).format(date)}
+          }).format(equipment.warrantyExpiresAt)}
         </span>
       )
     },
@@ -275,6 +266,39 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
 
     meta: {
       title: "Estado",
+    },
+  },
+
+  {
+    id: "actions",
+    header: "Acciones",
+    enableSorting: false,
+    enableHiding: false,
+
+    cell: ({ row }) => {
+      const equipmentId = row.original.id
+
+      return (
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/equipment/${equipmentId}`}
+            className="inline-flex h-8 items-center justify-center rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            Ver
+          </Link>
+
+          <Link
+            href={`/equipment/${equipmentId}/edit`}
+            className="inline-flex h-8 items-center justify-center rounded-md bg-blue-700 px-3 text-sm font-medium text-white transition hover:bg-blue-800"
+          >
+            Editar
+          </Link>
+        </div>
+      )
+    },
+
+    meta: {
+      title: "Acciones",
     },
   },
 ]

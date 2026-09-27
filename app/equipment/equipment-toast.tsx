@@ -12,11 +12,16 @@ export default function EquipmentToast() {
     if (shown.current) return;
 
     const created = searchParams.get("created");
+    const updated = searchParams.get("updated");
 
     if (created === "true") {
       shown.current = true;
 
       toast.success("Equipo registrado correctamente");
+    } else if (updated === "true") {
+      shown.current = true;
+
+      toast.success("Equipo actualizado correctamente");
     }
   }, [searchParams]);
 

@@ -16,9 +16,20 @@ export async function findEquipmentPaginated({
   const [data, total] = await prisma.$transaction([
     prisma.equipment.findMany({
       where,
-      orderBy: {
-        assetTag: "asc",
-      },
+      orderBy: [
+        {
+          assetTag: "asc",
+        },
+        {
+          inventoryNumber: "asc",
+        },
+        {
+          serialNumber: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
       skip,
       take: pageSize,
     }),

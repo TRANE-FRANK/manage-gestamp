@@ -78,7 +78,7 @@ export default async function EquipmentPage({
 
   const result = await listEquipmentPaginated({
     page: currentPage,
-    pageSize: 5,
+    pageSize: 10,
     search,
     company: validCompany,
     status: validStatus,
@@ -121,6 +121,10 @@ export default async function EquipmentPage({
           total={result.total}
           pageSize={result.pageSize}
           search={search}
+          company={validCompany}
+          status={validStatus}
+          type={validType}
+          ownership={validOwnership}
         />
       </Card>
 

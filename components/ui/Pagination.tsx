@@ -13,6 +13,7 @@ interface PaginationProps {
   process?: string
   company?: string
   type?: string
+  ownership?: string
 }
 
 export default function Pagination({
@@ -25,6 +26,7 @@ export default function Pagination({
   process,
   company,
   type,
+  ownership,
 }: PaginationProps) {
   const pathname = usePathname()
 
@@ -49,6 +51,10 @@ export default function Pagination({
 
     if (type) {
       params.set("type", type)
+    }
+
+    if (ownership) {
+      params.set("ownership", ownership)
     }
 
     params.set("page", String(newPage))

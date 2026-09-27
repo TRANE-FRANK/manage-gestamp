@@ -2,28 +2,56 @@
 
 import { useActionState, useState } from "react"
 
+import { equipmentTypeConfig } from "@/lib/equipment/config"
+
+import type { Equipment, EquipmentType } from "@/generated/prisma/client"
+
 import {
   createEquipment,
+  updateEquipment,
   type EquipmentFormState,
 } from "@/actions/equipment-actions"
 
 const initialState: EquipmentFormState = {}
 
-export default function EquipmentForm() {
+type EditableEquipment = Pick<
+  Equipment,
+  | "id"
+  | "assetTag"
+  | "type"
+  | "inventoryNumber"
+  | "serialNumber"
+  | "brand"
+  | "model"
+  | "company"
+  | "status"
+  | "ownership"
+  | "warrantyExpiresAt"
+>
+
+interface EquipmentFormProps {
+  equipment?: EditableEquipment
+}
+
+export default function EquipmentForm({ equipment }: EquipmentFormProps) {
+  const equipmentAction = equipment
+    ? updateEquipment.bind(null, equipment.id)
+    : createEquipment
+
   const [state, formAction, isPending] = useActionState(
-    createEquipment,
+    equipmentAction,
     initialState,
   )
 
-  const [equipmentType, setEquipmentType] = useState("")
+  const [equipmentType, setEquipmentType] = useState<EquipmentType | "">(
+    equipment?.type ?? "",
+  )
 
-  const requiresAssetTag =
-    equipmentType === "LAPTOP" || equipmentType === "DESKTOP"
+  const typeConfig =
+    equipmentType !== "" ? equipmentTypeConfig[equipmentType] : undefined
 
-  const hasWarranty =
-    equipmentType === "LAPTOP" ||
-    equipmentType === "DESKTOP" ||
-    equipmentType === "TABLET"
+  const requiresAssetTag = typeConfig?.requiresAssetTag ?? false
+  const hasWarranty = typeConfig?.hasWarranty ?? false
 
   return (
     <form action={formAction} className="space-y-6">
@@ -44,6 +72,7 @@ export default function EquipmentForm() {
         <input
           name="assetTag"
           placeholder="GP2LT001"
+          defaultValue={equipment?.assetTag ?? ""}
           className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           required={requiresAssetTag}
         />
@@ -61,7 +90,9 @@ export default function EquipmentForm() {
         <select
           name="type"
           value={equipmentType}
-          onChange={(event) => setEquipmentType(event.target.value)}
+          onChange={(event) =>
+            setEquipmentType(event.target.value as EquipmentType | "")
+          }
           className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           required
         >
@@ -84,6 +115,7 @@ export default function EquipmentForm() {
           <input
             name="inventoryNumber"
             placeholder="INV-0001"
+            defaultValue={equipment?.inventoryNumber ?? ""}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           />
 
@@ -102,6 +134,7 @@ export default function EquipmentForm() {
           <input
             name="serialNumber"
             placeholder="Serial"
+            defaultValue={equipment?.serialNumber ?? ""}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           />
 
@@ -122,6 +155,7 @@ export default function EquipmentForm() {
           <input
             name="brand"
             placeholder="Dell"
+            defaultValue={equipment?.brand ?? ""}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -134,6 +168,7 @@ export default function EquipmentForm() {
           <input
             name="model"
             placeholder="Latitude 5440"
+            defaultValue={equipment?.model ?? ""}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -147,6 +182,7 @@ export default function EquipmentForm() {
 
           <select
             name="company"
+            defaultValue={equipment?.company ?? "ORM"}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             required
           >
@@ -162,6 +198,7 @@ export default function EquipmentForm() {
 
           <select
             name="status"
+            defaultValue={equipment?.status ?? "AVAILABLE"}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             required
           >
@@ -186,6 +223,7 @@ export default function EquipmentForm() {
 
           <select
             name="ownership"
+            defaultValue={equipment?.ownership ?? "OWNED"}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             required
           >
@@ -206,6 +244,11 @@ export default function EquipmentForm() {
             <input
               type="date"
               name="warrantyExpiresAt"
+              defaultValue={
+                equipment?.warrantyExpiresAt
+                  ? equipment.warrantyExpiresAt.toISOString().slice(0, 10)
+                  : ""
+              }
               className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             />
           </div>
@@ -218,7 +261,11 @@ export default function EquipmentForm() {
           disabled={isPending}
           className="rounded-xl bg-blue-700 px-6 py-3 font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Guardando..." : "Guardar Equipo"}
+          {isPending
+            ? "Guardando..."
+            : equipment
+              ? "Guardar cambios"
+              : "Guardar Equipo"}
         </button>
       </div>
     </form>
