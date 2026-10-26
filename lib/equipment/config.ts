@@ -5,17 +5,16 @@ export interface EquipmentTypeConfig {
   requiresAssetTag: boolean
   hasWarranty: boolean
   requiresExitPermit: boolean
+  hasResponsiva: boolean
 }
 
-export const equipmentTypeConfig: Record<
-  EquipmentType,
-  EquipmentTypeConfig
-> = {
+export const equipmentTypeConfig: Record<EquipmentType, EquipmentTypeConfig> = {
   LAPTOP: {
     label: "Laptop",
     requiresAssetTag: true,
     hasWarranty: true,
     requiresExitPermit: true,
+    hasResponsiva: true,
   },
 
   DESKTOP: {
@@ -23,6 +22,7 @@ export const equipmentTypeConfig: Record<
     requiresAssetTag: true,
     hasWarranty: true,
     requiresExitPermit: false,
+    hasResponsiva: true,
   },
 
   SMARTPHONE: {
@@ -30,6 +30,7 @@ export const equipmentTypeConfig: Record<
     requiresAssetTag: false,
     hasWarranty: false,
     requiresExitPermit: false,
+    hasResponsiva: true,
   },
 
   TABLET: {
@@ -37,6 +38,7 @@ export const equipmentTypeConfig: Record<
     requiresAssetTag: false,
     hasWarranty: true,
     requiresExitPermit: false,
+    hasResponsiva: true,
   },
 
   RADIO: {
@@ -44,6 +46,7 @@ export const equipmentTypeConfig: Record<
     requiresAssetTag: false,
     hasWarranty: false,
     requiresExitPermit: false,
+    hasResponsiva: false,
   },
 
   PRINTER: {
@@ -51,5 +54,6 @@ export const equipmentTypeConfig: Record<
     requiresAssetTag: false,
     hasWarranty: false,
     requiresExitPermit: false,
+    hasResponsiva: false,
   },
 }

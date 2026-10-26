@@ -186,8 +186,8 @@ export default function EquipmentForm({ equipment }: EquipmentFormProps) {
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             required
           >
-            <option value="ORM">ORM</option>
             <option value="GP2">GP2</option>
+            <option value="ORM">ORM</option>
           </select>
         </div>
 

@@ -29,17 +29,20 @@ export type AggregateMaintenance = {
 export type MaintenanceAvgAggregateOutputType = {
   id: number | null
   equipmentId: number | null
+  batchId: number | null
 }
 
 export type MaintenanceSumAggregateOutputType = {
   id: number | null
   equipmentId: number | null
+  batchId: number | null
 }
 
 export type MaintenanceMinAggregateOutputType = {
   id: number | null
   equipmentId: number | null
   maintenanceDate: Date | null
+  batchId: number | null
   provider: string | null
   folio: string | null
   generatedPdfPath: string | null
@@ -52,6 +55,7 @@ export type MaintenanceMaxAggregateOutputType = {
   id: number | null
   equipmentId: number | null
   maintenanceDate: Date | null
+  batchId: number | null
   provider: string | null
   folio: string | null
   generatedPdfPath: string | null
@@ -64,6 +68,7 @@ export type MaintenanceCountAggregateOutputType = {
   id: number
   equipmentId: number
   maintenanceDate: number
+  batchId: number
   provider: number
   folio: number
   generatedPdfPath: number
@@ -77,17 +82,20 @@ export type MaintenanceCountAggregateOutputType = {
 export type MaintenanceAvgAggregateInputType = {
   id?: true
   equipmentId?: true
+  batchId?: true
 }
 
 export type MaintenanceSumAggregateInputType = {
   id?: true
   equipmentId?: true
+  batchId?: true
 }
 
 export type MaintenanceMinAggregateInputType = {
   id?: true
   equipmentId?: true
   maintenanceDate?: true
+  batchId?: true
   provider?: true
   folio?: true
   generatedPdfPath?: true
@@ -100,6 +108,7 @@ export type MaintenanceMaxAggregateInputType = {
   id?: true
   equipmentId?: true
   maintenanceDate?: true
+  batchId?: true
   provider?: true
   folio?: true
   generatedPdfPath?: true
@@ -112,6 +121,7 @@ export type MaintenanceCountAggregateInputType = {
   id?: true
   equipmentId?: true
   maintenanceDate?: true
+  batchId?: true
   provider?: true
   folio?: true
   generatedPdfPath?: true
@@ -211,6 +221,7 @@ export type MaintenanceGroupByOutputType = {
   id: number
   equipmentId: number
   maintenanceDate: Date
+  batchId: number | null
   provider: string | null
   folio: string | null
   generatedPdfPath: string | null
@@ -246,6 +257,7 @@ export type MaintenanceWhereInput = {
   id?: Prisma.IntFilter<"Maintenance"> | number
   equipmentId?: Prisma.IntFilter<"Maintenance"> | number
   maintenanceDate?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
+  batchId?: Prisma.IntNullableFilter<"Maintenance"> | number | null
   provider?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   folio?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Maintenance"> | string | null
@@ -253,12 +265,14 @@ export type MaintenanceWhereInput = {
   notes?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
   equipment?: Prisma.XOR<Prisma.EquipmentScalarRelationFilter, Prisma.EquipmentWhereInput>
+  batch?: Prisma.XOR<Prisma.MaintenanceBatchNullableScalarRelationFilter, Prisma.MaintenanceBatchWhereInput> | null
 }
 
 export type MaintenanceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
   maintenanceDate?: Prisma.SortOrder
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
   provider?: Prisma.SortOrderInput | Prisma.SortOrder
   folio?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -266,15 +280,18 @@ export type MaintenanceOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   equipment?: Prisma.EquipmentOrderByWithRelationInput
+  batch?: Prisma.MaintenanceBatchOrderByWithRelationInput
 }
 
 export type MaintenanceWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  equipmentId_maintenanceDate?: Prisma.MaintenanceEquipmentIdMaintenanceDateCompoundUniqueInput
   AND?: Prisma.MaintenanceWhereInput | Prisma.MaintenanceWhereInput[]
   OR?: Prisma.MaintenanceWhereInput[]
   NOT?: Prisma.MaintenanceWhereInput | Prisma.MaintenanceWhereInput[]
   equipmentId?: Prisma.IntFilter<"Maintenance"> | number
   maintenanceDate?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
+  batchId?: Prisma.IntNullableFilter<"Maintenance"> | number | null
   provider?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   folio?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Maintenance"> | string | null
@@ -282,12 +299,14 @@ export type MaintenanceWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
   equipment?: Prisma.XOR<Prisma.EquipmentScalarRelationFilter, Prisma.EquipmentWhereInput>
-}, "id">
+  batch?: Prisma.XOR<Prisma.MaintenanceBatchNullableScalarRelationFilter, Prisma.MaintenanceBatchWhereInput> | null
+}, "id" | "equipmentId_maintenanceDate">
 
 export type MaintenanceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
   maintenanceDate?: Prisma.SortOrder
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
   provider?: Prisma.SortOrderInput | Prisma.SortOrder
   folio?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -308,6 +327,7 @@ export type MaintenanceScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Maintenance"> | number
   equipmentId?: Prisma.IntWithAggregatesFilter<"Maintenance"> | number
   maintenanceDate?: Prisma.DateTimeWithAggregatesFilter<"Maintenance"> | Date | string
+  batchId?: Prisma.IntNullableWithAggregatesFilter<"Maintenance"> | number | null
   provider?: Prisma.StringNullableWithAggregatesFilter<"Maintenance"> | string | null
   folio?: Prisma.StringNullableWithAggregatesFilter<"Maintenance"> | string | null
   generatedPdfPath?: Prisma.StringNullableWithAggregatesFilter<"Maintenance"> | string | null
@@ -325,12 +345,14 @@ export type MaintenanceCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   equipment: Prisma.EquipmentCreateNestedOneWithoutMaintenancesInput
+  batch?: Prisma.MaintenanceBatchCreateNestedOneWithoutMaintenancesInput
 }
 
 export type MaintenanceUncheckedCreateInput = {
   id?: number
   equipmentId: number
   maintenanceDate: Date | string
+  batchId?: number | null
   provider?: string | null
   folio?: string | null
   generatedPdfPath?: string | null
@@ -348,12 +370,14 @@ export type MaintenanceUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.EquipmentUpdateOneRequiredWithoutMaintenancesNestedInput
+  batch?: Prisma.MaintenanceBatchUpdateOneWithoutMaintenancesNestedInput
 }
 
 export type MaintenanceUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batchId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -366,6 +390,7 @@ export type MaintenanceCreateManyInput = {
   id?: number
   equipmentId: number
   maintenanceDate: Date | string
+  batchId?: number | null
   provider?: string | null
   folio?: string | null
   generatedPdfPath?: string | null
@@ -388,6 +413,7 @@ export type MaintenanceUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batchId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -406,10 +432,16 @@ export type MaintenanceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type MaintenanceEquipmentIdMaintenanceDateCompoundUniqueInput = {
+  equipmentId: number
+  maintenanceDate: Date | string
+}
+
 export type MaintenanceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
   maintenanceDate?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   folio?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
@@ -421,12 +453,14 @@ export type MaintenanceCountOrderByAggregateInput = {
 export type MaintenanceAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
 }
 
 export type MaintenanceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
   maintenanceDate?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   folio?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
@@ -439,6 +473,7 @@ export type MaintenanceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
   maintenanceDate?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   folio?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
@@ -450,6 +485,7 @@ export type MaintenanceMinOrderByAggregateInput = {
 export type MaintenanceSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   equipmentId?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
 }
 
 export type MaintenanceCreateNestedManyWithoutEquipmentInput = {
@@ -494,6 +530,48 @@ export type MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput = {
   deleteMany?: Prisma.MaintenanceScalarWhereInput | Prisma.MaintenanceScalarWhereInput[]
 }
 
+export type MaintenanceCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput> | Prisma.MaintenanceCreateWithoutBatchInput[] | Prisma.MaintenanceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.MaintenanceCreateOrConnectWithoutBatchInput | Prisma.MaintenanceCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.MaintenanceCreateManyBatchInputEnvelope
+  connect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+}
+
+export type MaintenanceUncheckedCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput> | Prisma.MaintenanceCreateWithoutBatchInput[] | Prisma.MaintenanceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.MaintenanceCreateOrConnectWithoutBatchInput | Prisma.MaintenanceCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.MaintenanceCreateManyBatchInputEnvelope
+  connect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+}
+
+export type MaintenanceUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput> | Prisma.MaintenanceCreateWithoutBatchInput[] | Prisma.MaintenanceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.MaintenanceCreateOrConnectWithoutBatchInput | Prisma.MaintenanceCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.MaintenanceUpsertWithWhereUniqueWithoutBatchInput | Prisma.MaintenanceUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.MaintenanceCreateManyBatchInputEnvelope
+  set?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  disconnect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  delete?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  connect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  update?: Prisma.MaintenanceUpdateWithWhereUniqueWithoutBatchInput | Prisma.MaintenanceUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.MaintenanceUpdateManyWithWhereWithoutBatchInput | Prisma.MaintenanceUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.MaintenanceScalarWhereInput | Prisma.MaintenanceScalarWhereInput[]
+}
+
+export type MaintenanceUncheckedUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput> | Prisma.MaintenanceCreateWithoutBatchInput[] | Prisma.MaintenanceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.MaintenanceCreateOrConnectWithoutBatchInput | Prisma.MaintenanceCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.MaintenanceUpsertWithWhereUniqueWithoutBatchInput | Prisma.MaintenanceUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.MaintenanceCreateManyBatchInputEnvelope
+  set?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  disconnect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  delete?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  connect?: Prisma.MaintenanceWhereUniqueInput | Prisma.MaintenanceWhereUniqueInput[]
+  update?: Prisma.MaintenanceUpdateWithWhereUniqueWithoutBatchInput | Prisma.MaintenanceUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.MaintenanceUpdateManyWithWhereWithoutBatchInput | Prisma.MaintenanceUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.MaintenanceScalarWhereInput | Prisma.MaintenanceScalarWhereInput[]
+}
+
 export type MaintenanceCreateWithoutEquipmentInput = {
   maintenanceDate: Date | string
   provider?: string | null
@@ -502,11 +580,13 @@ export type MaintenanceCreateWithoutEquipmentInput = {
   signedPdfPath?: string | null
   notes?: string | null
   createdAt?: Date | string
+  batch?: Prisma.MaintenanceBatchCreateNestedOneWithoutMaintenancesInput
 }
 
 export type MaintenanceUncheckedCreateWithoutEquipmentInput = {
   id?: number
   maintenanceDate: Date | string
+  batchId?: number | null
   provider?: string | null
   folio?: string | null
   generatedPdfPath?: string | null
@@ -548,6 +628,7 @@ export type MaintenanceScalarWhereInput = {
   id?: Prisma.IntFilter<"Maintenance"> | number
   equipmentId?: Prisma.IntFilter<"Maintenance"> | number
   maintenanceDate?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
+  batchId?: Prisma.IntNullableFilter<"Maintenance"> | number | null
   provider?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   folio?: Prisma.StringNullableFilter<"Maintenance"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Maintenance"> | string | null
@@ -556,9 +637,59 @@ export type MaintenanceScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Maintenance"> | Date | string
 }
 
+export type MaintenanceCreateWithoutBatchInput = {
+  maintenanceDate: Date | string
+  provider?: string | null
+  folio?: string | null
+  generatedPdfPath?: string | null
+  signedPdfPath?: string | null
+  notes?: string | null
+  createdAt?: Date | string
+  equipment: Prisma.EquipmentCreateNestedOneWithoutMaintenancesInput
+}
+
+export type MaintenanceUncheckedCreateWithoutBatchInput = {
+  id?: number
+  equipmentId: number
+  maintenanceDate: Date | string
+  provider?: string | null
+  folio?: string | null
+  generatedPdfPath?: string | null
+  signedPdfPath?: string | null
+  notes?: string | null
+  createdAt?: Date | string
+}
+
+export type MaintenanceCreateOrConnectWithoutBatchInput = {
+  where: Prisma.MaintenanceWhereUniqueInput
+  create: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput>
+}
+
+export type MaintenanceCreateManyBatchInputEnvelope = {
+  data: Prisma.MaintenanceCreateManyBatchInput | Prisma.MaintenanceCreateManyBatchInput[]
+  skipDuplicates?: boolean
+}
+
+export type MaintenanceUpsertWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.MaintenanceWhereUniqueInput
+  update: Prisma.XOR<Prisma.MaintenanceUpdateWithoutBatchInput, Prisma.MaintenanceUncheckedUpdateWithoutBatchInput>
+  create: Prisma.XOR<Prisma.MaintenanceCreateWithoutBatchInput, Prisma.MaintenanceUncheckedCreateWithoutBatchInput>
+}
+
+export type MaintenanceUpdateWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.MaintenanceWhereUniqueInput
+  data: Prisma.XOR<Prisma.MaintenanceUpdateWithoutBatchInput, Prisma.MaintenanceUncheckedUpdateWithoutBatchInput>
+}
+
+export type MaintenanceUpdateManyWithWhereWithoutBatchInput = {
+  where: Prisma.MaintenanceScalarWhereInput
+  data: Prisma.XOR<Prisma.MaintenanceUpdateManyMutationInput, Prisma.MaintenanceUncheckedUpdateManyWithoutBatchInput>
+}
+
 export type MaintenanceCreateManyEquipmentInput = {
   id?: number
   maintenanceDate: Date | string
+  batchId?: number | null
   provider?: string | null
   folio?: string | null
   generatedPdfPath?: string | null
@@ -575,11 +706,13 @@ export type MaintenanceUpdateWithoutEquipmentInput = {
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batch?: Prisma.MaintenanceBatchUpdateOneWithoutMaintenancesNestedInput
 }
 
 export type MaintenanceUncheckedUpdateWithoutEquipmentInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batchId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -590,6 +723,54 @@ export type MaintenanceUncheckedUpdateWithoutEquipmentInput = {
 
 export type MaintenanceUncheckedUpdateManyWithoutEquipmentInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batchId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MaintenanceCreateManyBatchInput = {
+  id?: number
+  equipmentId: number
+  maintenanceDate: Date | string
+  provider?: string | null
+  folio?: string | null
+  generatedPdfPath?: string | null
+  signedPdfPath?: string | null
+  notes?: string | null
+  createdAt?: Date | string
+}
+
+export type MaintenanceUpdateWithoutBatchInput = {
+  maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  equipment?: Prisma.EquipmentUpdateOneRequiredWithoutMaintenancesNestedInput
+}
+
+export type MaintenanceUncheckedUpdateWithoutBatchInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
+  maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MaintenanceUncheckedUpdateManyWithoutBatchInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   maintenanceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   folio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -605,6 +786,7 @@ export type MaintenanceSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   id?: boolean
   equipmentId?: boolean
   maintenanceDate?: boolean
+  batchId?: boolean
   provider?: boolean
   folio?: boolean
   generatedPdfPath?: boolean
@@ -612,12 +794,14 @@ export type MaintenanceSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   notes?: boolean
   createdAt?: boolean
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }, ExtArgs["result"]["maintenance"]>
 
 export type MaintenanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   equipmentId?: boolean
   maintenanceDate?: boolean
+  batchId?: boolean
   provider?: boolean
   folio?: boolean
   generatedPdfPath?: boolean
@@ -625,12 +809,14 @@ export type MaintenanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }, ExtArgs["result"]["maintenance"]>
 
 export type MaintenanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   equipmentId?: boolean
   maintenanceDate?: boolean
+  batchId?: boolean
   provider?: boolean
   folio?: boolean
   generatedPdfPath?: boolean
@@ -638,12 +824,14 @@ export type MaintenanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }, ExtArgs["result"]["maintenance"]>
 
 export type MaintenanceSelectScalar = {
   id?: boolean
   equipmentId?: boolean
   maintenanceDate?: boolean
+  batchId?: boolean
   provider?: boolean
   folio?: boolean
   generatedPdfPath?: boolean
@@ -652,26 +840,31 @@ export type MaintenanceSelectScalar = {
   createdAt?: boolean
 }
 
-export type MaintenanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "equipmentId" | "maintenanceDate" | "provider" | "folio" | "generatedPdfPath" | "signedPdfPath" | "notes" | "createdAt", ExtArgs["result"]["maintenance"]>
+export type MaintenanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "equipmentId" | "maintenanceDate" | "batchId" | "provider" | "folio" | "generatedPdfPath" | "signedPdfPath" | "notes" | "createdAt", ExtArgs["result"]["maintenance"]>
 export type MaintenanceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }
 export type MaintenanceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }
 export type MaintenanceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.Maintenance$batchArgs<ExtArgs>
 }
 
 export type $MaintenancePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Maintenance"
   objects: {
     equipment: Prisma.$EquipmentPayload<ExtArgs>
+    batch: Prisma.$MaintenanceBatchPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     equipmentId: number
     maintenanceDate: Date
+    batchId: number | null
     provider: string | null
     folio: string | null
     generatedPdfPath: string | null
@@ -1073,6 +1266,7 @@ readonly fields: MaintenanceFieldRefs;
 export interface Prisma__MaintenanceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   equipment<T extends Prisma.EquipmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EquipmentDefaultArgs<ExtArgs>>): Prisma.Prisma__EquipmentClient<runtime.Types.Result.GetResult<Prisma.$EquipmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  batch<T extends Prisma.Maintenance$batchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Maintenance$batchArgs<ExtArgs>>): Prisma.Prisma__MaintenanceBatchClient<runtime.Types.Result.GetResult<Prisma.$MaintenanceBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1105,6 +1299,7 @@ export interface MaintenanceFieldRefs {
   readonly id: Prisma.FieldRef<"Maintenance", 'Int'>
   readonly equipmentId: Prisma.FieldRef<"Maintenance", 'Int'>
   readonly maintenanceDate: Prisma.FieldRef<"Maintenance", 'DateTime'>
+  readonly batchId: Prisma.FieldRef<"Maintenance", 'Int'>
   readonly provider: Prisma.FieldRef<"Maintenance", 'String'>
   readonly folio: Prisma.FieldRef<"Maintenance", 'String'>
   readonly generatedPdfPath: Prisma.FieldRef<"Maintenance", 'String'>
@@ -1509,6 +1704,25 @@ export type MaintenanceDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many Maintenances to delete.
    */
   limit?: number
+}
+
+/**
+ * Maintenance.batch
+ */
+export type Maintenance$batchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MaintenanceBatch
+   */
+  select?: Prisma.MaintenanceBatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MaintenanceBatch
+   */
+  omit?: Prisma.MaintenanceBatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MaintenanceBatchInclude<ExtArgs> | null
+  where?: Prisma.MaintenanceBatchWhereInput
 }
 
 /**

@@ -10,8 +10,12 @@ import PageHeader from "@/components/ui/PageHeader"
 
 import { equipmentTypeConfig } from "@/lib/equipment/config"
 import { getEquipmentDetails } from "@/services/equipment"
+import { getEquipmentMaintenanceHistory } from "@/services/maintenance"
 
 import EquipmentToast from "../equipment-toast"
+import MaintenanceHistoryTable, {
+  formatMaintenanceDate,
+} from "../../maintenance/maintenance-history-table"
 
 const statusConfig: Record<
   EquipmentStatus,
@@ -77,6 +81,8 @@ export default async function EquipmentDetailsPage({
   if (!equipment) {
     notFound()
   }
+
+  const maintenanceHistory = await getEquipmentMaintenanceHistory(equipmentId)
 
   const identifier =
     equipment.assetTag ??
@@ -205,7 +211,11 @@ export default async function EquipmentDetailsPage({
                   </p>
 
                   <p className="text-sm text-slate-500">
-                    {assignment.returnedAt
+                    {assignment.cancelledAt
+                      ? `Anulada: ${assignment.cancelledAt.toLocaleDateString(
+                          "es-MX",
+                        )}`
+                      : assignment.returnedAt
                       ? `Devuelto: ${assignment.returnedAt.toLocaleDateString(
                           "es-MX",
                         )}`
@@ -215,6 +225,29 @@ export default async function EquipmentDetailsPage({
               ))}
             </div>
           )}
+        </Card>
+
+        <Card>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">
+            Historial de mantenimientos
+          </h2>
+
+          {maintenanceHistory.records[0] ? (
+            <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Último mantenimiento</p>
+              <p className="font-medium">
+                {formatMaintenanceDate(
+                  maintenanceHistory.records[0].maintenanceDate,
+                )}
+              </p>
+            </div>
+          ) : (
+            <p className="mb-5 rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500">
+              Sin historial
+            </p>
+          )}
+
+          <MaintenanceHistoryTable records={maintenanceHistory.records} />
         </Card>
 
         {typeConfig?.requiresExitPermit && (

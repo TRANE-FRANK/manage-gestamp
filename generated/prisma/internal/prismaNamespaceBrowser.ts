@@ -57,6 +57,7 @@ export const ModelName = {
   Assignment: 'Assignment',
   Permit: 'Permit',
   ScanLog: 'ScanLog',
+  MaintenanceBatch: 'MaintenanceBatch',
   Maintenance: 'Maintenance'
 } as const
 
@@ -132,6 +133,8 @@ export const AssignmentScalarFieldEnum = {
   equipmentId: 'equipmentId',
   assignedAt: 'assignedAt',
   returnedAt: 'returnedAt',
+  cancelledAt: 'cancelledAt',
+  cancellationReason: 'cancellationReason',
   replacementReason: 'replacementReason',
   generatedPdfPath: 'generatedPdfPath',
   signedPdfPath: 'signedPdfPath',
@@ -176,10 +179,19 @@ export const ScanLogScalarFieldEnum = {
 export type ScanLogScalarFieldEnum = (typeof ScanLogScalarFieldEnum)[keyof typeof ScanLogScalarFieldEnum]
 
 
+export const MaintenanceBatchScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt'
+} as const
+
+export type MaintenanceBatchScalarFieldEnum = (typeof MaintenanceBatchScalarFieldEnum)[keyof typeof MaintenanceBatchScalarFieldEnum]
+
+
 export const MaintenanceScalarFieldEnum = {
   id: 'id',
   equipmentId: 'equipmentId',
   maintenanceDate: 'maintenanceDate',
+  batchId: 'batchId',
   provider: 'provider',
   folio: 'folio',
   generatedPdfPath: 'generatedPdfPath',

@@ -12,6 +12,7 @@ import {
 } from "@/generated/prisma/enums"
 
 import { prisma } from "@/lib/prisma"
+import { AccessControlError, requireRole } from "@/lib/auth/authorization"
 
 import { redirect } from "next/navigation"
 
@@ -183,6 +184,24 @@ export async function createEquipment(
   _previousState: EquipmentFormState,
   formData: FormData,
 ): Promise<EquipmentFormState> {
+  try {
+    await requireRole("ADMIN", "IT")
+  } catch (error) {
+    if (error instanceof AccessControlError) {
+      return {
+        errors: {
+          general:
+            error.code === "UNAUTHENTICATED"
+              ? "Debes iniciar sesión para registrar un equipo."
+              : "No tienes permisos para registrar equipos.",
+        },
+      }
+    }
+
+    console.error("No se pudo verificar el acceso para registrar un equipo.")
+    return getUnexpectedError()
+  }
+
   const data = getEquipmentFormData(formData)
 
   if (hasErrors(data)) {

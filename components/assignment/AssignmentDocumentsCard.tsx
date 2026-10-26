@@ -1,18 +1,31 @@
 import Card from "@/components/ui/Card"
 import ViewDocumentButton from "@/components/assignment/view-document-button"
 import UploadSignedPdfButton from "@/components/assignment/upload-signed-pdf-button"
+import { equipmentTypeConfig } from "@/lib/equipment/config"
+import type { EquipmentType } from "@/generated/prisma/client"
 
 interface Props {
   assignmentId: number
+  equipmentType: EquipmentType | null
+  isActive: boolean
   generatedPdfPath: string | null
   signedPdfPath: string | null
 }
 
 export default function AssignmentDocumentsCard({
   assignmentId,
+  equipmentType,
+  isActive,
   generatedPdfPath,
   signedPdfPath,
 }: Props) {
+  const hasResponsiva =
+    equipmentType !== null && equipmentTypeConfig[equipmentType].hasResponsiva
+
+  if (!hasResponsiva) {
+    return null
+  }
+
   return (
     <Card>
       <h2 className="mb-6 text-lg font-semibold">Centro documental</h2>
@@ -49,7 +62,7 @@ export default function AssignmentDocumentsCard({
 
           {signedPdfPath ? (
             <ViewDocumentButton assignmentId={assignmentId} type="signed" />
-          ) : generatedPdfPath ? (
+          ) : generatedPdfPath && isActive ? (
             <UploadSignedPdfButton assignmentId={assignmentId} />
           ) : (
             <span className="text-sm text-slate-400">Pendiente</span>

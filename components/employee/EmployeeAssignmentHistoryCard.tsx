@@ -34,8 +34,20 @@ export default function EmployeeAssignmentHistoryCard({ employee }: Props) {
                   {assignment.equipment.brand} {assignment.equipment.model}
                 </h3>
 
-                <Badge variant={assignment.returnedAt ? "outline" : "default"}>
-                  {assignment.returnedAt ? "Devuelta" : "Activa"}
+                <Badge
+                  variant={
+                    assignment.cancelledAt
+                      ? "destructive"
+                      : assignment.returnedAt
+                        ? "outline"
+                        : "default"
+                  }
+                >
+                  {assignment.cancelledAt
+                    ? "Anulada"
+                    : assignment.returnedAt
+                      ? "Devuelta"
+                      : "Activa"}
                 </Badge>
               </div>
 
@@ -56,8 +68,21 @@ export default function EmployeeAssignmentHistoryCard({ employee }: Props) {
                   <strong>Devuelto:</strong>{" "}
                   {assignment.returnedAt
                     ? formatDate(assignment.returnedAt)
-                    : "Aun con usuario"}
+                    : "-"}
                 </p>
+
+                {assignment.cancelledAt && (
+                  <>
+                    <p>
+                      <strong>Anulada:</strong>{" "}
+                      {formatDate(assignment.cancelledAt)}
+                    </p>
+
+                    <p>
+                      <strong>Motivo:</strong> {assignment.cancellationReason}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           ))}

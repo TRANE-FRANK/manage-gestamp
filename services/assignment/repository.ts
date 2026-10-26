@@ -5,6 +5,11 @@ import { NotFoundError } from "../shared/errors"
 
 import { assignmentInclude } from "./queries"
 
+const activeAssignmentWhere: Prisma.AssignmentWhereInput = {
+  returnedAt: null,
+  cancelledAt: null,
+}
+
 export async function findAssignmentById(id: number) {
   return prisma.assignment.findUnique({
     where: {
@@ -27,7 +32,7 @@ export async function findAssignmentByIdOrThrow(id: number) {
 export async function findActiveAssignments() {
   return prisma.assignment.findMany({
     where: {
-      returnedAt: null,
+      ...activeAssignmentWhere,
     },
     include: assignmentInclude,
     orderBy: {
@@ -50,7 +55,7 @@ export async function findActiveAssignmentsPaginated({
   const [data, total] = await prisma.$transaction([
     prisma.assignment.findMany({
       where: {
-        returnedAt: null,
+        ...activeAssignmentWhere,
         ...where,
       },
       include: assignmentInclude,
@@ -63,7 +68,7 @@ export async function findActiveAssignmentsPaginated({
 
     prisma.assignment.count({
       where: {
-        returnedAt: null,
+        ...activeAssignmentWhere,
         ...where,
       },
     }),
@@ -121,7 +126,7 @@ export async function findActiveAssignmentsByEmployeeId(employeeId: number) {
   return prisma.assignment.findMany({
     where: {
       employeeId,
-      returnedAt: null,
+      ...activeAssignmentWhere,
     },
     include: {
       equipment: true,
@@ -136,7 +141,7 @@ export async function findActiveAssignmentByEquipment(equipmentId: number) {
   return prisma.assignment.findFirst({
     where: {
       equipmentId,
-      returnedAt: null,
+      ...activeAssignmentWhere,
     },
     include: {
       employee: true,

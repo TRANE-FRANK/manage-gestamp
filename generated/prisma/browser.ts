@@ -48,6 +48,11 @@ export type Permit = Prisma.PermitModel
  */
 export type ScanLog = Prisma.ScanLogModel
 /**
+ * Model MaintenanceBatch
+ *
+ */
+export type MaintenanceBatch = Prisma.MaintenanceBatchModel
+/**
  * Model Maintenance
  * 
  */

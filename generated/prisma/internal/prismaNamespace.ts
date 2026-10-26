@@ -390,6 +390,7 @@ export const ModelName = {
   Assignment: 'Assignment',
   Permit: 'Permit',
   ScanLog: 'ScanLog',
+  MaintenanceBatch: 'MaintenanceBatch',
   Maintenance: 'Maintenance'
 } as const
 
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "employee" | "equipment" | "assignment" | "permit" | "scanLog" | "maintenance"
+    modelProps: "user" | "employee" | "equipment" | "assignment" | "permit" | "scanLog" | "maintenanceBatch" | "maintenance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -854,6 +855,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MaintenanceBatch: {
+      payload: Prisma.$MaintenanceBatchPayload<ExtArgs>
+      fields: Prisma.MaintenanceBatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MaintenanceBatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MaintenanceBatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        findFirst: {
+          args: Prisma.MaintenanceBatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MaintenanceBatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        findMany: {
+          args: Prisma.MaintenanceBatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>[]
+        }
+        create: {
+          args: Prisma.MaintenanceBatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        createMany: {
+          args: Prisma.MaintenanceBatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MaintenanceBatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>[]
+        }
+        delete: {
+          args: Prisma.MaintenanceBatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        update: {
+          args: Prisma.MaintenanceBatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.MaintenanceBatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MaintenanceBatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MaintenanceBatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.MaintenanceBatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceBatchPayload>
+        }
+        aggregate: {
+          args: Prisma.MaintenanceBatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMaintenanceBatch>
+        }
+        groupBy: {
+          args: Prisma.MaintenanceBatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaintenanceBatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MaintenanceBatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaintenanceBatchCountAggregateOutputType> | number
+        }
+      }
+    }
     Maintenance: {
       payload: Prisma.$MaintenancePayload<ExtArgs>
       fields: Prisma.MaintenanceFieldRefs
@@ -1023,6 +1098,8 @@ export const AssignmentScalarFieldEnum = {
   equipmentId: 'equipmentId',
   assignedAt: 'assignedAt',
   returnedAt: 'returnedAt',
+  cancelledAt: 'cancelledAt',
+  cancellationReason: 'cancellationReason',
   replacementReason: 'replacementReason',
   generatedPdfPath: 'generatedPdfPath',
   signedPdfPath: 'signedPdfPath',
@@ -1067,10 +1144,19 @@ export const ScanLogScalarFieldEnum = {
 export type ScanLogScalarFieldEnum = (typeof ScanLogScalarFieldEnum)[keyof typeof ScanLogScalarFieldEnum]
 
 
+export const MaintenanceBatchScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt'
+} as const
+
+export type MaintenanceBatchScalarFieldEnum = (typeof MaintenanceBatchScalarFieldEnum)[keyof typeof MaintenanceBatchScalarFieldEnum]
+
+
 export const MaintenanceScalarFieldEnum = {
   id: 'id',
   equipmentId: 'equipmentId',
   maintenanceDate: 'maintenanceDate',
+  batchId: 'batchId',
   provider: 'provider',
   folio: 'folio',
   generatedPdfPath: 'generatedPdfPath',
@@ -1402,6 +1488,7 @@ export type GlobalOmitConfig = {
   assignment?: Prisma.AssignmentOmit
   permit?: Prisma.PermitOmit
   scanLog?: Prisma.ScanLogOmit
+  maintenanceBatch?: Prisma.MaintenanceBatchOmit
   maintenance?: Prisma.MaintenanceOmit
 }
 

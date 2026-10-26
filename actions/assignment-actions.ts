@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache"
 
-import { createAssignment, returnAssignment } from "@/services/assignment"
+import {
+  cancelAssignment,
+  createAssignment,
+  returnAssignment,
+} from "@/services/assignment"
 
 import { BusinessError } from "@/services/shared/errors"
 import type { ActionResult } from "@/services/shared/types/action-result"
@@ -48,6 +52,40 @@ export async function returnAssignmentAction(
     const result = await returnAssignment(assignmentId)
 
     revalidatePath("/assignments")
+    revalidatePath("/assignments/history")
+    revalidatePath(`/assignments/${result.assignmentId}`)
+    revalidatePath(`/employees/${result.employeeId}`)
+    revalidatePath(`/equipment/${result.equipmentId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Ha ocurrido un error interno.",
+    }
+  }
+}
+
+export async function cancelAssignmentAction(
+  assignmentId: number,
+  reason: string,
+): Promise<ActionResult> {
+  try {
+    const result = await cancelAssignment(assignmentId, reason)
+
+    revalidatePath("/assignments")
+    revalidatePath("/assignments/history")
     revalidatePath(`/assignments/${result.assignmentId}`)
     revalidatePath(`/employees/${result.employeeId}`)
     revalidatePath(`/equipment/${result.equipmentId}`)

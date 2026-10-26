@@ -11,7 +11,8 @@ interface Props {
 
 export default function EmployeeCurrentEquipmentCard({ employee }: Props) {
   const assignment = employee.assignments.find(
-    (assignment) => assignment.returnedAt === null,
+    (assignment) =>
+      assignment.returnedAt === null && assignment.cancelledAt === null,
   )
 
   if (!assignment) {

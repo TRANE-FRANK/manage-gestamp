@@ -21,7 +21,15 @@ export default function GenerateResponsivaButton({
           id: "responsiva",
         })
 
-        await generateResponsivaAction(assignmentId)
+        const result = await generateResponsivaAction(assignmentId)
+
+        if (!result.success) {
+          toast.error(result.message ?? "No fue posible generar la responsiva.", {
+            id: "responsiva",
+          })
+          return
+        }
+
         toast.success("Responsiva generada correctamente.", {
           id: "responsiva",
         })

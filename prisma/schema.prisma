@@ -114,6 +114,8 @@ model Assignment {
     equipmentId       Int
     assignedAt        DateTime
     returnedAt        DateTime?
+    cancelledAt       DateTime?
+    cancellationReason String?
     replacementReason String?
     generatedPdfPath  String?
     signedPdfPath     String?
@@ -170,18 +172,28 @@ model ScanLog {
     @@index([result])
 }
 
+model MaintenanceBatch {
+    id           Int           @id @default(autoincrement())
+    createdAt    DateTime      @default(now())
+    maintenances Maintenance[]
+}
+
 model Maintenance {
     id               Int       @id @default(autoincrement())
     equipmentId      Int
-    maintenanceDate  DateTime
+    maintenanceDate  DateTime  @db.Date
+    batchId          Int?
     provider         String?
     folio            String?
     generatedPdfPath String?
     signedPdfPath    String?
     notes            String?
     equipment        Equipment @relation(fields: [equipmentId], references: [id])
+    batch            MaintenanceBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
     createdAt        DateTime  @default(now())
 
     @@index([equipmentId])
     @@index([maintenanceDate])
+    @@index([batchId])
+    @@unique([equipmentId, maintenanceDate])
 }

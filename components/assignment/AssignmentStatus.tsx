@@ -1,21 +1,21 @@
 import { Badge } from "@/components/ui/badge"
 
 interface Props {
-  generatedPdfPath: string | null
-  signedPdfPath: string | null
+  returnedAt: Date | null
+  cancelledAt: Date | null
 }
 
 export default function AssignmentStatus({
-  generatedPdfPath,
-  signedPdfPath,
+  returnedAt,
+  cancelledAt,
 }: Props) {
-  if (!generatedPdfPath) {
-    return <Badge variant="destructive">Sin generar</Badge>
+  if (cancelledAt) {
+    return <Badge variant="destructive">Anulada</Badge>
   }
 
-  if (!signedPdfPath) {
-    return <Badge variant="ghost">Pendiente firma</Badge>
+  if (returnedAt) {
+    return <Badge variant="outline">Devuelta</Badge>
   }
 
-  return <Badge variant="default">Generada y firmada</Badge>
+  return <Badge variant="default">Activa</Badge>
 }

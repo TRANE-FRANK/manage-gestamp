@@ -1,7 +1,12 @@
 import ExcelJS from "exceljs"
+import { randomUUID } from "crypto"
+import fs from "fs/promises"
 import path from "path"
 
 import { prisma } from "@/lib/prisma"
+
+import { equipmentTypeConfig } from "@/lib/equipment/config"
+import { BusinessError } from "@/services/shared/errors"
 
 import { ensureDirectory } from "../shared/storage"
 import { convertExcelToPdf } from "../shared/pdf"
@@ -22,6 +27,24 @@ export async function generateAssignmentDocument(assignmentId: number) {
     throw new Error("Asignación no encontrada.")
   }
 
+  if (assignment.returnedAt !== null || assignment.cancelledAt !== null) {
+    throw new BusinessError(
+      "No se puede generar una responsiva para una asignación cerrada.",
+    )
+  }
+
+  const equipmentType = assignment.equipment.type
+
+  if (!equipmentType) {
+    throw new BusinessError("El equipo no tiene un tipo asignado.")
+  }
+
+  const typeConfig = equipmentTypeConfig[equipmentType]
+
+  if (!typeConfig.hasResponsiva) {
+    throw new BusinessError("Este tipo de equipo no requiere una responsiva.")
+  }
+
   const workbook = new ExcelJS.Workbook()
 
   await workbook.xlsx.readFile(
@@ -33,6 +56,7 @@ export async function generateAssignmentDocument(assignmentId: number) {
   if (!worksheet) {
     throw new Error("No se encontró la hoja.")
   }
+
   worksheet.pageSetup = {
     paperSize: 9,
     orientation: "portrait",
@@ -56,35 +80,51 @@ export async function generateAssignmentDocument(assignmentId: number) {
     },
   }
 
-  //I.- DATOS DEL SOLICITANTE
+  // I.- DATOS DEL SOLICITANTE
+
   worksheet.getCell("H10").value =
     `${assignment.employee.firstName} ${assignment.employee.lastName}`
 
   worksheet.getCell("Z10").value =
     assignment.assignedAt.toLocaleDateString("es-MX")
+
   worksheet.getCell("AE10").value =
     assignment.assignedAt.toLocaleDateString("es-MX")
 
   worksheet.getCell("F12").value = assignment.employee.department ?? ""
+
   worksheet.getCell("Z12").value = assignment.employee.sapNumber
+
   worksheet.getCell("AE12").value = assignment.equipment.type ?? ""
 
-  //II.- INFORMACIÓN DEL EQUIPO SOLICITADO
+  // II.- INFORMACIÓN DEL EQUIPO SOLICITADO
+
   worksheet.getCell("C16").value = 1
   worksheet.getCell("E16").value = assignment.equipment.type ?? ""
+
   worksheet.getCell("N16").value = assignment.equipment.brand ?? ""
+
   worksheet.getCell("Q16").value = assignment.equipment.model ?? ""
+
   worksheet.getCell("T16").value = assignment.equipment.serialNumber ?? ""
-  worksheet.getCell("X16").value = assignment.equipment.assetTag
+
+  worksheet.getCell("X16").value = assignment.equipment.assetTag ?? ""
+
   worksheet.getCell("AB16").value = assignment.equipment.inventoryNumber ?? ""
 
-  //III.- INFORMACIÓN DEL EQUIPO ASIGNADO
+  // III.- INFORMACIÓN DEL EQUIPO ASIGNADO
+
   worksheet.getCell("C24").value = 1
   worksheet.getCell("E24").value = assignment.equipment.type ?? ""
+
   worksheet.getCell("N24").value = assignment.equipment.brand ?? ""
+
   worksheet.getCell("Q24").value = assignment.equipment.model ?? ""
+
   worksheet.getCell("T24").value = assignment.equipment.serialNumber ?? ""
-  worksheet.getCell("X24").value = assignment.equipment.assetTag
+
+  worksheet.getCell("X24").value = assignment.equipment.assetTag ?? ""
+
   worksheet.getCell("AB24").value = assignment.equipment.inventoryNumber ?? ""
 
   const controlSheet = workbook.getWorksheet("Control de cambios")
@@ -95,24 +135,73 @@ export async function generateAssignmentDocument(assignmentId: number) {
 
   const outputDir = await ensureDirectory("assignments/generated")
   const timestamp = new Date().toISOString().replace(/[:]/g, "-")
-  const excelName = `RESP-${assignment.employee.sapNumber}-${timestamp}.xlsx`
-  const excelPath = path.join(outputDir, excelName)
-  await workbook.xlsx.writeFile(excelPath)
-  const pdfPath = await convertExcelToPdf(excelPath)
-  const relativePdfPath = path.join(
-    "assignments",
-    "generated",
-    path.basename(pdfPath),
-  )
+  const uniqueName = `RESP-${assignment.employee.sapNumber}-${timestamp}-${randomUUID()}`
+  const temporaryDir = await fs.mkdtemp(path.join(outputDir, ".assignment-"))
+  const excelPath = path.join(temporaryDir, `${uniqueName}.xlsx`)
+  const pdfName = `${uniqueName}.pdf`
+  const pdfPath = path.join(outputDir, pdfName)
+  const relativePdfPath = path.join("assignments", "generated", pdfName)
+  let ownsPdf = false
+  let databaseWritePending = false
 
-  await prisma.assignment.update({
-    where: {
-      id: assignment.id,
-    },
-    data: {
-      generatedPdfPath: relativePdfPath,
-    },
-  })
+  try {
+    await workbook.xlsx.writeFile(excelPath)
+    const temporaryPdfPath = await convertExcelToPdf(excelPath)
+    const pdfHandle = await fs.open(pdfPath, "wx")
+    ownsPdf = true
 
-  return relativePdfPath
+    try {
+      await pdfHandle.writeFile(await fs.readFile(temporaryPdfPath))
+    } finally {
+      await pdfHandle.close()
+    }
+
+    databaseWritePending = true
+    const assignmentUpdate = await prisma.assignment.updateMany({
+      where: {
+        id: assignment.id,
+        returnedAt: null,
+        cancelledAt: null,
+      },
+      data: {
+        generatedPdfPath: relativePdfPath,
+      },
+    })
+    databaseWritePending = false
+
+    if (assignmentUpdate.count === 0) {
+      throw new BusinessError(
+        "No se puede generar una responsiva para una asignación cerrada.",
+      )
+    }
+
+    ownsPdf = false
+    return relativePdfPath
+  } catch (error) {
+    if (ownsPdf && !databaseWritePending) {
+      await removeGeneratedPdfIfUnreferenced(relativePdfPath, pdfPath)
+    }
+
+    throw error
+  } finally {
+    await fs.rm(temporaryDir, { recursive: true, force: true }).catch(() => {})
+  }
+}
+
+async function removeGeneratedPdfIfUnreferenced(
+  relativePath: string,
+  absolutePath: string,
+) {
+  try {
+    const reference = await prisma.assignment.findFirst({
+      where: { generatedPdfPath: relativePath },
+      select: { id: true },
+    })
+
+    if (!reference) {
+      await fs.unlink(absolutePath)
+    }
+  } catch {
+    // Keep the file if its database reference cannot be checked safely.
+  }
 }

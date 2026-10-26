@@ -1,13 +1,18 @@
 {
     "cSpell.words": [
         "autoincrement",
+        "BTRIM",
         "datasource",
         "esnext",
         "exceljs",
         "gestamp",
+        "indexrelid",
+        "indisunique",
+        "indisvalid",
         "libreoffice",
         "outdir",
         "postgresql",
+        "regclass",
         "tailwindcss"
     ]
 }

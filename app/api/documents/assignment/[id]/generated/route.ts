@@ -1,6 +1,8 @@
-import { getAssignmentDocument } from "@/services/document"
-
-import { pdfResponse, handleDocumentError } from "@/services/document"
+import {
+  getAssignmentDocument,
+  pdfResponse,
+  handleDocumentError,
+} from "@/services/document"
 
 interface Props {
   params: Promise<{

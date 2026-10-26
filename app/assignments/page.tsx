@@ -24,7 +24,7 @@ export default async function AssignmentsPage({
 
   const result = await listActiveAssignmentsPaginated({
     page: currentPage,
-    pageSize: 5,
+    pageSize: 20,
     search,
   })
 

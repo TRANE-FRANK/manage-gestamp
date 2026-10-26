@@ -1,61 +1,113 @@
-import { ValidationError } from "@/services/shared/errors";
-import fs from "fs/promises";
-import path from "path";
+import { NotFoundError, ValidationError } from "@/services/shared/errors"
+import { randomUUID } from "crypto"
+import fs from "fs/promises"
+import path from "path"
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma"
 
-import { ensureDirectory } from "../shared/storage";
+import { ensureDirectory } from "../shared/storage"
 
 export async function uploadSignedPdf(assignmentId: number, file: File) {
   const assignment = await prisma.assignment.findUnique({
     where: {
       id: assignmentId,
     },
-  });
+  })
 
   if (!assignment) {
-    throw new Error("Asignación no encontrada.");
+    throw new NotFoundError("Asignación no encontrada.")
+  }
+
+  if (assignment.returnedAt !== null || assignment.cancelledAt !== null) {
+    throw new ValidationError(
+      "No se puede cargar una responsiva firmada para una asignación cerrada.",
+    )
   }
 
   if (!assignment.generatedPdfPath) {
-    throw new Error("La responsiva aún no ha sido generada.");
+    throw new ValidationError("La responsiva aún no ha sido generada.")
   }
 
   if (file.type !== "application/pdf") {
-    throw new ValidationError("Solo se permiten archivos PDF.");
+    throw new ValidationError("Solo se permiten archivos PDF.")
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    // 3 MB
-    throw new ValidationError("El archivo excede los 10 MB.");
+  if (file.size > 3 * 1024 * 1024) {
+    throw new ValidationError("El archivo excede los 3 MB.")
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const directory = await ensureDirectory("assignments/signed");
+  const buffer = Buffer.from(await file.arrayBuffer())
+  const directory = await ensureDirectory("assignments/signed")
 
-  /**
+  /*
    * RESP-123456-2026-06-28_01-48-15.pdf
    */
 
-  const originalName = path.basename(assignment.generatedPdfPath, ".pdf");
+  const originalName = path.basename(assignment.generatedPdfPath, ".pdf")
 
-  /**
+  /*
    * RESP-123456-2026-06-28_01-48-15-FIRMADA.pdf
    */
 
-  const signedName = `${originalName}-FIRMADA.pdf`;
-  const outputPath = path.join(directory, signedName);
+  const signedName = `${originalName}-${randomUUID()}-FIRMADA.pdf`
+  const outputPath = path.join(directory, signedName)
+  const relativePath = path.join("assignments", "signed", signedName)
+  let ownsOutput = false
+  let databaseWritePending = false
 
-  await fs.writeFile(outputPath, buffer);
+  try {
+    const outputFile = await fs.open(outputPath, "wx")
+    ownsOutput = true
 
-  const relativePath = path.join("assignments", "signed", signedName);
+    try {
+      await outputFile.writeFile(buffer)
+    } finally {
+      await outputFile.close()
+    }
 
-  await prisma.assignment.update({
-    where: {
-      id: assignmentId,
-    },
-    data: {
-      signedPdfPath: relativePath,
-    },
-  });
+    databaseWritePending = true
+    const assignmentUpdate = await prisma.assignment.updateMany({
+      where: {
+        id: assignmentId,
+        returnedAt: null,
+        cancelledAt: null,
+      },
+      data: {
+        signedPdfPath: relativePath,
+      },
+    })
+    databaseWritePending = false
+
+    if (assignmentUpdate.count === 0) {
+      throw new ValidationError(
+        "No se puede cargar una responsiva firmada para una asignación cerrada.",
+      )
+    }
+
+    ownsOutput = false
+  } catch (error) {
+    if (ownsOutput && !databaseWritePending) {
+      await removeSignedPdfIfUnreferenced(relativePath, outputPath)
+    }
+
+    throw error
+  }
+}
+
+async function removeSignedPdfIfUnreferenced(
+  relativePath: string,
+  absolutePath: string,
+) {
+  try {
+    const reference = await prisma.assignment.findFirst({
+      where: { signedPdfPath: relativePath },
+      select: { id: true },
+    })
+
+    if (!reference) {
+      await fs.unlink(absolutePath)
+    }
+  } catch {
+    // Keep the file if its database reference cannot be checked safely.
+  }
 }

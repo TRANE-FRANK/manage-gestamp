@@ -22,17 +22,27 @@ export async function returnAssignment(
     throw new BusinessError("La asignación ya fue devuelta.")
   }
 
+  if (assignment.cancelledAt) {
+    throw new BusinessError("La asignación fue anulada.")
+  }
+
   const returnedAt = new Date()
 
   await prisma.$transaction(async (tx) => {
-    await tx.assignment.update({
+    const assignmentUpdate = await tx.assignment.updateMany({
       where: {
         id: assignmentId,
+        returnedAt: null,
+        cancelledAt: null,
       },
       data: {
         returnedAt,
       },
     })
+
+    if (assignmentUpdate.count === 0) {
+      throw new BusinessError("La asignación ya fue devuelta o anulada.")
+    }
 
     await tx.equipment.update({
       where: {

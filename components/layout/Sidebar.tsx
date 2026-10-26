@@ -14,7 +14,9 @@ import {
   Shield,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
 } from "lucide-react";
+import { logoutAction } from "@/app/login/actions";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -37,7 +39,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex h-screen flex-col border-r border-slate-800 bg-slate-950 text-white transition-all duration-300 ${
+      className={`flex h-dvh flex-col border-r border-slate-800 bg-slate-950 text-white transition-all duration-300 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
@@ -67,7 +69,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-4 py-6">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
         {/* Dashboard */}
         <div className="mb-8">
           <Link href="/" className={navClass("/")}>
@@ -148,15 +150,23 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-slate-800 px-6 py-4">
+      <div className="border-t border-slate-800 px-4 py-4">
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white ${collapsed ? "justify-center" : ""}`}
+          >
+            <LogOut size={18} />
+            {!collapsed && <span>Cerrar sesión</span>}
+          </button>
+        </form>
         {!collapsed && (
-          <>
+          <div className="mt-3 px-2">
             <p className="text-xs font-medium text-slate-400">
               Administración TI Gestamp
             </p>
-
             <p className="mt-1 text-xs text-slate-500">Versión 1.0</p>
-          </>
+          </div>
         )}
       </div>
     </aside>

@@ -44,6 +44,8 @@ export type AssignmentMinAggregateOutputType = {
   equipmentId: number | null
   assignedAt: Date | null
   returnedAt: Date | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   replacementReason: string | null
   generatedPdfPath: string | null
   signedPdfPath: string | null
@@ -56,6 +58,8 @@ export type AssignmentMaxAggregateOutputType = {
   equipmentId: number | null
   assignedAt: Date | null
   returnedAt: Date | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   replacementReason: string | null
   generatedPdfPath: string | null
   signedPdfPath: string | null
@@ -68,6 +72,8 @@ export type AssignmentCountAggregateOutputType = {
   equipmentId: number
   assignedAt: number
   returnedAt: number
+  cancelledAt: number
+  cancellationReason: number
   replacementReason: number
   generatedPdfPath: number
   signedPdfPath: number
@@ -94,6 +100,8 @@ export type AssignmentMinAggregateInputType = {
   equipmentId?: true
   assignedAt?: true
   returnedAt?: true
+  cancelledAt?: true
+  cancellationReason?: true
   replacementReason?: true
   generatedPdfPath?: true
   signedPdfPath?: true
@@ -106,6 +114,8 @@ export type AssignmentMaxAggregateInputType = {
   equipmentId?: true
   assignedAt?: true
   returnedAt?: true
+  cancelledAt?: true
+  cancellationReason?: true
   replacementReason?: true
   generatedPdfPath?: true
   signedPdfPath?: true
@@ -118,6 +128,8 @@ export type AssignmentCountAggregateInputType = {
   equipmentId?: true
   assignedAt?: true
   returnedAt?: true
+  cancelledAt?: true
+  cancellationReason?: true
   replacementReason?: true
   generatedPdfPath?: true
   signedPdfPath?: true
@@ -217,6 +229,8 @@ export type AssignmentGroupByOutputType = {
   equipmentId: number
   assignedAt: Date
   returnedAt: Date | null
+  cancelledAt: Date | null
+  cancellationReason: string | null
   replacementReason: string | null
   generatedPdfPath: string | null
   signedPdfPath: string | null
@@ -252,6 +266,8 @@ export type AssignmentWhereInput = {
   equipmentId?: Prisma.IntFilter<"Assignment"> | number
   assignedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
   returnedAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   replacementReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
@@ -266,6 +282,8 @@ export type AssignmentOrderByWithRelationInput = {
   equipmentId?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   returnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   replacementReason?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -283,6 +301,8 @@ export type AssignmentWhereUniqueInput = Prisma.AtLeast<{
   equipmentId?: Prisma.IntFilter<"Assignment"> | number
   assignedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
   returnedAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   replacementReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
@@ -297,6 +317,8 @@ export type AssignmentOrderByWithAggregationInput = {
   equipmentId?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   returnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   replacementReason?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -317,6 +339,8 @@ export type AssignmentScalarWhereWithAggregatesInput = {
   equipmentId?: Prisma.IntWithAggregatesFilter<"Assignment"> | number
   assignedAt?: Prisma.DateTimeWithAggregatesFilter<"Assignment"> | Date | string
   returnedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Assignment"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Assignment"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableWithAggregatesFilter<"Assignment"> | string | null
   replacementReason?: Prisma.StringNullableWithAggregatesFilter<"Assignment"> | string | null
   generatedPdfPath?: Prisma.StringNullableWithAggregatesFilter<"Assignment"> | string | null
   signedPdfPath?: Prisma.StringNullableWithAggregatesFilter<"Assignment"> | string | null
@@ -326,6 +350,8 @@ export type AssignmentScalarWhereWithAggregatesInput = {
 export type AssignmentCreateInput = {
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -340,6 +366,8 @@ export type AssignmentUncheckedCreateInput = {
   equipmentId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -349,6 +377,8 @@ export type AssignmentUncheckedCreateInput = {
 export type AssignmentUpdateInput = {
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -363,6 +393,8 @@ export type AssignmentUncheckedUpdateInput = {
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -375,6 +407,8 @@ export type AssignmentCreateManyInput = {
   equipmentId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -384,6 +418,8 @@ export type AssignmentCreateManyInput = {
 export type AssignmentUpdateManyMutationInput = {
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -396,6 +432,8 @@ export type AssignmentUncheckedUpdateManyInput = {
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -418,6 +456,8 @@ export type AssignmentCountOrderByAggregateInput = {
   equipmentId?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   returnedAt?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   replacementReason?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
@@ -436,6 +476,8 @@ export type AssignmentMaxOrderByAggregateInput = {
   equipmentId?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   returnedAt?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   replacementReason?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
@@ -448,6 +490,8 @@ export type AssignmentMinOrderByAggregateInput = {
   equipmentId?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   returnedAt?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
   replacementReason?: Prisma.SortOrder
   generatedPdfPath?: Prisma.SortOrder
   signedPdfPath?: Prisma.SortOrder
@@ -547,6 +591,8 @@ export type AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput = {
 export type AssignmentCreateWithoutEmployeeInput = {
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -559,6 +605,8 @@ export type AssignmentUncheckedCreateWithoutEmployeeInput = {
   equipmentId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -600,6 +648,8 @@ export type AssignmentScalarWhereInput = {
   equipmentId?: Prisma.IntFilter<"Assignment"> | number
   assignedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
   returnedAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Assignment"> | Date | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   replacementReason?: Prisma.StringNullableFilter<"Assignment"> | string | null
   generatedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
   signedPdfPath?: Prisma.StringNullableFilter<"Assignment"> | string | null
@@ -609,6 +659,8 @@ export type AssignmentScalarWhereInput = {
 export type AssignmentCreateWithoutEquipmentInput = {
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -621,6 +673,8 @@ export type AssignmentUncheckedCreateWithoutEquipmentInput = {
   employeeId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -658,6 +712,8 @@ export type AssignmentCreateManyEmployeeInput = {
   equipmentId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -667,6 +723,8 @@ export type AssignmentCreateManyEmployeeInput = {
 export type AssignmentUpdateWithoutEmployeeInput = {
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -679,6 +737,8 @@ export type AssignmentUncheckedUpdateWithoutEmployeeInput = {
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -690,6 +750,8 @@ export type AssignmentUncheckedUpdateManyWithoutEmployeeInput = {
   equipmentId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -701,6 +763,8 @@ export type AssignmentCreateManyEquipmentInput = {
   employeeId: number
   assignedAt: Date | string
   returnedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancellationReason?: string | null
   replacementReason?: string | null
   generatedPdfPath?: string | null
   signedPdfPath?: string | null
@@ -710,6 +774,8 @@ export type AssignmentCreateManyEquipmentInput = {
 export type AssignmentUpdateWithoutEquipmentInput = {
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -722,6 +788,8 @@ export type AssignmentUncheckedUpdateWithoutEquipmentInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -733,6 +801,8 @@ export type AssignmentUncheckedUpdateManyWithoutEquipmentInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replacementReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   signedPdfPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -747,6 +817,8 @@ export type AssignmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   equipmentId?: boolean
   assignedAt?: boolean
   returnedAt?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   replacementReason?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
@@ -761,6 +833,8 @@ export type AssignmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   equipmentId?: boolean
   assignedAt?: boolean
   returnedAt?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   replacementReason?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
@@ -775,6 +849,8 @@ export type AssignmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   equipmentId?: boolean
   assignedAt?: boolean
   returnedAt?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   replacementReason?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
@@ -789,13 +865,15 @@ export type AssignmentSelectScalar = {
   equipmentId?: boolean
   assignedAt?: boolean
   returnedAt?: boolean
+  cancelledAt?: boolean
+  cancellationReason?: boolean
   replacementReason?: boolean
   generatedPdfPath?: boolean
   signedPdfPath?: boolean
   createdAt?: boolean
 }
 
-export type AssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "equipmentId" | "assignedAt" | "returnedAt" | "replacementReason" | "generatedPdfPath" | "signedPdfPath" | "createdAt", ExtArgs["result"]["assignment"]>
+export type AssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "equipmentId" | "assignedAt" | "returnedAt" | "cancelledAt" | "cancellationReason" | "replacementReason" | "generatedPdfPath" | "signedPdfPath" | "createdAt", ExtArgs["result"]["assignment"]>
 export type AssignmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   equipment?: boolean | Prisma.EquipmentDefaultArgs<ExtArgs>
@@ -821,6 +899,8 @@ export type $AssignmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     equipmentId: number
     assignedAt: Date
     returnedAt: Date | null
+    cancelledAt: Date | null
+    cancellationReason: string | null
     replacementReason: string | null
     generatedPdfPath: string | null
     signedPdfPath: string | null
@@ -1255,6 +1335,8 @@ export interface AssignmentFieldRefs {
   readonly equipmentId: Prisma.FieldRef<"Assignment", 'Int'>
   readonly assignedAt: Prisma.FieldRef<"Assignment", 'DateTime'>
   readonly returnedAt: Prisma.FieldRef<"Assignment", 'DateTime'>
+  readonly cancelledAt: Prisma.FieldRef<"Assignment", 'DateTime'>
+  readonly cancellationReason: Prisma.FieldRef<"Assignment", 'String'>
   readonly replacementReason: Prisma.FieldRef<"Assignment", 'String'>
   readonly generatedPdfPath: Prisma.FieldRef<"Assignment", 'String'>
   readonly signedPdfPath: Prisma.FieldRef<"Assignment", 'String'>

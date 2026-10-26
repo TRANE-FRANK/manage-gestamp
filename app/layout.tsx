@@ -3,8 +3,7 @@ import { Poppins, Geist } from "next/font/google";
 
 import "./globals.css";
 
-import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
+import AppShell from "@/components/layout/AppShell";
 
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -28,18 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={cn("h-full", "font-sans", geist.variable)}>
-      <body className={`${poppins.className} min-h-screen bg-slate-100`}>
-        <div className="flex h-screen overflow-hidden">
-          <Sidebar />
-
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <Header />
-
-            <main className="flex-1 overflow-auto bg-slate-100 p-8">
-              <div className="mx-auto max-w-7xl">{children}</div>
-            </main>
-          </div>
-        </div>
+      <body className={`${poppins.className} h-dvh overflow-hidden bg-slate-100`}>
+        <AppShell>{children}</AppShell>
         <Toaster
           position="bottom-center"
           closeButton={true}
