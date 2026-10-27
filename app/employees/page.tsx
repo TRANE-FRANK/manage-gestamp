@@ -6,8 +6,11 @@ import { DataTable } from "@/components/ui/data-table"
 import { employeeColumns } from "@/app/employees/columns"
 
 import { listEmployees } from "@/services/employee"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 export default async function EmployeesPage() {
+  await requirePageRole("ADMIN", "IT")
+
   const employees = await listEmployees()
 
   return (

@@ -6,6 +6,7 @@ import { promisify } from "util"
 
 import { BusinessError } from "@/services/shared/errors"
 import { ensureDirectory } from "@/services/shared/storage"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { findPermitById, updatePermitGeneratedDocument } from "./repository"
 
@@ -16,6 +17,8 @@ function formatDate(date: Date) {
 }
 
 export async function generatePermitDocument(permitId: number) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {

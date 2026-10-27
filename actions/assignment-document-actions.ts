@@ -8,6 +8,19 @@ import { generateAssignmentDocument } from "@/services/assignment/document"
 import { uploadSignedPdf } from "@/services/assignment/upload"
 
 import { BusinessError, NotFoundError } from "@/services/shared/errors"
+import { AccessControlError } from "@/lib/auth/authorization"
+
+function getAuthorizationResult(error: unknown): ActionResult | null {
+  if (!(error instanceof AccessControlError)) return null
+
+  return {
+    success: false,
+    message:
+      error.code === "UNAUTHENTICATED"
+        ? "Debes iniciar sesión para realizar esta operación."
+        : "No tienes permisos para gestionar asignaciones.",
+  }
+}
 
 export async function generateResponsivaAction(assignmentId: number) {
   try {
@@ -18,6 +31,9 @@ export async function generateResponsivaAction(assignmentId: number) {
       success: true,
     } satisfies ActionResult
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -53,6 +69,9 @@ export async function uploadSignedPdfAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,

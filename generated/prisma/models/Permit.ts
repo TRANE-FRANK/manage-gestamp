@@ -714,10 +714,6 @@ export type EnumPermitStatusFieldUpdateOperationsInput = {
   set?: $Enums.PermitStatus
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type PermitCreateNestedOneWithoutScanLogsInput = {
   create?: Prisma.XOR<Prisma.PermitCreateWithoutScanLogsInput, Prisma.PermitUncheckedCreateWithoutScanLogsInput>
   connectOrCreate?: Prisma.PermitCreateOrConnectWithoutScanLogsInput

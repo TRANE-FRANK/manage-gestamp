@@ -10,6 +10,7 @@ import {
   getEmployeeUsage,
   getValidationStats,
 } from "@/services/scan"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 type Props = {
   searchParams: Promise<{
@@ -66,6 +67,8 @@ function getReasonClass(reason: string) {
 }
 
 export default async function SecurityHistoryPage({ searchParams }: Props) {
+  await requirePageRole("ADMIN", "IT", "SECURITY")
+
   const params = await searchParams
 
   const period =

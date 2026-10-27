@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 import { getAssignmentDetails } from "@/services/assignment"
 
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export default async function AssignmentPage({ params }: Props) {
+  await requirePageRole("ADMIN", "IT")
+
   const { id } = await params
 
   const assignmentId = Number(id)

@@ -10,6 +10,19 @@ import {
 
 import { BusinessError } from "@/services/shared/errors"
 import type { ActionResult } from "@/services/shared/types/action-result"
+import { AccessControlError } from "@/lib/auth/authorization"
+
+function getAuthorizationResult(error: unknown): ActionResult | null {
+  if (!(error instanceof AccessControlError)) return null
+
+  return {
+    success: false,
+    message:
+      error.code === "UNAUTHENTICATED"
+        ? "Debes iniciar sesión para realizar esta operación."
+        : "No tienes permisos para gestionar asignaciones.",
+  }
+}
 
 export async function createAssignmentAction(
   formData: FormData,
@@ -29,6 +42,9 @@ export async function createAssignmentAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -61,6 +77,9 @@ export async function returnAssignmentAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -94,6 +113,9 @@ export async function cancelAssignmentAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,

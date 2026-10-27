@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@/generated/prisma/client"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { BusinessError } from "@/services/shared/errors"
 
@@ -23,14 +24,17 @@ import { generateNextPermitFolio } from "./folio"
 import type { RenewPermitInput, ListPermitsInput } from "./types"
 
 export async function listPermits() {
+  await requireRole("ADMIN", "IT")
   return findPermits()
 }
 
 export async function getPermitDetails(id: number) {
+  await requireRole("ADMIN", "IT")
   return findPermitById(id)
 }
 
 export async function getPermitByFolio(folio: string) {
+  await requireRole("ADMIN", "IT")
   return findPermitByFolio(folio)
 }
 
@@ -41,6 +45,8 @@ export async function createPermit(data: {
   startDate: Date
   expirationDate: Date
 }) {
+  await requireRole("ADMIN", "IT")
+
   if (!data.folio.trim()) {
     throw new BusinessError("El folio es obligatorio.")
   }
@@ -73,6 +79,8 @@ export async function renewPermit({
   startDate,
   expirationDate,
 }: RenewPermitInput) {
+  await requireRole("ADMIN", "IT")
+
   if (startDate >= expirationDate) {
     throw new BusinessError(
       "La fecha de vencimiento debe ser posterior a la fecha de inicio.",
@@ -130,6 +138,8 @@ export async function renewPermit({
 }
 
 export async function cancelPermit(permitId: number, reason: string) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {
@@ -157,6 +167,8 @@ export async function authorizeExceptionalDeparture(
   permitId: number,
   reason: string,
 ) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {
@@ -191,6 +203,8 @@ export async function authorizeExceptionalDeparture(
 }
 
 export async function uploadSignedPermitPdf(permitId: number, file: File) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {
@@ -210,6 +224,8 @@ export async function setPermitDepartureAuthorization(
   permitId: number,
   departureAuthorized: boolean,
 ) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {
@@ -224,6 +240,8 @@ export async function setPermitDepartureAuthorization(
 }
 
 export async function authorizePermitDeparture(permitId: number) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {
@@ -250,6 +268,8 @@ export async function listPermitsPaginated({
   process,
   search,
 }: ListPermitsInput = {}) {
+  await requireRole("ADMIN", "IT")
+
   const where: Prisma.PermitWhereInput = {}
 
   if (search?.trim()) {

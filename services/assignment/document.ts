@@ -4,6 +4,7 @@ import fs from "fs/promises"
 import path from "path"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { equipmentTypeConfig } from "@/lib/equipment/config"
 import { BusinessError } from "@/services/shared/errors"
@@ -12,6 +13,8 @@ import { ensureDirectory } from "../shared/storage"
 import { convertExcelToPdf } from "../shared/pdf"
 
 export async function generateAssignmentDocument(assignmentId: number) {
+  await requireRole("ADMIN", "IT")
+
   const assignment = await prisma.assignment.findUnique({
     where: {
       id: assignmentId,

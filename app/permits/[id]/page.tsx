@@ -8,6 +8,7 @@ import UploadSignedPermitForm from "./UploadSignedPermitForm"
 import ViewSignedPermitDocumentButton from "./ViewSignedPermitDocumentButton"
 import AuthorizeDepartureButton from "./AuthorizeDepartureButton"
 import { getPermitDetails} from "@/services/permit"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 interface Props {
   params: Promise<{
@@ -16,6 +17,8 @@ interface Props {
 }
 
 export default async function PermitPage({ params }: Props) {
+  await requirePageRole("ADMIN", "IT")
+
   const { id } = await params
 
   const permitId = Number(id)

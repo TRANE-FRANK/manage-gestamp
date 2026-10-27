@@ -1,4 +1,5 @@
 import { Prisma } from "@/generated/prisma/client"
+import { requireRole } from "@/lib/auth/authorization"
 
 import {
   findActiveAssignmentsByEmployeeId,
@@ -92,6 +93,7 @@ function buildAssignmentSearchWhere(
 }
 
 export async function getActiveAssignmentsByEmployeeId(employeeId: number) {
+  await requireRole("ADMIN", "IT")
   return findActiveAssignmentsByEmployeeId(employeeId)
 }
 
@@ -100,6 +102,7 @@ export async function listActiveAssignmentsPaginated({
   pageSize = 20,
   search,
 }: ListAssignmentsInput = {}) {
+  await requireRole("ADMIN", "IT")
   const where = buildAssignmentSearchWhere(search)
 
   const result = await findActiveAssignmentsPaginated({
@@ -121,6 +124,7 @@ export async function listAssignmentHistoryPaginated({
   pageSize = 20,
   search,
 }: ListAssignmentsInput = {}) {
+  await requireRole("ADMIN", "IT")
   const where = buildAssignmentSearchWhere(search)
 
   const result = await findAssignmentHistoryPaginated({

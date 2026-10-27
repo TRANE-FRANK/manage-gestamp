@@ -28,3 +28,27 @@ export interface ScanEquipmentResult {
     }
   } | null
 }
+
+export interface SecurityScanEquipmentResult {
+  allowed: boolean
+  result: "ALLOWED" | "DENIED"
+  message: string
+  equipment: {
+    assetTag: string
+    company: string
+  } | null
+  permit: {
+    folio: string
+    status: "ACTIVE" | "EXPIRED" | "CANCELLED"
+    startDate: Date
+    expirationDate: Date
+    employee: {
+      firstName: string
+      lastName: string
+    }
+  } | null
+}
+
+export type AuthorizedScanResult =
+  | ScanEquipmentResult
+  | SecurityScanEquipmentResult

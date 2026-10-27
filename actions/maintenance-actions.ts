@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 
 import { registerMaintenanceBatch } from "@/services/maintenance"
 import { BusinessError } from "@/services/shared/errors"
+import { AccessControlError } from "@/lib/auth/authorization"
 
 export interface MaintenanceRegistrationState {
   success?: boolean
@@ -41,6 +42,16 @@ export async function registerMaintenanceBatchAction(
       message: `Se registraron ${result.count} mantenimiento${result.count === 1 ? "" : "s"}.`,
     }
   } catch (error) {
+    if (error instanceof AccessControlError) {
+      return {
+        success: false,
+        message:
+          error.code === "UNAUTHENTICATED"
+            ? "Debes iniciar sesión para registrar mantenimientos."
+            : "No tienes permisos para registrar mantenimientos.",
+      }
+    }
+
     if (error instanceof BusinessError) {
       return {
         success: false,

@@ -43,10 +43,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             firstName: true,
             lastName: true,
             role: true,
+            isActive: true,
           },
         });
 
-        if (!user || !user.passwordHash.startsWith("$argon2id$")) return null;
+        if (
+          !user ||
+          !user.isActive ||
+          !user.passwordHash.startsWith("$argon2id$")
+        ) return null;
 
         let passwordMatches = false;
         try {
@@ -72,16 +77,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.username = user.username;
+        token.disabled = false;
+      } else if (typeof token.id === "string" && /^[1-9]\d*$/.test(token.id)) {
+        const currentUser = await prisma.user.findUnique({
+          where: { id: Number(token.id) },
+          select: { id: true, username: true, role: true, isActive: true },
+        });
+
+        if (!currentUser?.isActive) {
+          delete token.id;
+          delete token.role;
+          delete token.username;
+          token.disabled = true;
+        } else {
+          token.id = String(currentUser.id);
+          token.username = currentUser.username;
+          token.role = currentUser.role;
+          token.disabled = false;
+        }
       }
       return token;
     },
     session({ session, token }) {
       if (
+        token.disabled !== true &&
         session.user &&
         typeof token.id === "string" &&
         typeof token.username === "string" &&

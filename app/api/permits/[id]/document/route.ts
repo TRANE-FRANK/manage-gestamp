@@ -3,6 +3,7 @@ import path from "path"
 import fs from "fs/promises"
 
 import { getPermitDetails } from "@/services/permit"
+import { AccessControlError } from "@/lib/auth/authorization"
 
 interface Props {
   params: Promise<{
@@ -21,7 +22,21 @@ export async function GET(_: Request, { params }: Props) {
     })
   }
 
-  const permit = await getPermitDetails(permitId)
+  let permit
+  try {
+    permit = await getPermitDetails(permitId)
+  } catch (error) {
+    if (error instanceof AccessControlError) {
+      return new NextResponse(
+        error.code === "UNAUTHENTICATED"
+          ? "Debes iniciar sesión para descargar este documento."
+          : "No tienes permisos para descargar este documento.",
+        { status: error.code === "UNAUTHENTICATED" ? 401 : 403 },
+      )
+    }
+
+    throw error
+  }
 
   if (!permit?.generatedPdfPath) {
     return new NextResponse("El formato no ha sido generado.", {

@@ -18,6 +18,7 @@ import EquipmentToast from "./equipment-toast"
 import { equipmentColumns } from "./equipment-columns"
 
 import { listEquipmentPaginated } from "@/services/equipment"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 export default async function EquipmentPage({
   searchParams,
@@ -31,6 +32,8 @@ export default async function EquipmentPage({
     ownership?: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   function isCompany(value: string | undefined): value is Company {
     return value === "ORM" || value === "GP2"
   }

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 import Link from "next/link"
 
@@ -68,6 +69,8 @@ export default async function EquipmentDetailsPage({
     id: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   const { id } = await params
 
   const equipmentId = Number(id)

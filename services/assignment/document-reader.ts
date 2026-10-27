@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
-import { DocumentType, readDocument } from "@/services/document"
+import type { DocumentType } from "@/services/document/types"
+import { readDocument } from "@/services/document/reader"
 
 import { NotFoundError } from "@/services/shared/errors"
 
@@ -8,6 +10,8 @@ export async function getAssignmentDocument(
   assignmentId: number,
   type: DocumentType,
 ) {
+  await requireRole("ADMIN", "IT")
+
   const assignment = await prisma.assignment.findUnique({
     where: {
       id: assignmentId,

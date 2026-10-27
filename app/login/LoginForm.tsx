@@ -9,11 +9,13 @@ import { loginAction, type LoginState } from "./actions";
 
 const initialState: LoginState = { error: null };
 
-export default function LoginForm() {
+export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
     <form action={formAction} className="space-y-5">
+      <input type="hidden" name="callbackUrl" value={callbackUrl ?? "/"} />
+
       <div className="space-y-2">
         <label htmlFor="username" className="text-sm font-medium text-slate-700">
           Usuario

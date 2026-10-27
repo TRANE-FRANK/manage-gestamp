@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 
 import { getPermitDetails } from "@/services/permit"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 import Card from "@/components/ui/Card"
 
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export default async function RenewPermitPage({ params }: Props) {
+  await requirePageRole("ADMIN", "IT")
+
   const { id } = await params
 
   const permitId = Number(id)

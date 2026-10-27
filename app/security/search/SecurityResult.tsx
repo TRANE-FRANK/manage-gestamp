@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useScanResult } from "@/components/security/ScanResultContext"
 
 const RESULT_DELAY = 5
 
 export default function SecurityResult() {
   const router = useRouter()
+  const { setResult, setSearchedAssetTag } = useScanResult()
 
   const [seconds, setSeconds] = useState(RESULT_DELAY)
 
@@ -23,6 +25,8 @@ export default function SecurityResult() {
     }, 1000)
 
     const redirect = setTimeout(() => {
+      setResult(null)
+      setSearchedAssetTag(null)
       router.replace("/security")
     }, RESULT_DELAY * 1000)
 
@@ -30,7 +34,7 @@ export default function SecurityResult() {
       clearInterval(countdown)
       clearTimeout(redirect)
     }
-  }, [router])
+  }, [router, setResult, setSearchedAssetTag])
 
   return (
     <p className="mt-3 text-center text-lg text-slate-500">

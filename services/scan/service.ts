@@ -9,7 +9,14 @@ import {
   getScanReasonStats,
 } from "./repository"
 
-import type { ScanEquipmentInput, ScanEquipmentResult } from "./types"
+import type {
+  AuthorizedScanResult,
+  ScanEquipmentInput,
+  ScanEquipmentResult,
+  SecurityScanEquipmentResult,
+} from "./types"
+import { requireRole } from "@/lib/auth/authorization"
+import { parseScanEquipmentInput } from "./input"
 
 function getEquipmentIdentifier(equipment: {
   assetTag: string | null
@@ -62,26 +69,17 @@ function buildPermitResult(
 }
 
 export async function scanEquipment(
+  data: unknown,
+): Promise<AuthorizedScanResult> {
+  const user = await requireRole("ADMIN", "IT", "SECURITY")
+  const result = await processEquipmentScan(parseScanEquipmentInput(data))
+  return user.role === "SECURITY" ? toSecurityScanResult(result) : result
+}
+
+async function processEquipmentScan(
   data: ScanEquipmentInput,
 ): Promise<ScanEquipmentResult> {
-  const assetTag = data.assetTag.trim()
-
-  if (!assetTag) {
-    await createScanLog({
-      assetTag,
-      result: "DENIED",
-      reason: "INVALID_ASSET_TAG",
-      notes: "No se proporcionó un Asset Tag.",
-    })
-
-    return {
-      allowed: false,
-      result: "DENIED",
-      message: "Debes proporcionar el Asset Tag del equipo.",
-      equipment: null,
-      permit: null,
-    }
-  }
+  const assetTag = data.assetTag
 
   const equipment = await findEquipmentByAssetTag(assetTag)
 
@@ -274,6 +272,34 @@ export async function scanEquipment(
   return buildPermitResult(permit, true, "ALLOWED", "Salida autorizada.")
 }
 
+function toSecurityScanResult(
+  result: ScanEquipmentResult,
+): SecurityScanEquipmentResult {
+  return {
+    allowed: result.allowed,
+    result: result.result,
+    message: result.message,
+    equipment: result.equipment
+      ? {
+          assetTag: result.equipment.assetTag,
+          company: result.equipment.company,
+        }
+      : null,
+    permit: result.permit
+      ? {
+          folio: result.permit.folio,
+          status: result.permit.status,
+          startDate: result.permit.startDate,
+          expirationDate: result.permit.expirationDate,
+          employee: {
+            firstName: result.permit.employee.firstName,
+            lastName: result.permit.employee.lastName,
+          },
+        }
+      : null,
+  }
+}
+
 /*
  * Historial de escaneos
  */
@@ -285,6 +311,7 @@ export async function listScanLogs(filters?: {
   page?: number
   pageSize?: number
 }) {
+  await requireRole("ADMIN", "IT", "SECURITY")
   return findScanLogs(filters)
 }
 
@@ -294,6 +321,7 @@ export async function getScanStats(filters: {
   result?: "ALLOWED" | "DENIED"
   search?: string
 }) {
+  await requireRole("ADMIN", "IT", "SECURITY")
   return getScanLogStats(filters)
 }
 
@@ -302,6 +330,7 @@ export async function getEquipmentUsage(filters: {
   endDate: Date
   search?: string
 }) {
+  await requireRole("ADMIN", "IT", "SECURITY")
   const scans = await getAllowedScansByEquipment(
     filters.startDate,
     filters.endDate,
@@ -351,6 +380,7 @@ export async function getEmployeeUsage(filters: {
   endDate: Date
   search?: string
 }) {
+  await requireRole("ADMIN", "IT", "SECURITY")
   const scans = await getAllowedScansByEmployee(filters)
 
   const usage = new Map<
@@ -394,6 +424,7 @@ export async function getValidationStats(filters: {
   result?: "ALLOWED" | "DENIED"
   search?: string
 }) {
+  await requireRole("ADMIN", "IT", "SECURITY")
   const stats = await getScanReasonStats(filters)
 
   return stats.map((item) => ({

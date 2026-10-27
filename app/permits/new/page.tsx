@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 import PageHeader from "@/components/ui/PageHeader"
 import Card from "@/components/ui/Card"
@@ -6,6 +7,8 @@ import Card from "@/components/ui/Card"
 import PermitForm from "@/components/PermitForm"
 
 export default async function NewPermitPage() {
+  await requirePageRole("ADMIN", "IT")
+
   const employees = await prisma.employee.findMany({
     orderBy: [
       {

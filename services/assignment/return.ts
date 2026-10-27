@@ -1,6 +1,7 @@
 import { EquipmentStatus } from "@/generated/prisma/enums"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { BusinessError } from "@/services/shared/errors"
 
@@ -16,6 +17,8 @@ export interface ReturnAssignmentResult {
 export async function returnAssignment(
   assignmentId: number,
 ): Promise<ReturnAssignmentResult> {
+  await requireRole("ADMIN", "IT")
+
   const assignment = await findAssignmentByIdOrThrow(assignmentId)
 
   if (assignment.returnedAt) {

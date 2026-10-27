@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/client"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import {
   BusinessError,
@@ -100,6 +101,8 @@ export async function listMaintenanceHistory({
   equipmentId?: number
   pageSize?: number
 } = {}) {
+  await requireRole("ADMIN", "IT")
+
   const currentPage = Number.isInteger(page) && page > 0 ? page : 1
   const safePageSize =
     Number.isInteger(pageSize) && pageSize > 0 ? pageSize : PAGE_SIZE
@@ -206,6 +209,8 @@ export async function listMaintenanceHistory({
 }
 
 export async function getEquipmentMaintenanceHistory(equipmentId: number) {
+  await requireRole("ADMIN", "IT")
+
   const records = await prisma.maintenance.findMany({
     where: { equipmentId },
     include: maintenanceHistoryInclude,
@@ -233,6 +238,8 @@ export async function listEligibleMaintenanceEquipment({
   historyMode?: string
   lastMaintenanceBefore?: string
 } = {}) {
+  await requireRole("ADMIN", "IT")
+
   const currentPage = Number.isInteger(page) && page > 0 ? page : 1
   const searchTerm = search?.trim()
   const companyFilter = company ?? "all"
@@ -409,6 +416,8 @@ export async function registerMaintenanceBatch({
   notes: string
   equipmentIds: number[]
 }) {
+  await requireRole("ADMIN", "IT")
+
   const maintenanceDate = parseEffectiveDate(maintenanceDateInput)
   const ids = equipmentIds
 

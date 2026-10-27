@@ -2,15 +2,18 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useScanResult } from "@/components/security/ScanResultContext"
 
 export default function SecurityScanner() {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+  const { setResult, setSearchedAssetTag } = useScanResult()
 
   const [assetTag, setAssetTag] = useState("")
   const [isSearching, setIsSearching] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  function searchEquipment(value: string) {
+  async function searchEquipment(value: string) {
     const normalizedValue = value.trim()
 
     if (!normalizedValue || isSearching) {
@@ -18,10 +21,31 @@ export default function SecurityScanner() {
     }
 
     setIsSearching(true)
+    setError(null)
+    setResult(null)
+    setSearchedAssetTag(null)
 
-    router.push(
-      `/security/search?assetTag=${encodeURIComponent(normalizedValue)}`,
-    )
+    try {
+      const response = await fetch("/api/permits/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetTag: normalizedValue }),
+      })
+      const payload = await response.json()
+
+      if (!response.ok) {
+        setError(payload.message ?? "No fue posible verificar el equipo.")
+        return
+      }
+
+      setResult(payload)
+      setSearchedAssetTag(normalizedValue)
+      router.push("/security/search")
+    } catch {
+      setError("No fue posible conectar con el servicio de verificación.")
+    } finally {
+      setIsSearching(false)
+    }
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -66,6 +90,12 @@ export default function SecurityScanner() {
       >
         {isSearching ? "Verificando..." : "Verificar salida"}
       </button>
+
+      {error && (
+        <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       <p className="text-center text-sm text-slate-500">
         Escanee la etiqueta del equipo con el lector.

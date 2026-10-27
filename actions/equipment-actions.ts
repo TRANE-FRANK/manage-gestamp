@@ -180,27 +180,35 @@ function getUnexpectedError(): EquipmentFormState {
   }
 }
 
-export async function createEquipment(
-  _previousState: EquipmentFormState,
-  formData: FormData,
-): Promise<EquipmentFormState> {
+async function getEquipmentAuthorizationError(
+  operation: "registrar" | "modificar",
+): Promise<EquipmentFormState | null> {
   try {
     await requireRole("ADMIN", "IT")
+    return null
   } catch (error) {
     if (error instanceof AccessControlError) {
       return {
         errors: {
           general:
             error.code === "UNAUTHENTICATED"
-              ? "Debes iniciar sesión para registrar un equipo."
-              : "No tienes permisos para registrar equipos.",
+              ? "Debes iniciar sesión para " + operation + " un equipo."
+              : "No tienes permisos para " + operation + " equipos.",
         },
       }
     }
 
-    console.error("No se pudo verificar el acceso para registrar un equipo.")
+    console.error("No se pudo verificar el acceso para " + operation + " equipos.")
     return getUnexpectedError()
   }
+}
+
+export async function createEquipment(
+  _previousState: EquipmentFormState,
+  formData: FormData,
+): Promise<EquipmentFormState> {
+  const authorizationError = await getEquipmentAuthorizationError("registrar")
+  if (authorizationError) return authorizationError
 
   const data = getEquipmentFormData(formData)
 
@@ -234,6 +242,9 @@ export async function updateEquipment(
   _previousState: EquipmentFormState,
   formData: FormData,
 ): Promise<EquipmentFormState> {
+  const authorizationError = await getEquipmentAuthorizationError("modificar")
+  if (authorizationError) return authorizationError
+
   const data = getEquipmentFormData(formData)
 
   if (hasErrors(data)) {

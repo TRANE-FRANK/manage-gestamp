@@ -1,6 +1,7 @@
 import { EquipmentStatus } from "@/generated/prisma/enums"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { BusinessError, ValidationError } from "@/services/shared/errors"
 
@@ -17,6 +18,8 @@ export async function cancelAssignment(
   assignmentId: number,
   reason: string,
 ): Promise<CancelAssignmentResult> {
+  await requireRole("ADMIN", "IT")
+
   const cancellationReason = reason.trim()
 
   if (!cancellationReason) {

@@ -36,14 +36,15 @@ export async function requireUser(): Promise<VerifiedUser> {
       id: true,
       username: true,
       role: true,
+      isActive: true,
     },
   });
 
-  if (!user) {
+  if (!user || !user.isActive) {
     throw new AccessControlError("UNAUTHENTICATED");
   }
 
-  return user;
+  return { id: user.id, username: user.username, role: user.role };
 }
 
 export async function requireRole(

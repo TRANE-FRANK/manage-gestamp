@@ -13,8 +13,21 @@ import {
 } from "@/services/permit"
 
 import { BusinessError } from "@/services/shared/errors"
+import { AccessControlError } from "@/lib/auth/authorization"
 
 import type { ActionResult } from "@/services/shared/types/action-result"
+
+function getAuthorizationResult(error: unknown): ActionResult<void> | null {
+  if (!(error instanceof AccessControlError)) return null
+
+  return {
+    success: false,
+    message:
+      error.code === "UNAUTHENTICATED"
+        ? "Debes iniciar sesión para realizar esta operación."
+        : "No tienes permisos para administrar permisos de salida.",
+  }
+}
 
 export async function createPermit(
   formData: FormData,
@@ -68,6 +81,9 @@ export async function createPermit(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -123,6 +139,9 @@ export async function renewPermitAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -165,6 +184,9 @@ export async function cancelPermitAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -217,6 +239,9 @@ export async function authorizeExceptionalDepartureAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -253,6 +278,9 @@ export async function uploadSignedPermitPdfAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -283,6 +311,9 @@ export async function setPermitDepartureAuthorizationAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,
@@ -312,6 +343,9 @@ export async function authorizePermitDepartureAction(
       success: true,
     }
   } catch (error) {
+    const authorizationResult = getAuthorizationResult(error)
+    if (authorizationResult) return authorizationResult
+
     if (error instanceof BusinessError) {
       return {
         success: false,

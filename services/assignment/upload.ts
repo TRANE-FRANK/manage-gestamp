@@ -4,10 +4,13 @@ import fs from "fs/promises"
 import path from "path"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { ensureDirectory } from "../shared/storage"
 
 export async function uploadSignedPdf(assignmentId: number, file: File) {
+  await requireRole("ADMIN", "IT")
+
   const assignment = await prisma.assignment.findUnique({
     where: {
       id: assignmentId,

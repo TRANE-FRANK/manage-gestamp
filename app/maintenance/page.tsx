@@ -10,6 +10,7 @@ import MaintenanceEquipmentPagination from "./equipment-pagination"
 import MaintenanceHistoryPagination from "./history-pagination"
 import MaintenanceHistorySearch from "./history-search"
 import MaintenanceHistoryTable from "./maintenance-history-table"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 export default async function MaintenancePage({
   searchParams,
@@ -28,6 +29,8 @@ export default async function MaintenancePage({
     historyProvider?: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   const {
     page,
     search,

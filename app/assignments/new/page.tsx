@@ -2,6 +2,7 @@ import PageHeader from "@/components/ui/PageHeader"
 import AssignmentForm from "@/components/assignment/AssignmentForm"
 
 import { prisma } from "@/lib/prisma"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 interface Props {
   searchParams: Promise<{
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default async function NewAssignmentPage({ searchParams }: Props) {
+  await requirePageRole("ADMIN", "IT")
+
   const { employeeId } = await searchParams
 
   const employees = await prisma.employee.findMany({

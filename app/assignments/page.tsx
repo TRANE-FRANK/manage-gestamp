@@ -9,6 +9,7 @@ import SearchForm from "./search-form"
 import { assignmentColumns } from "./assignment-columns"
 
 import { listActiveAssignmentsPaginated } from "@/services/assignment"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 export default async function AssignmentsPage({
   searchParams,
@@ -18,6 +19,8 @@ export default async function AssignmentsPage({
     page?: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   const { search, page } = await searchParams
 
   const currentPage = Math.max(1, Number(page) || 1)

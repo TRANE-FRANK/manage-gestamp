@@ -8,6 +8,7 @@ import Pagination from "@/components/ui/Pagination"
 import { permitColumns } from "./columns"
 
 import { listPermitsPaginated } from "@/services/permit"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 import type { PermitProcess } from "@/services/permit/types"
 
@@ -21,6 +22,8 @@ export default async function PermitsPage({
     page?: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   function isPermitProcess(value: string | undefined): value is PermitProcess {
     return (
       value === "pending-generation" ||

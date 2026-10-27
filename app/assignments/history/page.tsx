@@ -7,6 +7,7 @@ import SearchForm from "./search-form"
 import { assignmentHistoryColumns } from "@/app/assignments/history-columns"
 
 import { listAssignmentHistoryPaginated } from "@/services/assignment"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 export default async function AssignmentHistoryPage({
   searchParams,
@@ -16,6 +17,8 @@ export default async function AssignmentHistoryPage({
     page?: string
   }>
 }) {
+  await requirePageRole("ADMIN", "IT")
+
   const { search, page } = await searchParams
 
   const currentPage = Math.max(1, Number(page) || 1)

@@ -1,5 +1,4 @@
 export * from "./details"
-export * from "./repository"
 export * from "./queries"
 export * from "./list"
 export * from "./types"

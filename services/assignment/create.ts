@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/client"
 
 import { prisma } from "@/lib/prisma"
+import { requireRole } from "@/lib/auth/authorization"
 
 import { CreateAssignmentDto } from "./types"
 
@@ -9,6 +10,8 @@ import { ConflictError } from "../shared/errors"
 import { findActiveAssignmentByEquipment } from "./repository"
 
 export async function createAssignment(dto: CreateAssignmentDto) {
+  await requireRole("ADMIN", "IT")
+
   const { employeeId, equipmentId } = dto
 
   const activeAssignment = await findActiveAssignmentByEquipment(equipmentId)

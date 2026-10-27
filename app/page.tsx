@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { requirePageRole } from "@/lib/auth/page-guard";
 
-export default function HomePage() {
+export default async function HomePage() {
+  await requirePageRole("ADMIN", "IT");
+
   return (
     <main className="min-h-screen bg-zinc-50 p-6">
       <div className="mx-auto max-w-4xl">

@@ -2,7 +2,13 @@ import { ShieldCheck } from "lucide-react";
 
 import LoginForm from "./LoginForm";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>
+}) {
+  const { callbackUrl } = await searchParams
+
   return (
     <main className="flex h-dvh items-start justify-center overflow-y-auto bg-slate-100 px-4 py-10 sm:items-center">
       <section className="my-auto w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-900/5 sm:p-10">
@@ -27,7 +33,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <LoginForm />
+        <LoginForm callbackUrl={callbackUrl} />
       </section>
     </main>
   );

@@ -9,6 +9,7 @@ import EmployeeGeneratedDocumentsCard from "@/components/employee/EmployeeGenera
 import EmployeeTimelineCard from "@/components/employee/EmployeeTimelineCard"
 
 import { getEmployeeDetails } from "@/services/employee"
+import { requirePageRole } from "@/lib/auth/page-guard"
 
 interface Props {
   params: Promise<{
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export default async function EmployeeDetailsPage({ params }: Props) {
+  await requirePageRole("ADMIN", "IT")
+
   const { id } = await params
 
   const employee = await getEmployeeDetails(Number(id))

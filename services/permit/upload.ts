@@ -3,6 +3,7 @@ import { writeFile } from "fs/promises"
 
 import { BusinessError } from "@/services/shared/errors"
 import { ensureDirectory } from "@/services/shared/storage"
+import { requireRole } from "@/lib/auth/authorization"
 
 import {
   findPermitById,
@@ -13,6 +14,8 @@ export async function uploadSignedPermitPdf(
   permitId: number,
   file: File,
 ) {
+  await requireRole("ADMIN", "IT")
+
   const permit = await findPermitById(permitId)
 
   if (!permit) {

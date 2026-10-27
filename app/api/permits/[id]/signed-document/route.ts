@@ -2,6 +2,7 @@ import { readFile } from "fs/promises"
 import path from "path"
 
 import { getPermitDetails } from "@/services/permit"
+import { AccessControlError } from "@/lib/auth/authorization"
 
 export async function GET(
   _request: Request,
@@ -23,7 +24,21 @@ export async function GET(
     })
   }
 
-  const permit = await getPermitDetails(permitId)
+  let permit
+  try {
+    permit = await getPermitDetails(permitId)
+  } catch (error) {
+    if (error instanceof AccessControlError) {
+      return new Response(
+        error.code === "UNAUTHENTICATED"
+          ? "Debes iniciar sesión para descargar este documento."
+          : "No tienes permisos para descargar este documento.",
+        { status: error.code === "UNAUTHENTICATED" ? 401 : 403 },
+      )
+    }
+
+    throw error
+  }
 
   if (!permit || !permit.signedPdfPath) {
     return new Response("El PDF firmado no está disponible.", {
@@ -33,7 +48,6 @@ export async function GET(
 
   try {
     const filePath = path.join(process.cwd(), "storage", permit.signedPdfPath)
-
     const file = await readFile(filePath)
 
     return new Response(file, {
@@ -44,7 +58,6 @@ export async function GET(
     })
   } catch (error) {
     console.error(error)
-
     return new Response("No fue posible abrir el PDF firmado.", {
       status: 500,
     })

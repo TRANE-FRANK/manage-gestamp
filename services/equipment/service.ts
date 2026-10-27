@@ -1,4 +1,5 @@
 import { Prisma } from "@/generated/prisma/client"
+import { requireRole } from "@/lib/auth/authorization"
 
 import type { Equipment } from "@/generated/prisma/client"
 
@@ -15,6 +16,8 @@ export async function listEquipmentPaginated({
   type,
   ownership,
 }: ListEquipmentInput = {}): Promise<PaginatedEquipmentResult<Equipment>> {
+  await requireRole("ADMIN", "IT")
+
   const where: Prisma.EquipmentWhereInput = {}
 
   if (search?.trim()) {
@@ -85,5 +88,6 @@ export async function listEquipmentPaginated({
 }
 
 export async function getEquipmentDetails(id: number) {
+  await requireRole("ADMIN", "IT")
   return findEquipmentById(id)
 }
