@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 const {
   requireRoleMock,
   createScanLogMock,
+  transactionMock,
+  writeAuditEventMock,
+  transactionClient,
   findEquipmentByAssetTagMock,
   findLatestPermitByEquipmentIdMock,
   findScanLogsMock,
@@ -13,6 +16,9 @@ const {
 } = vi.hoisted(() => ({
   requireRoleMock: vi.fn(),
   createScanLogMock: vi.fn(),
+  transactionMock: vi.fn(),
+  writeAuditEventMock: vi.fn(),
+  transactionClient: { scanLog: { create: vi.fn() }, auditEvent: { create: vi.fn() } },
   findEquipmentByAssetTagMock: vi.fn(),
   findLatestPermitByEquipmentIdMock: vi.fn(),
   findScanLogsMock: vi.fn(),
@@ -39,6 +45,12 @@ vi.mock("@/services/scan/repository", () => ({
   getAllowedScansByEquipment: getAllowedScansByEquipmentMock,
   getAllowedScansByEmployee: getAllowedScansByEmployeeMock,
   getScanReasonStats: getScanReasonStatsMock,
+}))
+vi.mock("@/lib/prisma", () => ({
+  prisma: { $transaction: transactionMock },
+}))
+vi.mock("@/services/audit/service", () => ({
+  writeAuditEvent: writeAuditEventMock,
 }))
 
 import {
@@ -80,7 +92,19 @@ beforeEach(() => {
   requireRoleMock.mockResolvedValue({ id: 4, username: "operator", role: "IT" })
   findEquipmentByAssetTagMock.mockResolvedValue(permit.equipment)
   findLatestPermitByEquipmentIdMock.mockResolvedValue(permit)
-  createScanLogMock.mockResolvedValue({ id: 1 })
+  createScanLogMock.mockImplementation(async (data) => ({
+    id: 1,
+    scannedAt: new Date("2026-10-27T12:00:00.000Z"),
+    permitId: data.permitId ?? null,
+    assetTag: data.assetTag,
+    result: data.result,
+    reason: data.reason,
+  }))
+  transactionMock.mockImplementation(
+    async (callback: (tx: typeof transactionClient) => unknown) =>
+      callback(transactionClient),
+  )
+  writeAuditEventMock.mockResolvedValue({ id: 2 })
 })
 
 describe("servicio de escaneo autorizado", () => {
@@ -94,8 +118,82 @@ describe("servicio de escaneo autorizado", () => {
       expect(requireRoleMock).toHaveBeenCalledWith("ADMIN", "IT", "SECURITY")
       expect(findEquipmentByAssetTagMock).toHaveBeenCalledWith("TAG-5")
       expect(result.result).toBe("ALLOWED")
+      expect(createScanLogMock).toHaveBeenCalledOnce()
+      expect(createScanLogMock).toHaveBeenCalledWith(
+        {
+          permitId: 9,
+          assetTag: "TAG-5",
+          result: "ALLOWED",
+          reason: "ALLOWED",
+          notes: "Salida autorizada.",
+        },
+        transactionClient,
+      )
+      expect(writeAuditEventMock).toHaveBeenCalledWith(transactionClient, {
+        actor: { id: 4, username: "operator", role },
+        action: "PERMIT_SCAN_EXECUTED",
+        entityType: "SCAN_LOG",
+        entityId: "1",
+        outcome: "SUCCESS",
+        source: "permit.scan",
+        after: {
+          scannedAt: "2026-10-27T12:00:00.000Z",
+          result: "ALLOWED",
+          scanReason: "ALLOWED",
+        },
+      })
     },
   )
+
+  it("registra una sola vez un resultado denegado por equipo inexistente", async () => {
+    findEquipmentByAssetTagMock.mockResolvedValue(null)
+
+    const result = await scanEquipment({ assetTag: "UNKNOWN" })
+
+    expect(result.result).toBe("DENIED")
+    expect(createScanLogMock).toHaveBeenCalledOnce()
+    expect(createScanLogMock).toHaveBeenCalledWith({
+      assetTag: "UNKNOWN",
+      result: "DENIED",
+      reason: "EQUIPMENT_NOT_FOUND",
+      notes: "El equipo no está registrado.",
+    }, transactionClient)
+    expect(writeAuditEventMock).toHaveBeenCalledWith(transactionClient, {
+      actor: { id: 4, username: "operator", role: "IT" },
+      action: "PERMIT_SCAN_EXECUTED",
+      entityType: "SCAN_LOG",
+      entityId: "1",
+      outcome: "SUCCESS",
+      source: "permit.scan",
+      after: {
+        scannedAt: "2026-10-27T12:00:00.000Z",
+        result: "DENIED",
+        scanReason: "EQUIPMENT_NOT_FOUND",
+      },
+    })
+  })
+
+  it("no devuelve un resultado si falla la escritura del ScanLog", async () => {
+    const auditError = new Error("scan log insert failed")
+    createScanLogMock.mockRejectedValue(auditError)
+    findEquipmentByAssetTagMock.mockResolvedValue(null)
+
+    await expect(scanEquipment({ assetTag: "UNKNOWN" })).rejects.toBe(
+      auditError,
+    )
+    expect(createScanLogMock).toHaveBeenCalledOnce()
+    expect(writeAuditEventMock).not.toHaveBeenCalled()
+  })
+
+  it("propaga un fallo de AuditEvent y no devuelve el resultado del escaneo", async () => {
+    const auditError = new Error("audit event insert failed")
+    writeAuditEventMock.mockRejectedValue(auditError)
+
+    await expect(scanEquipment({ assetTag: "TAG-5" })).rejects.toBe(auditError)
+
+    expect(createScanLogMock).toHaveBeenCalledOnce()
+    expect(writeAuditEventMock).toHaveBeenCalledOnce()
+  })
 
   it.each([
     ["sin cuerpo", null],
@@ -110,6 +208,7 @@ describe("servicio de escaneo autorizado", () => {
     expect(findEquipmentByAssetTagMock).not.toHaveBeenCalled()
     expect(findLatestPermitByEquipmentIdMock).not.toHaveBeenCalled()
     expect(createScanLogMock).not.toHaveBeenCalled()
+    expect(writeAuditEventMock).not.toHaveBeenCalled()
   })
 
   it.each(["UNAUTHENTICATED", "FORBIDDEN"] as const)(
@@ -124,6 +223,7 @@ describe("servicio de escaneo autorizado", () => {
       expect(findEquipmentByAssetTagMock).not.toHaveBeenCalled()
       expect(findLatestPermitByEquipmentIdMock).not.toHaveBeenCalled()
       expect(createScanLogMock).not.toHaveBeenCalled()
+      expect(writeAuditEventMock).not.toHaveBeenCalled()
     },
   )
 

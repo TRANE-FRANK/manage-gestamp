@@ -4,11 +4,14 @@ import { usePathname } from "next/navigation"
 
 import Header from "@/components/layout/Header"
 import Sidebar from "@/components/layout/Sidebar"
+import type { UserRole } from "@/generated/prisma/client"
 
 export default function AppShell({
   children,
+  role,
 }: {
   children: React.ReactNode
+  role: UserRole | null
 }) {
   const pathname = usePathname()
 
@@ -16,7 +19,7 @@ export default function AppShell({
 
   return (
     <div className="flex h-dvh overflow-hidden">
-      <Sidebar />
+      <Sidebar role={role} />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Header />

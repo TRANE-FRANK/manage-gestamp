@@ -5,6 +5,7 @@ import path from "path"
 
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { equipmentTypeConfig } from "@/lib/equipment/config"
 import { BusinessError } from "@/services/shared/errors"
@@ -13,7 +14,7 @@ import { ensureDirectory } from "../shared/storage"
 import { convertExcelToPdf } from "../shared/pdf"
 
 export async function generateAssignmentDocument(assignmentId: number) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const assignment = await prisma.assignment.findUnique({
     where: {
@@ -160,27 +161,39 @@ export async function generateAssignmentDocument(assignmentId: number) {
     }
 
     databaseWritePending = true
-    const assignmentUpdate = await prisma.assignment.updateMany({
-      where: {
-        id: assignment.id,
-        returnedAt: null,
-        cancelledAt: null,
-      },
-      data: {
-        generatedPdfPath: relativePdfPath,
-      },
+    await prisma.$transaction(async (tx) => {
+      const assignmentUpdate = await tx.assignment.updateMany({
+        where: {
+          id: assignment.id,
+          returnedAt: null,
+          cancelledAt: null,
+        },
+        data: {
+          generatedPdfPath: relativePdfPath,
+        },
+      })
+
+      if (assignmentUpdate.count === 0) {
+        throw new BusinessError(
+          "No se puede generar una responsiva para una asignación cerrada.",
+        )
+      }
+
+      await writeAuditEvent(tx, {
+        actor,
+        action: "ASSIGNMENT_DOCUMENT_GENERATED",
+        entityType: "ASSIGNMENT",
+        entityId: String(assignment.id),
+        outcome: "SUCCESS",
+        source: "assignment.document.generate",
+      })
     })
     databaseWritePending = false
-
-    if (assignmentUpdate.count === 0) {
-      throw new BusinessError(
-        "No se puede generar una responsiva para una asignación cerrada.",
-      )
-    }
 
     ownsPdf = false
     return relativePdfPath
   } catch (error) {
+    if (databaseWritePending) databaseWritePending = false
     if (ownsPdf && !databaseWritePending) {
       await removeGeneratedPdfIfUnreferenced(relativePdfPath, pdfPath)
     }

@@ -17,6 +17,33 @@ import type {
 } from "./types"
 import { requireRole } from "@/lib/auth/authorization"
 import { parseScanEquipmentInput } from "./input"
+import { prisma } from "@/lib/prisma"
+import { writeAuditEvent, type AuditActor } from "@/services/audit/service"
+
+async function recordScanResult(
+  data: Parameters<typeof createScanLog>[0],
+  actor: AuditActor,
+) {
+  return prisma.$transaction(async (tx) => {
+    const scanLog = await createScanLog(data, tx)
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_SCAN_EXECUTED",
+      entityType: "SCAN_LOG",
+      entityId: String(scanLog.id),
+      outcome: "SUCCESS",
+      source: "permit.scan",
+      after: {
+        scannedAt: scanLog.scannedAt.toISOString(),
+        result: scanLog.result,
+        scanReason: scanLog.reason,
+      },
+    })
+
+    return scanLog
+  })
+}
 
 function getEquipmentIdentifier(equipment: {
   assetTag: string | null
@@ -72,24 +99,28 @@ export async function scanEquipment(
   data: unknown,
 ): Promise<AuthorizedScanResult> {
   const user = await requireRole("ADMIN", "IT", "SECURITY")
-  const result = await processEquipmentScan(parseScanEquipmentInput(data))
+  const result = await processEquipmentScan(parseScanEquipmentInput(data), user)
   return user.role === "SECURITY" ? toSecurityScanResult(result) : result
 }
 
 async function processEquipmentScan(
   data: ScanEquipmentInput,
+  actor: AuditActor,
 ): Promise<ScanEquipmentResult> {
   const assetTag = data.assetTag
 
   const equipment = await findEquipmentByAssetTag(assetTag)
 
   if (!equipment) {
-    await createScanLog({
-      assetTag,
-      result: "DENIED",
-      reason: "EQUIPMENT_NOT_FOUND",
-      notes: "El equipo no está registrado.",
-    })
+    await recordScanResult(
+      {
+        assetTag,
+        result: "DENIED",
+        reason: "EQUIPMENT_NOT_FOUND",
+        notes: "El equipo no está registrado.",
+      },
+      actor,
+    )
 
     return {
       allowed: false,
@@ -108,12 +139,15 @@ async function processEquipmentScan(
    * Equipo registrado pero sin permiso
    */
   if (!permit) {
-    await createScanLog({
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "NO_PERMIT",
-      notes: "El equipo no tiene ningún permiso registrado.",
-    })
+    await recordScanResult(
+      {
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "NO_PERMIT",
+        notes: "El equipo no tiene ningún permiso registrado.",
+      },
+      actor,
+    )
 
     return {
       allowed: false,
@@ -139,13 +173,16 @@ async function processEquipmentScan(
    * Permiso cancelado
    */
   if (permit.status === "CANCELLED") {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "CANCELLED",
-      notes: "El permiso está cancelado.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "CANCELLED",
+        notes: "El permiso está cancelado.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -157,13 +194,16 @@ async function processEquipmentScan(
    * Permiso expirado por estado
    */
   if (permit.status === "EXPIRED") {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "EXPIRED",
-      notes: "El permiso está expirado.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "EXPIRED",
+        notes: "El permiso está expirado.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -190,13 +230,16 @@ async function processEquipmentScan(
    * Permiso todavía no vigente
    */
   if (today < startDate) {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "NOT_STARTED",
-      notes: "El permiso todavía no está vigente.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "NOT_STARTED",
+        notes: "El permiso todavía no está vigente.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -208,13 +251,16 @@ async function processEquipmentScan(
    * Permiso expirado por fecha
    */
   if (today > expirationDate) {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "EXPIRED",
-      notes: "El permiso ha expirado.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "EXPIRED",
+        notes: "El permiso ha expirado.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -226,13 +272,16 @@ async function processEquipmentScan(
    * Permiso no activo
    */
   if (permit.status !== "ACTIVE") {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "NOT_ACTIVE",
-      notes: "El permiso no está activo.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "NOT_ACTIVE",
+        notes: "El permiso no está activo.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -244,13 +293,16 @@ async function processEquipmentScan(
    * Salida no autorizada
    */
   if (!permit.departureAuthorized) {
-    await createScanLog({
-      permitId: permit.id,
-      assetTag: equipmentIdentifier,
-      result: "DENIED",
-      reason: "NOT_ACTIVE",
-      notes: "La salida del equipo todavía no ha sido autorizada.",
-    })
+    await recordScanResult(
+      {
+        permitId: permit.id,
+        assetTag: equipmentIdentifier,
+        result: "DENIED",
+        reason: "NOT_ACTIVE",
+        notes: "La salida del equipo todavía no ha sido autorizada.",
+      },
+      actor,
+    )
 
     return {
       ...permitResult,
@@ -261,13 +313,16 @@ async function processEquipmentScan(
   /*
    * Salida autorizada
    */
-  await createScanLog({
-    permitId: permit.id,
-    assetTag: equipmentIdentifier,
-    result: "ALLOWED",
-    reason: "ALLOWED",
-    notes: "Salida autorizada.",
-  })
+  await recordScanResult(
+    {
+      permitId: permit.id,
+      assetTag: equipmentIdentifier,
+      result: "ALLOWED",
+      reason: "ALLOWED",
+      notes: "Salida autorizada.",
+    },
+    actor,
+  )
 
   return buildPermitResult(permit, true, "ALLOWED", "Salida autorizada.")
 }

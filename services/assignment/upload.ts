@@ -5,11 +5,12 @@ import path from "path"
 
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { ensureDirectory } from "../shared/storage"
 
 export async function uploadSignedPdf(assignmentId: number, file: File) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const assignment = await prisma.assignment.findUnique({
     where: {
@@ -69,26 +70,38 @@ export async function uploadSignedPdf(assignmentId: number, file: File) {
     }
 
     databaseWritePending = true
-    const assignmentUpdate = await prisma.assignment.updateMany({
-      where: {
-        id: assignmentId,
-        returnedAt: null,
-        cancelledAt: null,
-      },
-      data: {
-        signedPdfPath: relativePath,
-      },
+    await prisma.$transaction(async (tx) => {
+      const assignmentUpdate = await tx.assignment.updateMany({
+        where: {
+          id: assignmentId,
+          returnedAt: null,
+          cancelledAt: null,
+        },
+        data: {
+          signedPdfPath: relativePath,
+        },
+      })
+
+      if (assignmentUpdate.count === 0) {
+        throw new ValidationError(
+          "No se puede cargar una responsiva firmada para una asignación cerrada.",
+        )
+      }
+
+      await writeAuditEvent(tx, {
+        actor,
+        action: "ASSIGNMENT_SIGNED_DOCUMENT_UPLOADED",
+        entityType: "ASSIGNMENT",
+        entityId: String(assignmentId),
+        outcome: "SUCCESS",
+        source: "assignment.document.upload-signed",
+      })
     })
     databaseWritePending = false
 
-    if (assignmentUpdate.count === 0) {
-      throw new ValidationError(
-        "No se puede cargar una responsiva firmada para una asignación cerrada.",
-      )
-    }
-
     ownsOutput = false
   } catch (error) {
+    if (databaseWritePending) databaseWritePending = false
     if (ownsOutput && !databaseWritePending) {
       await removeSignedPdfIfUnreferenced(relativePath, outputPath)
     }

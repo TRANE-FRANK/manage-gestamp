@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import type { MaintenanceHistoryRecord } from "@/services/maintenance"
+import MaintenanceDocumentAction from "./maintenance-document-action"
 
 export function formatMaintenanceDate(date: Date) {
   return new Intl.DateTimeFormat("es-MX", {
@@ -51,6 +52,10 @@ function EquipmentIdentifier({ record }: { record: MaintenanceHistoryRecord }) {
       {description.length > 0 ? (
         <p className="mt-1 text-xs text-slate-600">{description.join(" ")}</p>
       ) : null}
+      <MaintenanceDocumentAction
+        maintenanceId={record.id}
+        hasGeneratedDocument={Boolean(record.generatedPdfPath)}
+      />
     </div>
   )
 }

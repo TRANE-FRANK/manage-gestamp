@@ -1,19 +1,15 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@/generated/prisma/client"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { BusinessError } from "@/services/shared/errors"
 
 import {
-  authorizePermitDeparture as authorizePermitDepartureRepository,
-  authorizeExceptionalDeparture as authorizeExceptionalDepartureRepository,
-  cancelPermit as cancelPermitRepository,
-  createPermit as createPermitRepository,
   findActivePermitByEquipmentId,
   findPermitByFolio,
   findPermitById,
   findPermits,
-  updatePermitDepartureAuthorization,
   findPermitsPaginated,
 } from "./repository"
 
@@ -45,7 +41,7 @@ export async function createPermit(data: {
   startDate: Date
   expirationDate: Date
 }) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   if (!data.folio.trim()) {
     throw new BusinessError("El folio es obligatorio.")
@@ -71,7 +67,39 @@ export async function createPermit(data: {
     )
   }
 
-  return createPermitRepository(data)
+  return prisma.$transaction(async (tx) => {
+    const permit = await tx.permit.create({
+      data: {
+        folio: data.folio,
+        employeeId: data.employeeId,
+        equipmentId: data.equipmentId,
+        startDate: data.startDate,
+        expirationDate: data.expirationDate,
+        status: "ACTIVE",
+      },
+      include: { employee: true, equipment: true },
+    })
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_CREATED",
+      entityType: "PERMIT",
+      entityId: String(permit.id),
+      outcome: "SUCCESS",
+      source: "permit.create",
+      after: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        startDate: permit.startDate.toISOString(),
+        expirationDate: permit.expirationDate.toISOString(),
+        status: permit.status,
+        departureAuthorized: permit.departureAuthorized,
+      },
+    })
+
+    return permit
+  })
 }
 
 export async function renewPermit({
@@ -79,7 +107,7 @@ export async function renewPermit({
   startDate,
   expirationDate,
 }: RenewPermitInput) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   if (startDate >= expirationDate) {
     throw new BusinessError(
@@ -111,20 +139,63 @@ export async function renewPermit({
   const newFolio = generateNextPermitFolio(permit.folio)
 
   return prisma.$transaction(async (tx) => {
-    await tx.permit.update({
-      where: {
-        id: permitId,
-      },
-      data: {
-        status: "EXPIRED",
+    const currentPermit = await tx.permit.findUnique({
+      where: { id: permitId },
+      select: {
+        id: true,
+        folio: true,
+        employeeId: true,
+        equipmentId: true,
+        startDate: true,
+        expirationDate: true,
+        status: true,
+        departureAuthorized: true,
       },
     })
 
-    return tx.permit.create({
+    if (!currentPermit) {
+      throw new BusinessError("El permiso no existe.")
+    }
+
+    if (currentPermit.status === "CANCELLED") {
+      throw new BusinessError("No se puede renovar un permiso cancelado.")
+    }
+
+    const concurrentActivePermit = await tx.permit.findFirst({
+      where: {
+        equipmentId: currentPermit.equipmentId,
+        status: "ACTIVE",
+        id: { not: currentPermit.id },
+      },
+      include: { equipment: { select: { assetTag: true } } },
+    })
+
+    if (concurrentActivePermit) {
+      throw new BusinessError(
+        `El equipo ${concurrentActivePermit.equipment.assetTag} ya tiene otro permiso activo.`,
+      )
+    }
+
+    if (currentPermit.status !== "EXPIRED") {
+      const expiredPermit = await tx.permit.updateMany({
+        where: {
+          id: permitId,
+          status: currentPermit.status,
+          departureAuthorized: currentPermit.departureAuthorized,
+        },
+        data: { status: "EXPIRED" },
+      })
+
+      if (expiredPermit.count === 0) {
+        throw new BusinessError("El permiso cambió y ya no se puede renovar.")
+      }
+    }
+
+    const renewedPermit = await tx.permit.create({
       data: {
         folio: newFolio,
-        employeeId: permit.employeeId,
-        equipmentId: permit.equipmentId,
+        employeeId: currentPermit.employeeId,
+        equipmentId: currentPermit.equipmentId,
         startDate,
         expirationDate,
         status: "ACTIVE",
@@ -134,11 +205,62 @@ export async function renewPermit({
         equipment: true,
       },
     })
+
+    if (currentPermit.status !== "EXPIRED") {
+      await writeAuditEvent(tx, {
+        actor,
+        action: "PERMIT_RENEWED",
+        entityType: "PERMIT",
+        entityId: String(currentPermit.id),
+        outcome: "SUCCESS",
+        source: "permit.renewal",
+        before: {
+          folio: currentPermit.folio,
+          employeeId: currentPermit.employeeId,
+          equipmentId: currentPermit.equipmentId,
+          startDate: currentPermit.startDate.toISOString(),
+          expirationDate: currentPermit.expirationDate.toISOString(),
+          status: currentPermit.status,
+          departureAuthorized: currentPermit.departureAuthorized,
+        },
+        after: {
+          folio: currentPermit.folio,
+          employeeId: currentPermit.employeeId,
+          equipmentId: currentPermit.equipmentId,
+          startDate: currentPermit.startDate.toISOString(),
+          expirationDate: currentPermit.expirationDate.toISOString(),
+          status: "EXPIRED",
+          departureAuthorized: currentPermit.departureAuthorized,
+          replacementPermitId: renewedPermit.id,
+        },
+      })
+    }
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_CREATED",
+      entityType: "PERMIT",
+      entityId: String(renewedPermit.id),
+      outcome: "SUCCESS",
+      source: "permit.renewal",
+      after: {
+        folio: renewedPermit.folio,
+        employeeId: renewedPermit.employeeId,
+        equipmentId: renewedPermit.equipmentId,
+        startDate: renewedPermit.startDate.toISOString(),
+        expirationDate: renewedPermit.expirationDate.toISOString(),
+        status: renewedPermit.status,
+        departureAuthorized: renewedPermit.departureAuthorized,
+        renewedFromPermitId: currentPermit.id,
+      },
+    })
+
+    return renewedPermit
   })
 }
 
 export async function cancelPermit(permitId: number, reason: string) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -160,14 +282,64 @@ export async function cancelPermit(permitId: number, reason: string) {
     throw new BusinessError("El motivo de cancelación es obligatorio.")
   }
 
-  return cancelPermitRepository(permitId, cancellationReason)
+  const cancelledAt = new Date()
+
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.permit.updateMany({
+      where: {
+        id: permitId,
+        status: permit.status,
+        departureAuthorized: permit.departureAuthorized,
+        cancelledAt: permit.cancelledAt,
+      },
+      data: {
+        status: "CANCELLED",
+        cancelledAt,
+        cancellationReason,
+      },
+    })
+
+    if (update.count === 0) {
+      throw new BusinessError("El permiso cambió y ya no se puede cancelar.")
+    }
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_CANCELLED",
+      entityType: "PERMIT",
+      entityId: String(permit.id),
+      outcome: "SUCCESS",
+      source: "permit.cancel",
+      before: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: permit.departureAuthorized,
+        cancelledAt: permit.cancelledAt?.toISOString() ?? null,
+      },
+      after: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: "CANCELLED",
+        departureAuthorized: permit.departureAuthorized,
+        cancelledAt: cancelledAt.toISOString(),
+      },
+    })
+
+    return tx.permit.findUniqueOrThrow({
+      where: { id: permitId },
+      include: { employee: true, equipment: true },
+    })
+  })
 }
 
 export async function authorizeExceptionalDeparture(
   permitId: number,
   reason: string,
 ) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -199,7 +371,59 @@ export async function authorizeExceptionalDeparture(
     )
   }
 
-  return authorizeExceptionalDepartureRepository(permitId, authorizationReason)
+  const departureAuthorizedAt = new Date()
+
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.permit.updateMany({
+      where: {
+        id: permitId,
+        status: permit.status,
+        departureAuthorized: false,
+        departureAuthorizedAt: permit.departureAuthorizedAt,
+      },
+      data: {
+        departureAuthorized: true,
+        departureAuthorizedAt,
+        departureAuthorizationReason: authorizationReason,
+      },
+    })
+
+    if (update.count === 0) {
+      throw new BusinessError(
+        "El permiso cambió y no se pudo autorizar la salida excepcional.",
+      )
+    }
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_EXCEPTIONAL_DEPARTURE_AUTHORIZED",
+      entityType: "PERMIT",
+      entityId: String(permit.id),
+      outcome: "SUCCESS",
+      source: "permit.exceptional-departure",
+      before: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: false,
+        departureAuthorizedAt: permit.departureAuthorizedAt?.toISOString() ?? null,
+      },
+      after: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: true,
+        departureAuthorizedAt: departureAuthorizedAt.toISOString(),
+      },
+    })
+
+    return tx.permit.findUniqueOrThrow({
+      where: { id: permitId },
+      include: { employee: true, equipment: true },
+    })
+  })
 }
 
 export async function uploadSignedPermitPdf(permitId: number, file: File) {
@@ -224,7 +448,7 @@ export async function setPermitDepartureAuthorization(
   permitId: number,
   departureAuthorized: boolean,
 ) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -236,11 +460,57 @@ export async function setPermitDepartureAuthorization(
     throw new BusinessError("No se puede modificar un permiso cancelado.")
   }
 
-  return updatePermitDepartureAuthorization(permitId, departureAuthorized)
+  if (permit.departureAuthorized === departureAuthorized) {
+    return permit
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.permit.updateMany({
+      where: {
+        id: permitId,
+        status: permit.status,
+        departureAuthorized: permit.departureAuthorized,
+      },
+      data: { departureAuthorized },
+    })
+
+    if (update.count === 0) {
+      throw new BusinessError(
+        "El permiso cambió y no se pudo modificar la autorización.",
+      )
+    }
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: departureAuthorized
+        ? "PERMIT_DEPARTURE_AUTHORIZED"
+        : "PERMIT_DEPARTURE_AUTHORIZATION_REVOKED",
+      entityType: "PERMIT",
+      entityId: String(permit.id),
+      outcome: "SUCCESS",
+      source: "permit.departure-authorization",
+      before: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: permit.departureAuthorized,
+      },
+      after: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized,
+      },
+    })
+
+    return tx.permit.findUniqueOrThrow({ where: { id: permitId } })
+  })
 }
 
 export async function authorizePermitDeparture(permitId: number) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -258,7 +528,48 @@ export async function authorizePermitDeparture(permitId: number) {
     throw new BusinessError("La salida de este equipo ya está autorizada.")
   }
 
-  return authorizePermitDepartureRepository(permitId)
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.permit.updateMany({
+      where: {
+        id: permitId,
+        status: "ACTIVE",
+        departureAuthorized: false,
+      },
+      data: { departureAuthorized: true },
+    })
+
+    if (update.count === 0) {
+      throw new BusinessError("El permiso cambió y no se pudo autorizar la salida.")
+    }
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "PERMIT_DEPARTURE_AUTHORIZED",
+      entityType: "PERMIT",
+      entityId: String(permit.id),
+      outcome: "SUCCESS",
+      source: "permit.departure-authorization",
+      before: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: false,
+      },
+      after: {
+        folio: permit.folio,
+        employeeId: permit.employeeId,
+        equipmentId: permit.equipmentId,
+        status: permit.status,
+        departureAuthorized: true,
+      },
+    })
+
+    return tx.permit.findUniqueOrThrow({
+      where: { id: permitId },
+      include: { employee: true, equipment: true },
+    })
+  })
 }
 
 export async function listPermitsPaginated({

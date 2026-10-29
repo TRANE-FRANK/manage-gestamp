@@ -2,6 +2,7 @@ import { Prisma } from "@/generated/prisma/client"
 
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { CreateAssignmentDto } from "./types"
 
@@ -10,7 +11,7 @@ import { ConflictError } from "../shared/errors"
 import { findActiveAssignmentByEquipment } from "./repository"
 
 export async function createAssignment(dto: CreateAssignmentDto) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const { employeeId, equipmentId } = dto
 
@@ -36,11 +37,36 @@ export async function createAssignment(dto: CreateAssignmentDto) {
         throw new ConflictError("El equipo no está disponible.")
       }
 
-      await tx.assignment.create({
+      const assignment = await tx.assignment.create({
         data: {
           employeeId,
           equipmentId,
           assignedAt: new Date(),
+        },
+        select: {
+          id: true,
+          employeeId: true,
+          equipmentId: true,
+          assignedAt: true,
+          returnedAt: true,
+          cancelledAt: true,
+        },
+      })
+
+      await writeAuditEvent(tx, {
+        actor,
+        action: "ASSIGNMENT_CREATED",
+        entityType: "ASSIGNMENT",
+        entityId: String(assignment.id),
+        outcome: "SUCCESS",
+        source: "assignment.create",
+        after: {
+          employeeId: assignment.employeeId,
+          equipmentId: assignment.equipmentId,
+          assignedAt: assignment.assignedAt.toISOString(),
+          returnedAt: assignment.returnedAt?.toISOString() ?? null,
+          cancelledAt: assignment.cancelledAt?.toISOString() ?? null,
+          equipmentStatus: "ASSIGNED",
         },
       })
     })

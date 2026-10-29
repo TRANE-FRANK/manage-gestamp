@@ -2,6 +2,7 @@ import { Prisma } from "@/generated/prisma/client"
 
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import {
   BusinessError,
@@ -416,7 +417,7 @@ export async function registerMaintenanceBatch({
   notes: string
   equipmentIds: number[]
 }) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const maintenanceDate = parseEffectiveDate(maintenanceDateInput)
   const ids = equipmentIds
@@ -438,8 +439,7 @@ export async function registerMaintenanceBatch({
 
   await ensureMaintenanceMigrationIsApplied()
 
-  try {
-    return await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
       // Lock in stable order so company/type cannot change after validation
       // while this batch is being written.
       const lockedEquipment = await tx.$queryRaw<Array<{ id: number }>>`
@@ -505,37 +505,65 @@ export async function registerMaintenanceBatch({
         },
       })
 
-      const created = await tx.maintenance.createMany({
-        data: ids.map((equipmentId) => ({
-          equipmentId,
-          maintenanceDate,
-          batchId: batch.id,
-          provider,
-          notes,
-        })),
-      })
+      let created
+      try {
+        created = await tx.maintenance.createManyAndReturn({
+          data: ids.map((equipmentId) => ({
+            equipmentId,
+            maintenanceDate,
+            batchId: batch.id,
+            provider,
+            notes,
+          })),
+          select: {
+            id: true,
+            equipmentId: true,
+            maintenanceDate: true,
+            batchId: true,
+            provider: true,
+          },
+        })
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
+          throw new ConflictError(
+            "Uno o más equipos ya tienen un mantenimiento registrado en esa fecha.",
+          )
+        }
 
-      if (created.count !== ids.length) {
+        throw error
+      }
+
+      if (created.length !== ids.length) {
         throw new BusinessError(
           "No se pudieron guardar todos los mantenimientos seleccionados.",
         )
       }
 
+      for (const maintenance of created) {
+        await writeAuditEvent(tx, {
+          actor,
+          action: "MAINTENANCE_CREATED",
+          entityType: "MAINTENANCE",
+          entityId: String(maintenance.id),
+          outcome: "SUCCESS",
+          source: "maintenance.register-batch",
+          after: {
+            equipmentId: maintenance.equipmentId,
+            maintenanceDate: maintenance.maintenanceDate
+              .toISOString()
+              .slice(0, 10),
+            batchId: maintenance.batchId,
+            provider: maintenance.provider,
+          },
+        })
+      }
+
       return {
         batchId: batch.id,
-        count: created.count,
+        count: created.length,
       }
     })
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
-      throw new ConflictError(
-        "Uno o más equipos ya tienen un mantenimiento registrado en esa fecha.",
-      )
-    }
-
-    throw error
-  }
 }

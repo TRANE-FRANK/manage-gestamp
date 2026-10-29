@@ -4,6 +4,8 @@ import argon2 from "argon2"
 import { Client } from "pg"
 import { createInterface } from "node:readline/promises"
 import { StringDecoder } from "node:string_decoder"
+import { resolve } from "node:path"
+import { fileURLToPath } from "node:url"
 
 const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{3,64}$/
 const PASSWORD_MIN_LENGTH = 12
@@ -78,8 +80,12 @@ async function promptHidden(label) {
   })
 }
 
-async function createInitialAdmin(username, passwordHash) {
-  const client = new Client({ connectionString: process.env.DATABASE_URL })
+export async function createInitialAdmin(
+  username,
+  passwordHash,
+  connectionString = process.env.DATABASE_URL,
+) {
+  const client = new Client({ connectionString })
   let transactionStarted = false
 
   try {
@@ -115,9 +121,36 @@ async function createInitialAdmin(username, passwordHash) {
       )
     }
 
-    await client.query(
-      'INSERT INTO "User" ("username", "passwordHash", "role", "createdAt", "updatedAt") VALUES ($1, $2, \'ADMIN\'::"UserRole", NOW(), NOW())',
+    const auditTable = await client.query(
+      `SELECT to_regclass('public."AuditEvent"') AS audit_table`,
+    )
+    if (!auditTable.rows[0]?.audit_table) {
+      throw new InitialAdminError(
+        "Aplica primero las migraciones de Prisma para habilitar la bitácora de auditoría.",
+      )
+    }
+
+    const createdUser = await client.query(
+      'INSERT INTO "User" ("username", "passwordHash", "role", "createdAt", "updatedAt") VALUES ($1, $2, \'ADMIN\'::"UserRole", NOW(), NOW()) RETURNING "id"',
       [username, passwordHash],
+    )
+
+    const userId = createdUser.rows[0]?.id
+    if (!Number.isSafeInteger(Number(userId)) || Number(userId) <= 0) {
+      throw new InitialAdminError(
+        "No fue posible confirmar la creación de la cuenta.",
+      )
+    }
+
+    await client.query(
+      `INSERT INTO "AuditEvent" (
+        "actorUserIdSnapshot", "actorUsernameSnapshot", "actorRoleSnapshot",
+        "action", "entityType", "entityId", "outcome", "source", "after"
+      ) VALUES (NULL, NULL, NULL, 'USER_CREATED', 'USER', $1, 'SUCCESS'::"AuditOutcome", 'users.bootstrap-initial-admin', $2::jsonb)`,
+      [
+        String(userId),
+        JSON.stringify({ username, role: "ADMIN", isActive: true }),
+      ],
     )
 
     await client.query("COMMIT")
@@ -173,9 +206,11 @@ async function main() {
   process.stdout.write("Cuenta ADMIN creada. Ya puedes iniciar sesión.\n")
 }
 
-main().catch((error) => {
-  process.stderr.write(
-    `${error instanceof InitialAdminError ? error.message : "No fue posible completar la operación."}\n`,
-  )
-  process.exitCode = 1
-})
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    process.stderr.write(
+      `${error instanceof InitialAdminError ? error.message : "No fue posible completar la operación."}\n`,
+    )
+    process.exitCode = 1
+  })
+}

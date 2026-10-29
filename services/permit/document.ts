@@ -7,8 +7,11 @@ import { promisify } from "util"
 import { BusinessError } from "@/services/shared/errors"
 import { ensureDirectory } from "@/services/shared/storage"
 import { requireRole } from "@/lib/auth/authorization"
+import { prisma } from "@/lib/prisma"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { findPermitById, updatePermitGeneratedDocument } from "./repository"
+import { randomUUID } from "crypto"
 
 const execFileAsync = promisify(execFile)
 
@@ -17,7 +20,7 @@ function formatDate(date: Date) {
 }
 
 export async function generatePermitDocument(permitId: number) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -98,7 +101,7 @@ export async function generatePermitDocument(permitId: number) {
 
   const safeFolio = permit.folio.replace(/[^a-zA-Z0-9-_]/g, "-")
 
-  const excelFileName = `PERM-${safeFolio}-${timestamp}.xlsx`
+  const excelFileName = `PERM-${safeFolio}-${timestamp}-${randomUUID()}.xlsx`
 
   const excelPath = path.join(temporaryDir, excelFileName)
 
@@ -147,11 +150,41 @@ export async function generatePermitDocument(permitId: number) {
     pdfFileName,
   )
 
-  await updatePermitGeneratedDocument(permit.id, relativePath)
+  try {
+    await prisma.$transaction(async (tx) => {
+      await updatePermitGeneratedDocument(permit.id, relativePath, tx)
+      await writeAuditEvent(tx, {
+        actor,
+        action: "PERMIT_DOCUMENT_GENERATED",
+        entityType: "PERMIT",
+        entityId: String(permit.id),
+        outcome: "SUCCESS",
+        source: "permit.document.generate",
+      })
+    })
+  } catch (error) {
+    await removeGeneratedPdfIfUnreferenced(relativePath, pdfPath)
+    throw error
+  }
 
   return {
     fileName: pdfFileName,
     outputPath: pdfPath,
     relativePath,
+  }
+}
+
+async function removeGeneratedPdfIfUnreferenced(
+  relativePath: string,
+  absolutePath: string,
+) {
+  try {
+    const reference = await prisma.permit.findFirst({
+      where: { generatedPdfPath: relativePath },
+      select: { id: true },
+    })
+    if (!reference) await fs.unlink(absolutePath)
+  } catch {
+    // Preserve the file if its database reference cannot be checked safely.
   }
 }

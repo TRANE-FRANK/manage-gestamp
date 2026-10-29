@@ -17,8 +17,9 @@ import {
   LogOut,
 } from "lucide-react";
 import { logoutAction } from "@/app/login/actions";
+import type { UserRole } from "@/generated/prisma/client";
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role: UserRole | null }) {
   const pathname = usePathname();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -128,6 +129,12 @@ export default function Sidebar() {
 
               {!collapsed && <span>Mantenimientos</span>}
             </Link>
+            {role === "ADMIN" ? (
+              <Link href="/users" className={navClass("/users")}>
+                <Users size={20} />
+                {!collapsed && <span>Usuarios</span>}
+              </Link>
+            ) : null}
           </div>
         </div>
 

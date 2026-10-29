@@ -62,6 +62,16 @@ describe("loginAction", () => {
     expect(redirectMock).not.toHaveBeenCalled();
   });
 
+  it("usa la misma respuesta visible para cualquier CredentialsSignin", async () => {
+    const { AuthError } = await import("next-auth");
+    signInMock.mockRejectedValue(new AuthError("Credentials rejected"));
+
+    await expect(loginAction({ error: null }, loginFormData())).resolves.toEqual({
+      error: "Usuario o contraseña incorrectos.",
+    });
+    expect(redirectMock).not.toHaveBeenCalled();
+  });
+
   it("no acepta un callbackUrl externo", async () => {
     signInMock.mockResolvedValue("http://localhost/");
 

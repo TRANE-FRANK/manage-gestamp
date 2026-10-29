@@ -1,20 +1,19 @@
 import path from "path"
-import { writeFile } from "fs/promises"
+import { unlink, writeFile } from "fs/promises"
 
 import { BusinessError } from "@/services/shared/errors"
 import { ensureDirectory } from "@/services/shared/storage"
 import { requireRole } from "@/lib/auth/authorization"
+import { prisma } from "@/lib/prisma"
+import { writeAuditEvent } from "@/services/audit/service"
 
-import {
-  findPermitById,
-  updatePermitSignedDocument,
-} from "./repository"
+import { findPermitById } from "./repository"
 
 export async function uploadSignedPermitPdf(
   permitId: number,
   file: File,
 ) {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const permit = await findPermitById(permitId)
 
@@ -48,15 +47,107 @@ export async function uploadSignedPermitPdf(
 
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  await writeFile(outputPath, buffer)
-
   const relativePath = path.join("permits", "signed", fileName)
 
-  await updatePermitSignedDocument(permit.id, relativePath)
+  let ownsCreatedFile = false
+  try {
+    await writeFile(outputPath, buffer, { flag: "wx" })
+    ownsCreatedFile = true
+
+    await prisma.$transaction(async (tx) => {
+      const current = await tx.permit.findUnique({
+        where: { id: permit.id },
+        select: {
+          id: true,
+          folio: true,
+          employeeId: true,
+          equipmentId: true,
+          status: true,
+          departureAuthorized: true,
+        },
+      })
+
+      if (!current || current.status === "CANCELLED") {
+        throw new BusinessError("No se pudo guardar el documento del permiso.")
+      }
+
+      const wasAuthorized = current.departureAuthorized
+      const update = await tx.permit.updateMany({
+        where: {
+          id: current.id,
+          status: current.status,
+          departureAuthorized: wasAuthorized,
+        },
+        data: {
+          signedPdfPath: relativePath,
+          departureAuthorized: true,
+        },
+      })
+
+      if (update.count === 0) {
+        throw new BusinessError("El permiso cambió y no se pudo guardar el documento.")
+      }
+
+      await writeAuditEvent(tx, {
+        actor,
+        action: "PERMIT_SIGNED_DOCUMENT_UPLOADED",
+        entityType: "PERMIT",
+        entityId: String(current.id),
+        outcome: "SUCCESS",
+        source: "permit.signed-document-upload",
+      })
+
+      if (!wasAuthorized) {
+        await writeAuditEvent(tx, {
+          actor,
+          action: "PERMIT_DEPARTURE_AUTHORIZED",
+          entityType: "PERMIT",
+          entityId: String(current.id),
+          outcome: "SUCCESS",
+          source: "permit.signed-document-upload",
+          before: {
+            folio: current.folio,
+            employeeId: current.employeeId,
+            equipmentId: current.equipmentId,
+            status: current.status,
+            departureAuthorized: false,
+          },
+          after: {
+            folio: current.folio,
+            employeeId: current.employeeId,
+            equipmentId: current.equipmentId,
+            status: current.status,
+            departureAuthorized: true,
+          },
+        })
+      }
+    })
+  } catch (error) {
+    if (ownsCreatedFile) {
+      await removeSignedPermitPdfIfUnreferenced(relativePath, outputPath)
+    }
+    throw error
+  }
 
   return {
     fileName,
     outputPath,
     relativePath,
+  }
+}
+
+async function removeSignedPermitPdfIfUnreferenced(
+  relativePath: string,
+  absolutePath: string,
+) {
+  try {
+    const reference = await prisma.permit.findFirst({
+      where: { signedPdfPath: relativePath },
+      select: { id: true },
+    })
+
+    if (!reference) await unlink(absolutePath)
+  } catch {
+    // Preserve the file if its database reference cannot be checked safely.
   }
 }

@@ -2,6 +2,7 @@ import { EquipmentStatus } from "@/generated/prisma/enums"
 
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { BusinessError, ValidationError } from "@/services/shared/errors"
 
@@ -18,7 +19,7 @@ export async function cancelAssignment(
   assignmentId: number,
   reason: string,
 ): Promise<CancelAssignmentResult> {
-  await requireRole("ADMIN", "IT")
+  const actor = await requireRole("ADMIN", "IT")
 
   const cancellationReason = reason.trim()
 
@@ -55,12 +56,42 @@ export async function cancelAssignment(
       throw new BusinessError("La asignación ya fue devuelta o anulada.")
     }
 
+    const equipment = await tx.equipment.findUniqueOrThrow({
+      where: { id: assignment.equipmentId },
+      select: { status: true },
+    })
+
     await tx.equipment.update({
       where: {
         id: assignment.equipmentId,
       },
       data: {
         status: EquipmentStatus.AVAILABLE,
+      },
+    })
+
+    await writeAuditEvent(tx, {
+      actor,
+      action: "ASSIGNMENT_CANCELLED",
+      entityType: "ASSIGNMENT",
+      entityId: String(assignment.id),
+      outcome: "SUCCESS",
+      source: "assignment.cancel",
+      before: {
+        employeeId: assignment.employeeId,
+        equipmentId: assignment.equipmentId,
+        assignedAt: assignment.assignedAt.toISOString(),
+        returnedAt: null,
+        cancelledAt: null,
+        equipmentStatus: equipment.status,
+      },
+      after: {
+        employeeId: assignment.employeeId,
+        equipmentId: assignment.equipmentId,
+        assignedAt: assignment.assignedAt.toISOString(),
+        returnedAt: null,
+        cancelledAt: cancelledAt.toISOString(),
+        equipmentStatus: EquipmentStatus.AVAILABLE,
       },
     })
   })

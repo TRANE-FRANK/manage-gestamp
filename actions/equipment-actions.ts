@@ -12,7 +12,12 @@ import {
 } from "@/generated/prisma/enums"
 
 import { prisma } from "@/lib/prisma"
-import { AccessControlError, requireRole } from "@/lib/auth/authorization"
+import {
+  AccessControlError,
+  requireRole,
+  type VerifiedUser,
+} from "@/lib/auth/authorization"
+import { writeAuditEvent } from "@/services/audit/service"
 
 import { redirect } from "next/navigation"
 
@@ -39,6 +44,41 @@ type EquipmentFormData = {
   status: EquipmentStatus
   ownership: EquipmentOwnership
   warrantyExpiresAt: Date | null
+}
+
+const equipmentAuditSelect = {
+  id: true,
+  assetTag: true,
+  barcode: true,
+  type: true,
+  inventoryNumber: true,
+  serialNumber: true,
+  brand: true,
+  model: true,
+  company: true,
+  status: true,
+  ownership: true,
+  warrantyExpiresAt: true,
+} satisfies Prisma.EquipmentSelect
+
+type EquipmentAuditRecord = Prisma.EquipmentGetPayload<{
+  select: typeof equipmentAuditSelect
+}>
+
+function equipmentAuditSnapshot(equipment: EquipmentAuditRecord) {
+  return {
+    assetTag: equipment.assetTag,
+    barcode: equipment.barcode,
+    type: equipment.type,
+    inventoryNumber: equipment.inventoryNumber,
+    serialNumber: equipment.serialNumber,
+    brand: equipment.brand,
+    model: equipment.model,
+    company: equipment.company,
+    status: equipment.status,
+    ownership: equipment.ownership,
+    warrantyExpiresAt: equipment.warrantyExpiresAt?.toISOString() ?? null,
+  }
 }
 
 function getEquipmentFormData(
@@ -182,24 +222,25 @@ function getUnexpectedError(): EquipmentFormState {
 
 async function getEquipmentAuthorizationError(
   operation: "registrar" | "modificar",
-): Promise<EquipmentFormState | null> {
+): Promise<{ actor: VerifiedUser } | { error: EquipmentFormState }> {
   try {
-    await requireRole("ADMIN", "IT")
-    return null
+    return { actor: await requireRole("ADMIN", "IT") }
   } catch (error) {
     if (error instanceof AccessControlError) {
       return {
-        errors: {
-          general:
-            error.code === "UNAUTHENTICATED"
-              ? "Debes iniciar sesión para " + operation + " un equipo."
-              : "No tienes permisos para " + operation + " equipos.",
+        error: {
+          errors: {
+            general:
+              error.code === "UNAUTHENTICATED"
+                ? "Debes iniciar sesión para " + operation + " un equipo."
+                : "No tienes permisos para " + operation + " equipos.",
+          },
         },
       }
     }
 
     console.error("No se pudo verificar el acceso para " + operation + " equipos.")
-    return getUnexpectedError()
+    return { error: getUnexpectedError() }
   }
 }
 
@@ -207,8 +248,9 @@ export async function createEquipment(
   _previousState: EquipmentFormState,
   formData: FormData,
 ): Promise<EquipmentFormState> {
-  const authorizationError = await getEquipmentAuthorizationError("registrar")
-  if (authorizationError) return authorizationError
+  const authorization = await getEquipmentAuthorizationError("registrar")
+  if ("error" in authorization) return authorization.error
+  const { actor } = authorization
 
   const data = getEquipmentFormData(formData)
 
@@ -217,8 +259,23 @@ export async function createEquipment(
   }
 
   try {
-    await prisma.equipment.create({
-      data,
+    await prisma.$transaction(async (tx) => {
+      const created = await tx.equipment.create({
+        data,
+        select: equipmentAuditSelect,
+      })
+
+      await writeAuditEvent(tx, {
+        actor,
+        action: "EQUIPMENT_CREATED",
+        entityType: "EQUIPMENT",
+        entityId: String(created.id),
+        outcome: "SUCCESS",
+        source: "equipment.create",
+        after: equipmentAuditSnapshot(created),
+      })
+
+      return created
     })
   } catch (error) {
     console.error("Error al registrar equipo:", error)
@@ -242,8 +299,9 @@ export async function updateEquipment(
   _previousState: EquipmentFormState,
   formData: FormData,
 ): Promise<EquipmentFormState> {
-  const authorizationError = await getEquipmentAuthorizationError("modificar")
-  if (authorizationError) return authorizationError
+  const authorization = await getEquipmentAuthorizationError("modificar")
+  if ("error" in authorization) return authorization.error
+  const { actor } = authorization
 
   const data = getEquipmentFormData(formData)
 
@@ -252,11 +310,47 @@ export async function updateEquipment(
   }
 
   try {
-    await prisma.equipment.update({
-      where: {
-        id: equipmentId,
-      },
-      data,
+    await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`
+        SELECT "id"
+        FROM "Equipment"
+        WHERE "id" = ${equipmentId}
+        FOR UPDATE
+      `
+      const existing = await tx.equipment.findUnique({
+        where: { id: equipmentId },
+        select: equipmentAuditSelect,
+      })
+
+      if (!existing) {
+        // Preserve Prisma's existing not-found error behavior for the action.
+        await tx.equipment.update({
+          where: { id: equipmentId },
+          data,
+        })
+        return
+      }
+
+      const updated = await tx.equipment.update({
+        where: { id: equipmentId },
+        data,
+        select: equipmentAuditSelect,
+      })
+
+      const before = equipmentAuditSnapshot(existing)
+      const after = equipmentAuditSnapshot(updated)
+      if (JSON.stringify(before) !== JSON.stringify(after)) {
+        await writeAuditEvent(tx, {
+          actor,
+          action: "EQUIPMENT_UPDATED",
+          entityType: "EQUIPMENT",
+          entityId: String(equipmentId),
+          outcome: "SUCCESS",
+          source: "equipment.update",
+          before,
+          after,
+        })
+      }
     })
   } catch (error) {
     console.error("Error al actualizar equipo:", error)

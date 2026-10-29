@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@/generated/prisma/client"
 
 const permitInclude = {
   employee: true,
@@ -39,8 +40,8 @@ export async function createScanLog(data: {
     | "NOT_STARTED"
     | "NOT_ACTIVE"
   notes?: string
-}) {
-  return prisma.scanLog.create({
+}, tx?: Prisma.TransactionClient) {
+  return (tx ?? prisma).scanLog.create({
     data: {
       ...(data.permitId !== undefined
         ? {

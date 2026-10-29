@@ -4,9 +4,24 @@ import argon2 from "argon2";
 
 import type { UserRole } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { writeAuditEvent } from "@/services/audit/service";
 
 function isUserRole(value: unknown): value is UserRole {
   return value === "ADMIN" || value === "IT" || value === "SECURITY";
+}
+
+async function recordFailedLogin(username: string) {
+  await prisma.$transaction((tx) =>
+    writeAuditEvent(tx, {
+      actor: null,
+      action: "LOGIN_FAILED",
+      entityType: "AUTHENTICATION",
+      entityId: "credentials",
+      outcome: "FAILURE",
+      source: "auth.credentials",
+      after: { username: username.slice(0, 100) },
+    }),
+  );
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -32,7 +47,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password =
           typeof credentials.password === "string" ? credentials.password : "";
 
-        if (!username || !password) return null;
+        if (!username || !password) {
+          await recordFailedLogin(username);
+          return null;
+        }
 
         const user = await prisma.user.findUnique({
           where: { username },
@@ -51,17 +69,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           !user ||
           !user.isActive ||
           !user.passwordHash.startsWith("$argon2id$")
-        ) return null;
+        ) {
+          await recordFailedLogin(username);
+          return null;
+        }
 
         let passwordMatches = false;
         try {
           passwordMatches = await argon2.verify(user.passwordHash, password);
         } catch {
           // Treat malformed or unsupported hashes as invalid credentials.
+          await recordFailedLogin(username);
           return null;
         }
 
-        if (!passwordMatches) return null;
+        if (!passwordMatches) {
+          await recordFailedLogin(username);
+          return null;
+        }
 
         const fullName = [user.firstName, user.lastName]
           .filter(Boolean)
@@ -76,6 +101,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  events: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return;
+
+      const userId = Number(user.id);
+      if (
+        !Number.isSafeInteger(userId) ||
+        userId <= 0 ||
+        typeof user.username !== "string" ||
+        !isUserRole(user.role)
+      ) {
+        throw new Error("Auth.js returned an invalid authenticated identity.");
+      }
+
+      await prisma.$transaction((tx) =>
+        writeAuditEvent(tx, {
+          actor: { id: userId, username: user.username, role: user.role },
+          action: "LOGIN_SUCCEEDED",
+          entityType: "AUTHENTICATION",
+          entityId: String(userId),
+          outcome: "SUCCESS",
+          source: "auth.credentials",
+        }),
+      );
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

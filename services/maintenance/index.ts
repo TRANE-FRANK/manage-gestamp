@@ -5,6 +5,11 @@ export {
   registerMaintenanceBatch,
 } from "./service"
 
+export {
+  generateMaintenanceDocument,
+  getMaintenanceDocument,
+} from "./document"
+
 export type {
   MaintenanceEquipmentOption,
   MaintenanceHistoryRecord,
