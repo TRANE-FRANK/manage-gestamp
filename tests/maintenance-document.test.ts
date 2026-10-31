@@ -16,48 +16,65 @@ const {
     string,
     Record<
       string,
-      { value: unknown; alignment: Record<string, unknown>; font?: { size?: number } }
+      {
+        value: unknown
+        alignment: Record<string, unknown>
+        font?: { size?: number }
+        numFmt?: string
+      }
     >
   >()
-  const worksheets = ["FORMATO_DESKTOP", "FORMATO_LAPTOP", "FORMATO_IMPRESORA", "EQUIPOS", "Control de cambios"].map(
-    (name, index) => {
-      const cells: Record<
-        string,
-        { value: unknown; alignment: Record<string, unknown>; font?: { size?: number } }
-      > = {}
-      cellsBySheet.set(name, cells)
-      const rows = new Map(
-        Array.from({ length: 12 }, (_, offset) => [18 + offset, { height: 36 }]),
-      )
-      return {
-        id: index + 1,
-        name,
-        cells,
-        rows,
-        pageSetup: {
-          paperSize: 1,
-          orientation: "landscape",
-          fitToPage: true,
-          fitToWidth: 1,
-          fitToHeight: 1,
-          scale: 62,
-        },
-        getCell: (address: string) => {
-          cells[address] ??= {
-            value: `plantilla:${address}`,
-            alignment: {},
-            font: { size: 12 },
-          }
-          return cells[address]
-        },
-        getRow: (rowNumber: number) => rows.get(rowNumber) ?? { height: undefined },
+  const worksheets = [
+    "FORMATO_DESKTOP",
+    "FORMATO_LAPTOP",
+    "FORMATO_IMPRESORA",
+    "EQUIPOS",
+    "Control de cambios",
+  ].map((name, index) => {
+    const cells: Record<
+      string,
+      {
+        value: unknown
+        alignment: Record<string, unknown>
+        font?: { size?: number }
+        numFmt?: string
       }
-    },
-  )
+    > = {}
+    cellsBySheet.set(name, cells)
+    const rows = new Map(
+      Array.from({ length: 12 }, (_, offset) => [18 + offset, { height: 36 }]),
+    )
+    return {
+      id: index + 1,
+      name,
+      cells,
+      rows,
+      pageSetup: {
+        paperSize: 1,
+        orientation: "landscape",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 1,
+        scale: 62,
+      },
+      getCell: (address: string) => {
+        cells[address] ??= {
+          value: `plantilla:${address}`,
+          alignment: {},
+          font: { size: 12 },
+        }
+        return cells[address]
+      },
+      getRow: (rowNumber: number) =>
+        rows.get(rowNumber) ?? { height: undefined },
+    }
+  })
   const workbook = {
     worksheets: [...worksheets],
     xlsx: { load: vi.fn(), writeFile: vi.fn() },
-    getWorksheet: vi.fn((name: string) => workbook.worksheets.find((sheet) => sheet.name === name)),
+    getWorksheet: vi.fn((name: string) =>
+      workbook.worksheets.find((sheet) => sheet.name === name),
+    ),
     removeWorksheet: vi.fn((id: number) => {
       const index = workbook.worksheets.findIndex((sheet) => sheet.id === id)
       if (index >= 0) workbook.worksheets.splice(index, 1)
@@ -98,7 +115,9 @@ vi.mock("@/lib/prisma", () => ({
   },
 }))
 vi.mock("node:fs/promises", () => ({ default: fsMock }))
-vi.mock("@/services/shared/pdf", () => ({ convertExcelToPdf: convertExcelToPdfMock }))
+vi.mock("@/services/shared/pdf", () => ({
+  convertExcelToPdf: convertExcelToPdfMock,
+}))
 vi.mock("exceljs", () => ({
   default: {
     Workbook: class {
@@ -117,6 +136,7 @@ import {
 
 const record = {
   id: 81,
+  maintenanceDate: new Date("2026-10-30T12:00:00.000Z"),
   generatedPdfPath: null,
   equipment: {
     type: "LAPTOP",
@@ -125,9 +145,16 @@ const record = {
     serialNumber: "SER-81",
     brand: "Marca",
     model: "Modelo",
+    assignments: [
+      {
+        employee: {
+          firstName: "Juan",
+          lastName: "Pérez",
+        },
+      },
+    ],
   },
 }
-
 function resetWorkbook() {
   workbook.worksheets.splice(0, workbook.worksheets.length, ...worksheets)
   cellsBySheet.clear()
@@ -141,21 +168,28 @@ function resetWorkbook() {
 beforeEach(() => {
   vi.clearAllMocks()
   resetWorkbook()
-  requireRoleMock.mockResolvedValue({ id: 7, username: "it.operator", role: "IT" })
+  requireRoleMock.mockResolvedValue({
+    id: 7,
+    username: "it.operator",
+    role: "IT",
+  })
   maintenanceFindUniqueMock.mockResolvedValue(record)
   maintenanceFindFirstMock.mockResolvedValue(null)
   maintenanceUpdateManyMock.mockResolvedValue({ count: 1 })
-  transactionMock.mockImplementation(async (callback: (tx: unknown) => unknown) =>
-    callback({
-      maintenance: {
-        updateMany: maintenanceUpdateManyMock,
-        findUnique: maintenanceFindUniqueMock,
-      },
-    }),
+  transactionMock.mockImplementation(
+    async (callback: (tx: unknown) => unknown) =>
+      callback({
+        maintenance: {
+          updateMany: maintenanceUpdateManyMock,
+          findUnique: maintenanceFindUniqueMock,
+        },
+      }),
   )
   fsMock.readFile.mockResolvedValue(Buffer.from("pdf"))
   fsMock.mkdir.mockResolvedValue(undefined)
-  fsMock.mkdtemp.mockResolvedValue("/private/storage/maintenance/generated/.maintenance-tmp")
+  fsMock.mkdtemp.mockResolvedValue(
+    "/private/storage/maintenance/generated/.maintenance-tmp",
+  )
   fsMock.open.mockResolvedValue({
     writeFile: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
@@ -200,7 +234,11 @@ describe("documentos imprimibles de mantenimiento", () => {
     expect(laptopCells.C9.value).toContain("LAPTOP")
     expect(laptopCells.C9.value).toContain("INV-81")
     expect(laptopCells.C9.value).toContain("SER-81")
-    for (const address of ["C7", "C8", "C10", "C11", "C12", "C13"]) {
+    expect(laptopCells.C7.value).toEqual(record.maintenanceDate)
+    expect(laptopCells.C7.numFmt).toBe("dd/mm/yyyy")
+    expect(laptopCells.C8.value).toBe("Juan Pérez")
+
+    for (const address of ["C10", "C11", "C12", "C13"]) {
       expect(laptopCells[address]?.value).toBeNull()
     }
     expect(laptopCells.A18).toBeUndefined()
@@ -226,11 +264,17 @@ describe("documentos imprimibles de mantenimiento", () => {
       fitToHeight: 1,
       scale: 62,
     })
-    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["FORMATO_LAPTOP"])
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual([
+      "FORMATO_LAPTOP",
+    ])
     expect(maintenanceUpdateManyMock).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 81, generatedPdfPath: null },
-        data: { generatedPdfPath: expect.stringMatching(/^maintenance\/generated\/maintenance-81-.+\.pdf$/) },
+        data: {
+          generatedPdfPath: expect.stringMatching(
+            /^maintenance\/generated\/maintenance-81-.+\.pdf$/,
+          ),
+        },
       }),
     )
   })
@@ -245,6 +289,7 @@ describe("documentos imprimibles de mantenimiento", () => {
         serialNumber: null,
         brand: null,
         model: null,
+        assignments: [],
       },
     })
 
@@ -307,7 +352,11 @@ describe("documentos imprimibles de mantenimiento", () => {
     await expect(getMaintenanceDocument(81)).rejects.toBe(denied)
     expect(maintenanceFindUniqueMock).not.toHaveBeenCalled()
 
-    requireRoleMock.mockResolvedValue({ id: 7, username: "it.operator", role: "IT" })
+    requireRoleMock.mockResolvedValue({
+      id: 7,
+      username: "it.operator",
+      role: "IT",
+    })
     maintenanceFindUniqueMock.mockResolvedValueOnce({
       id: 81,
       generatedPdfPath: "maintenance/generated/../../private.pdf",

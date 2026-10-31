@@ -26,24 +26,42 @@ const GENERATED_DIRECTORY = path.join("maintenance", "generated")
 
 type MaintenanceDocumentSource = {
   id: number
+  maintenanceDate: Date
   generatedPdfPath: string | null
   equipment: {
-    type: "LAPTOP" | "DESKTOP" | "PRINTER" | "SMARTPHONE" | "TABLET" | "RADIO" | null
+    type:
+      | "LAPTOP"
+      | "DESKTOP"
+      | "PRINTER"
+      | "SMARTPHONE"
+      | "TABLET"
+      | "RADIO"
+      | null
     inventoryNumber: string | null
     assetTag: string | null
     serialNumber: string | null
     brand: string | null
     model: string | null
+    assignments: {
+      employee: {
+        firstName: string
+        lastName: string
+      }
+    }[]
   }
 }
 
-function getEquipmentDescription(equipment: MaintenanceDocumentSource["equipment"]) {
+function getEquipmentDescription(
+  equipment: MaintenanceDocumentSource["equipment"],
+) {
   const typeLabel = equipment.type === "PRINTER" ? "IMPRESORA" : equipment.type
   return [
     typeLabel,
     equipment.brand,
     equipment.model,
-    //equipment.inventoryNumber ? `Inventario: ${equipment.inventoryNumber}` : null,
+    equipment.inventoryNumber
+      ? `Inventario: ${equipment.inventoryNumber}`
+      : null,
     equipment.assetTag ? `Asset tag: ${equipment.assetTag}` : null,
     equipment.serialNumber ? `Serie: ${equipment.serialNumber}` : null,
   ]
@@ -55,23 +73,31 @@ function fillMaintenanceSheet(
   worksheet: ExcelJS.Worksheet,
   maintenance: MaintenanceDocumentSource,
 ) {
-  // The official template has no effective-maintenance-date field. Its request
-  // and delivery dates must remain blank rather than being inferred.
-  worksheet.getCell("C7").value = null
-  worksheet.getCell("C8").value = null
+  const employee = maintenance.equipment.assignments[0]?.employee
+
+  const employeeName = employee
+    ? `${employee.firstName} ${employee.lastName}`.trim()
+    : null
+
+  worksheet.getCell("C7").value = maintenance.maintenanceDate
+  worksheet.getCell("C7").numFmt = "dd/mm/yyyy"
+
+  worksheet.getCell("C8").value = employeeName
+
   worksheet.getCell("C9").value = getEquipmentDescription(maintenance.equipment)
+
   worksheet.getCell("C9").alignment = {
     ...worksheet.getCell("C9").alignment,
     vertical: "middle",
     horizontal: "center",
     wrapText: true,
   }
+
   worksheet.getCell("C10").value = null
   worksheet.getCell("C11").value = null
   worksheet.getCell("C12").value = null
   worksheet.getCell("C13").value = null
 }
-
 function getGeneratedFilePath(relativePath: string) {
   const normalized = relativePath.replaceAll("\\", "/")
   const segments = normalized.split("/")
@@ -81,7 +107,9 @@ function getGeneratedFilePath(relativePath: string) {
     segments.length !== 3 ||
     segments[0] !== "maintenance" ||
     segments[1] !== "generated" ||
-    segments.some((segment) => !segment || segment === "." || segment === "..") ||
+    segments.some(
+      (segment) => !segment || segment === "." || segment === "..",
+    ) ||
     path.posix.extname(segments[2]).toLowerCase() !== ".pdf"
   ) {
     throw new BusinessError("La ruta del formato no es válida.")
@@ -165,6 +193,7 @@ export async function generateMaintenanceDocument(maintenanceId: number) {
     where: { id: maintenanceId },
     select: {
       id: true,
+      maintenanceDate: true,
       generatedPdfPath: true,
       equipment: {
         select: {
@@ -174,6 +203,24 @@ export async function generateMaintenanceDocument(maintenanceId: number) {
           serialNumber: true,
           brand: true,
           model: true,
+          assignments: {
+            where: {
+              returnedAt: null,
+              cancelledAt: null,
+            },
+            orderBy: {
+              assignedAt: "desc",
+            },
+            take: 1,
+            select: {
+              employee: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -284,7 +331,9 @@ export async function generateMaintenanceDocument(maintenanceId: number) {
     }
     throw error
   } finally {
-    await fs.rm(temporaryDirectory, { recursive: true, force: true }).catch(() => {})
+    await fs
+      .rm(temporaryDirectory, { recursive: true, force: true })
+      .catch(() => {})
   }
 }
 
@@ -306,4 +355,103 @@ export async function getMaintenanceDocument(maintenanceId: number) {
   }
 
   return readPrivateGeneratedPdf(maintenance.generatedPdfPath)
+}
+
+function getSignedFilePath(relativePath: string) {
+  const normalized = relativePath.replaceAll("\\", "/")
+  const segments = normalized.split("/")
+
+  if (
+    path.posix.isAbsolute(normalized) ||
+    segments.length !== 3 ||
+    segments[0] !== "maintenance" ||
+    segments[1] !== "signed" ||
+    segments.some(
+      (segment) => !segment || segment === "." || segment === "..",
+    ) ||
+    path.posix.extname(segments[2]).toLowerCase() !== ".pdf"
+  ) {
+    throw new BusinessError("La ruta del documento firmado no es válida.")
+  }
+
+  const signedRoot = path.resolve(
+    process.cwd(),
+    "storage",
+    "maintenance",
+    "signed",
+  )
+
+  const absolutePath = path.resolve(signedRoot, segments[2])
+  const relativeToRoot = path.relative(signedRoot, absolutePath)
+
+  if (
+    !relativeToRoot ||
+    relativeToRoot.startsWith(`..${path.sep}`) ||
+    relativeToRoot === ".." ||
+    path.isAbsolute(relativeToRoot)
+  ) {
+    throw new BusinessError("La ruta del documento firmado no es válida.")
+  }
+
+  return { absolutePath, signedRoot }
+}
+
+async function readPrivateSignedPdf(relativePath: string) {
+  const { absolutePath, signedRoot } = getSignedFilePath(relativePath)
+
+  try {
+    const [realRoot, realFile] = await Promise.all([
+      fs.realpath(signedRoot),
+      fs.realpath(absolutePath),
+    ])
+
+    const relativeRealPath = path.relative(realRoot, realFile)
+
+    if (
+      !relativeRealPath ||
+      relativeRealPath.startsWith(`..${path.sep}`) ||
+      relativeRealPath === ".." ||
+      path.isAbsolute(relativeRealPath)
+    ) {
+      throw new BusinessError("La ruta del documento firmado no es válida.")
+    }
+
+    const stats = await fs.stat(realFile)
+
+    if (!stats.isFile()) {
+      throw new NotFoundError("No se encontró el documento firmado.")
+    }
+
+    return Buffer.from(await fs.readFile(realFile))
+  } catch (error) {
+    if (error instanceof BusinessError) throw error
+
+    throw new NotFoundError("No se encontró el documento firmado.")
+  }
+}
+
+export async function getMaintenanceSignedDocument(maintenanceId: number) {
+  await requireRole("ADMIN", "IT")
+
+  if (!Number.isSafeInteger(maintenanceId) || maintenanceId <= 0) {
+    throw new NotFoundError("El mantenimiento no existe.")
+  }
+
+  const maintenance = await prisma.maintenance.findUnique({
+    where: { id: maintenanceId },
+    select: {
+      id: true,
+      signedPdfPath: true,
+    },
+  })
+
+  if (!maintenance) {
+    throw new NotFoundError("El mantenimiento no existe.")
+  }
+
+  if (!maintenance.signedPdfPath) {
+    throw new NotFoundError("Todavía no se ha cargado el documento firmado.")
+  }
+
+  return readPrivateSignedPdf(maintenance.signedPdfPath)
 }

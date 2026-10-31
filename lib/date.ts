@@ -5,3 +5,10 @@ export function getDaysUntil(date: Date): number {
 
   return Math.ceil((date.getTime() - now.getTime()) / millisecondsPerDay)
 }
+
+export function formatMaintenanceDate(date: Date) {
+  return new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(date)
+}

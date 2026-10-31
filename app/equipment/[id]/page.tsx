@@ -14,9 +14,8 @@ import { getEquipmentDetails } from "@/services/equipment"
 import { getEquipmentMaintenanceHistory } from "@/services/maintenance"
 
 import EquipmentToast from "../equipment-toast"
-import MaintenanceHistoryTable, {
-  formatMaintenanceDate,
-} from "../../maintenance/maintenance-history-table"
+import MaintenanceHistoryTable from "../../maintenance/maintenance-history-table"
+import { formatMaintenanceDate } from "@/lib/date"
 
 const statusConfig: Record<
   EquipmentStatus,
@@ -219,10 +218,10 @@ export default async function EquipmentDetailsPage({
                           "es-MX",
                         )}`
                       : assignment.returnedAt
-                      ? `Devuelto: ${assignment.returnedAt.toLocaleDateString(
-                          "es-MX",
-                        )}`
-                      : "Asignación activa"}
+                        ? `Devuelto: ${assignment.returnedAt.toLocaleDateString(
+                            "es-MX",
+                          )}`
+                        : "Asignación activa"}
                   </p>
                 </div>
               ))}
