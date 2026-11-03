@@ -28,10 +28,14 @@ export type AggregateEquipment = {
 
 export type EquipmentAvgAggregateOutputType = {
   id: number | null
+  responsibleDepartmentId: number | null
+  locationId: number | null
 }
 
 export type EquipmentSumAggregateOutputType = {
   id: number | null
+  responsibleDepartmentId: number | null
+  locationId: number | null
 }
 
 export type EquipmentMinAggregateOutputType = {
@@ -45,6 +49,8 @@ export type EquipmentMinAggregateOutputType = {
   model: string | null
   company: $Enums.Company | null
   status: $Enums.EquipmentStatus | null
+  responsibleDepartmentId: number | null
+  locationId: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownership: $Enums.EquipmentOwnership | null
@@ -62,6 +68,8 @@ export type EquipmentMaxAggregateOutputType = {
   model: string | null
   company: $Enums.Company | null
   status: $Enums.EquipmentStatus | null
+  responsibleDepartmentId: number | null
+  locationId: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownership: $Enums.EquipmentOwnership | null
@@ -79,6 +87,8 @@ export type EquipmentCountAggregateOutputType = {
   model: number
   company: number
   status: number
+  responsibleDepartmentId: number
+  locationId: number
   createdAt: number
   updatedAt: number
   ownership: number
@@ -89,10 +99,14 @@ export type EquipmentCountAggregateOutputType = {
 
 export type EquipmentAvgAggregateInputType = {
   id?: true
+  responsibleDepartmentId?: true
+  locationId?: true
 }
 
 export type EquipmentSumAggregateInputType = {
   id?: true
+  responsibleDepartmentId?: true
+  locationId?: true
 }
 
 export type EquipmentMinAggregateInputType = {
@@ -106,6 +120,8 @@ export type EquipmentMinAggregateInputType = {
   model?: true
   company?: true
   status?: true
+  responsibleDepartmentId?: true
+  locationId?: true
   createdAt?: true
   updatedAt?: true
   ownership?: true
@@ -123,6 +139,8 @@ export type EquipmentMaxAggregateInputType = {
   model?: true
   company?: true
   status?: true
+  responsibleDepartmentId?: true
+  locationId?: true
   createdAt?: true
   updatedAt?: true
   ownership?: true
@@ -140,6 +158,8 @@ export type EquipmentCountAggregateInputType = {
   model?: true
   company?: true
   status?: true
+  responsibleDepartmentId?: true
+  locationId?: true
   createdAt?: true
   updatedAt?: true
   ownership?: true
@@ -244,6 +264,8 @@ export type EquipmentGroupByOutputType = {
   model: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId: number | null
+  locationId: number | null
   createdAt: Date
   updatedAt: Date
   ownership: $Enums.EquipmentOwnership
@@ -284,10 +306,14 @@ export type EquipmentWhereInput = {
   model?: Prisma.StringNullableFilter<"Equipment"> | string | null
   company?: Prisma.EnumCompanyFilter<"Equipment"> | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFilter<"Equipment"> | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.IntNullableFilter<"Equipment"> | number | null
+  locationId?: Prisma.IntNullableFilter<"Equipment"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFilter<"Equipment"> | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.DateTimeNullableFilter<"Equipment"> | Date | string | null
+  responsibleDepartment?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
+  location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
   maintenances?: Prisma.MaintenanceListRelationFilter
@@ -304,10 +330,14 @@ export type EquipmentOrderByWithRelationInput = {
   model?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownership?: Prisma.SortOrder
   warrantyExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  responsibleDepartment?: Prisma.DepartmentOrderByWithRelationInput
+  location?: Prisma.LocationOrderByWithRelationInput
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   permits?: Prisma.PermitOrderByRelationAggregateInput
   maintenances?: Prisma.MaintenanceOrderByRelationAggregateInput
@@ -327,10 +357,14 @@ export type EquipmentWhereUniqueInput = Prisma.AtLeast<{
   model?: Prisma.StringNullableFilter<"Equipment"> | string | null
   company?: Prisma.EnumCompanyFilter<"Equipment"> | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFilter<"Equipment"> | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.IntNullableFilter<"Equipment"> | number | null
+  locationId?: Prisma.IntNullableFilter<"Equipment"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFilter<"Equipment"> | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.DateTimeNullableFilter<"Equipment"> | Date | string | null
+  responsibleDepartment?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
+  location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
   maintenances?: Prisma.MaintenanceListRelationFilter
@@ -347,6 +381,8 @@ export type EquipmentOrderByWithAggregationInput = {
   model?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownership?: Prisma.SortOrder
@@ -372,6 +408,8 @@ export type EquipmentScalarWhereWithAggregatesInput = {
   model?: Prisma.StringNullableWithAggregatesFilter<"Equipment"> | string | null
   company?: Prisma.EnumCompanyWithAggregatesFilter<"Equipment"> | $Enums.Company
   status?: Prisma.EnumEquipmentStatusWithAggregatesFilter<"Equipment"> | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.IntNullableWithAggregatesFilter<"Equipment"> | number | null
+  locationId?: Prisma.IntNullableWithAggregatesFilter<"Equipment"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Equipment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Equipment"> | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipWithAggregatesFilter<"Equipment"> | $Enums.EquipmentOwnership
@@ -386,12 +424,13 @@ export type EquipmentCreateInput = {
   serialNumber?: string | null
   brand?: string | null
   model?: string | null
-  company: $Enums.Company
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
   warrantyExpiresAt?: Date | string | null
+  responsibleDepartment?: Prisma.DepartmentCreateNestedOneWithoutResponsibleEquipmentInput
+  location?: Prisma.LocationCreateNestedOneWithoutEquipmentInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
@@ -408,6 +447,8 @@ export type EquipmentUncheckedCreateInput = {
   model?: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  locationId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
@@ -425,12 +466,13 @@ export type EquipmentUpdateInput = {
   serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  responsibleDepartment?: Prisma.DepartmentUpdateOneWithoutResponsibleEquipmentNestedInput
+  location?: Prisma.LocationUpdateOneWithoutEquipmentNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
@@ -447,6 +489,8 @@ export type EquipmentUncheckedUpdateInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
@@ -467,6 +511,8 @@ export type EquipmentCreateManyInput = {
   model?: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  locationId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
@@ -481,7 +527,6 @@ export type EquipmentUpdateManyMutationInput = {
   serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -500,6 +545,8 @@ export type EquipmentUncheckedUpdateManyInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
@@ -517,6 +564,8 @@ export type EquipmentCountOrderByAggregateInput = {
   model?: Prisma.SortOrder
   company?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownership?: Prisma.SortOrder
@@ -525,6 +574,8 @@ export type EquipmentCountOrderByAggregateInput = {
 
 export type EquipmentAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
 }
 
 export type EquipmentMaxOrderByAggregateInput = {
@@ -538,6 +589,8 @@ export type EquipmentMaxOrderByAggregateInput = {
   model?: Prisma.SortOrder
   company?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownership?: Prisma.SortOrder
@@ -555,6 +608,8 @@ export type EquipmentMinOrderByAggregateInput = {
   model?: Prisma.SortOrder
   company?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownership?: Prisma.SortOrder
@@ -563,11 +618,23 @@ export type EquipmentMinOrderByAggregateInput = {
 
 export type EquipmentSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  responsibleDepartmentId?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
 }
 
 export type EquipmentScalarRelationFilter = {
   is?: Prisma.EquipmentWhereInput
   isNot?: Prisma.EquipmentWhereInput
+}
+
+export type EquipmentListRelationFilter = {
+  every?: Prisma.EquipmentWhereInput
+  some?: Prisma.EquipmentWhereInput
+  none?: Prisma.EquipmentWhereInput
+}
+
+export type EquipmentOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type NullableEnumEquipmentTypeFieldUpdateOperationsInput = {
@@ -628,6 +695,90 @@ export type EquipmentUpdateOneRequiredWithoutMaintenancesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EquipmentUpdateToOneWithWhereWithoutMaintenancesInput, Prisma.EquipmentUpdateWithoutMaintenancesInput>, Prisma.EquipmentUncheckedUpdateWithoutMaintenancesInput>
 }
 
+export type EquipmentCreateNestedManyWithoutResponsibleDepartmentInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput> | Prisma.EquipmentCreateWithoutResponsibleDepartmentInput[] | Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput | Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput[]
+  createMany?: Prisma.EquipmentCreateManyResponsibleDepartmentInputEnvelope
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+}
+
+export type EquipmentUncheckedCreateNestedManyWithoutResponsibleDepartmentInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput> | Prisma.EquipmentCreateWithoutResponsibleDepartmentInput[] | Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput | Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput[]
+  createMany?: Prisma.EquipmentCreateManyResponsibleDepartmentInputEnvelope
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+}
+
+export type EquipmentUpdateManyWithoutResponsibleDepartmentNestedInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput> | Prisma.EquipmentCreateWithoutResponsibleDepartmentInput[] | Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput | Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput[]
+  upsert?: Prisma.EquipmentUpsertWithWhereUniqueWithoutResponsibleDepartmentInput | Prisma.EquipmentUpsertWithWhereUniqueWithoutResponsibleDepartmentInput[]
+  createMany?: Prisma.EquipmentCreateManyResponsibleDepartmentInputEnvelope
+  set?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  disconnect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  delete?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  update?: Prisma.EquipmentUpdateWithWhereUniqueWithoutResponsibleDepartmentInput | Prisma.EquipmentUpdateWithWhereUniqueWithoutResponsibleDepartmentInput[]
+  updateMany?: Prisma.EquipmentUpdateManyWithWhereWithoutResponsibleDepartmentInput | Prisma.EquipmentUpdateManyWithWhereWithoutResponsibleDepartmentInput[]
+  deleteMany?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+}
+
+export type EquipmentUncheckedUpdateManyWithoutResponsibleDepartmentNestedInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput> | Prisma.EquipmentCreateWithoutResponsibleDepartmentInput[] | Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput | Prisma.EquipmentCreateOrConnectWithoutResponsibleDepartmentInput[]
+  upsert?: Prisma.EquipmentUpsertWithWhereUniqueWithoutResponsibleDepartmentInput | Prisma.EquipmentUpsertWithWhereUniqueWithoutResponsibleDepartmentInput[]
+  createMany?: Prisma.EquipmentCreateManyResponsibleDepartmentInputEnvelope
+  set?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  disconnect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  delete?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  update?: Prisma.EquipmentUpdateWithWhereUniqueWithoutResponsibleDepartmentInput | Prisma.EquipmentUpdateWithWhereUniqueWithoutResponsibleDepartmentInput[]
+  updateMany?: Prisma.EquipmentUpdateManyWithWhereWithoutResponsibleDepartmentInput | Prisma.EquipmentUpdateManyWithWhereWithoutResponsibleDepartmentInput[]
+  deleteMany?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+}
+
+export type EquipmentCreateNestedManyWithoutLocationInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput> | Prisma.EquipmentCreateWithoutLocationInput[] | Prisma.EquipmentUncheckedCreateWithoutLocationInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutLocationInput | Prisma.EquipmentCreateOrConnectWithoutLocationInput[]
+  createMany?: Prisma.EquipmentCreateManyLocationInputEnvelope
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+}
+
+export type EquipmentUncheckedCreateNestedManyWithoutLocationInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput> | Prisma.EquipmentCreateWithoutLocationInput[] | Prisma.EquipmentUncheckedCreateWithoutLocationInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutLocationInput | Prisma.EquipmentCreateOrConnectWithoutLocationInput[]
+  createMany?: Prisma.EquipmentCreateManyLocationInputEnvelope
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+}
+
+export type EquipmentUpdateManyWithoutLocationNestedInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput> | Prisma.EquipmentCreateWithoutLocationInput[] | Prisma.EquipmentUncheckedCreateWithoutLocationInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutLocationInput | Prisma.EquipmentCreateOrConnectWithoutLocationInput[]
+  upsert?: Prisma.EquipmentUpsertWithWhereUniqueWithoutLocationInput | Prisma.EquipmentUpsertWithWhereUniqueWithoutLocationInput[]
+  createMany?: Prisma.EquipmentCreateManyLocationInputEnvelope
+  set?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  disconnect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  delete?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  update?: Prisma.EquipmentUpdateWithWhereUniqueWithoutLocationInput | Prisma.EquipmentUpdateWithWhereUniqueWithoutLocationInput[]
+  updateMany?: Prisma.EquipmentUpdateManyWithWhereWithoutLocationInput | Prisma.EquipmentUpdateManyWithWhereWithoutLocationInput[]
+  deleteMany?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+}
+
+export type EquipmentUncheckedUpdateManyWithoutLocationNestedInput = {
+  create?: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput> | Prisma.EquipmentCreateWithoutLocationInput[] | Prisma.EquipmentUncheckedCreateWithoutLocationInput[]
+  connectOrCreate?: Prisma.EquipmentCreateOrConnectWithoutLocationInput | Prisma.EquipmentCreateOrConnectWithoutLocationInput[]
+  upsert?: Prisma.EquipmentUpsertWithWhereUniqueWithoutLocationInput | Prisma.EquipmentUpsertWithWhereUniqueWithoutLocationInput[]
+  createMany?: Prisma.EquipmentCreateManyLocationInputEnvelope
+  set?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  disconnect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  delete?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  connect?: Prisma.EquipmentWhereUniqueInput | Prisma.EquipmentWhereUniqueInput[]
+  update?: Prisma.EquipmentUpdateWithWhereUniqueWithoutLocationInput | Prisma.EquipmentUpdateWithWhereUniqueWithoutLocationInput[]
+  updateMany?: Prisma.EquipmentUpdateManyWithWhereWithoutLocationInput | Prisma.EquipmentUpdateManyWithWhereWithoutLocationInput[]
+  deleteMany?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+}
+
 export type EquipmentCreateWithoutAssignmentsInput = {
   assetTag?: string | null
   barcode?: string | null
@@ -636,12 +787,13 @@ export type EquipmentCreateWithoutAssignmentsInput = {
   serialNumber?: string | null
   brand?: string | null
   model?: string | null
-  company: $Enums.Company
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
   warrantyExpiresAt?: Date | string | null
+  responsibleDepartment?: Prisma.DepartmentCreateNestedOneWithoutResponsibleEquipmentInput
+  location?: Prisma.LocationCreateNestedOneWithoutEquipmentInput
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
 }
@@ -657,6 +809,8 @@ export type EquipmentUncheckedCreateWithoutAssignmentsInput = {
   model?: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  locationId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
@@ -689,12 +843,13 @@ export type EquipmentUpdateWithoutAssignmentsInput = {
   serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  responsibleDepartment?: Prisma.DepartmentUpdateOneWithoutResponsibleEquipmentNestedInput
+  location?: Prisma.LocationUpdateOneWithoutEquipmentNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
 }
@@ -710,6 +865,8 @@ export type EquipmentUncheckedUpdateWithoutAssignmentsInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
@@ -726,12 +883,13 @@ export type EquipmentCreateWithoutPermitsInput = {
   serialNumber?: string | null
   brand?: string | null
   model?: string | null
-  company: $Enums.Company
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
   warrantyExpiresAt?: Date | string | null
+  responsibleDepartment?: Prisma.DepartmentCreateNestedOneWithoutResponsibleEquipmentInput
+  location?: Prisma.LocationCreateNestedOneWithoutEquipmentInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
 }
@@ -747,6 +905,8 @@ export type EquipmentUncheckedCreateWithoutPermitsInput = {
   model?: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  locationId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
@@ -779,12 +939,13 @@ export type EquipmentUpdateWithoutPermitsInput = {
   serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  responsibleDepartment?: Prisma.DepartmentUpdateOneWithoutResponsibleEquipmentNestedInput
+  location?: Prisma.LocationUpdateOneWithoutEquipmentNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
 }
@@ -800,6 +961,8 @@ export type EquipmentUncheckedUpdateWithoutPermitsInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
@@ -816,12 +979,13 @@ export type EquipmentCreateWithoutMaintenancesInput = {
   serialNumber?: string | null
   brand?: string | null
   model?: string | null
-  company: $Enums.Company
   status: $Enums.EquipmentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
   warrantyExpiresAt?: Date | string | null
+  responsibleDepartment?: Prisma.DepartmentCreateNestedOneWithoutResponsibleEquipmentInput
+  location?: Prisma.LocationCreateNestedOneWithoutEquipmentInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
   permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
 }
@@ -837,6 +1001,8 @@ export type EquipmentUncheckedCreateWithoutMaintenancesInput = {
   model?: string | null
   company: $Enums.Company
   status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  locationId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownership?: $Enums.EquipmentOwnership
@@ -869,12 +1035,13 @@ export type EquipmentUpdateWithoutMaintenancesInput = {
   serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  responsibleDepartment?: Prisma.DepartmentUpdateOneWithoutResponsibleEquipmentNestedInput
+  location?: Prisma.LocationUpdateOneWithoutEquipmentNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
 }
@@ -890,12 +1057,312 @@ export type EquipmentUncheckedUpdateWithoutMaintenancesInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
   warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
   permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
+}
+
+export type EquipmentCreateWithoutResponsibleDepartmentInput = {
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+  location?: Prisma.LocationCreateNestedOneWithoutEquipmentInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
+  permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
+  maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
+}
+
+export type EquipmentUncheckedCreateWithoutResponsibleDepartmentInput = {
+  id?: number
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  locationId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEquipmentInput
+  permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEquipmentInput
+  maintenances?: Prisma.MaintenanceUncheckedCreateNestedManyWithoutEquipmentInput
+}
+
+export type EquipmentCreateOrConnectWithoutResponsibleDepartmentInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput>
+}
+
+export type EquipmentCreateManyResponsibleDepartmentInputEnvelope = {
+  data: Prisma.EquipmentCreateManyResponsibleDepartmentInput | Prisma.EquipmentCreateManyResponsibleDepartmentInput[]
+  skipDuplicates?: boolean
+}
+
+export type EquipmentUpsertWithWhereUniqueWithoutResponsibleDepartmentInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  update: Prisma.XOR<Prisma.EquipmentUpdateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedUpdateWithoutResponsibleDepartmentInput>
+  create: Prisma.XOR<Prisma.EquipmentCreateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedCreateWithoutResponsibleDepartmentInput>
+}
+
+export type EquipmentUpdateWithWhereUniqueWithoutResponsibleDepartmentInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  data: Prisma.XOR<Prisma.EquipmentUpdateWithoutResponsibleDepartmentInput, Prisma.EquipmentUncheckedUpdateWithoutResponsibleDepartmentInput>
+}
+
+export type EquipmentUpdateManyWithWhereWithoutResponsibleDepartmentInput = {
+  where: Prisma.EquipmentScalarWhereInput
+  data: Prisma.XOR<Prisma.EquipmentUpdateManyMutationInput, Prisma.EquipmentUncheckedUpdateManyWithoutResponsibleDepartmentInput>
+}
+
+export type EquipmentScalarWhereInput = {
+  AND?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+  OR?: Prisma.EquipmentScalarWhereInput[]
+  NOT?: Prisma.EquipmentScalarWhereInput | Prisma.EquipmentScalarWhereInput[]
+  id?: Prisma.IntFilter<"Equipment"> | number
+  assetTag?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  barcode?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  type?: Prisma.EnumEquipmentTypeNullableFilter<"Equipment"> | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  serialNumber?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  brand?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  model?: Prisma.StringNullableFilter<"Equipment"> | string | null
+  company?: Prisma.EnumCompanyFilter<"Equipment"> | $Enums.Company
+  status?: Prisma.EnumEquipmentStatusFilter<"Equipment"> | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.IntNullableFilter<"Equipment"> | number | null
+  locationId?: Prisma.IntNullableFilter<"Equipment"> | number | null
+  createdAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Equipment"> | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFilter<"Equipment"> | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.DateTimeNullableFilter<"Equipment"> | Date | string | null
+}
+
+export type EquipmentCreateWithoutLocationInput = {
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+  responsibleDepartment?: Prisma.DepartmentCreateNestedOneWithoutResponsibleEquipmentInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutEquipmentInput
+  permits?: Prisma.PermitCreateNestedManyWithoutEquipmentInput
+  maintenances?: Prisma.MaintenanceCreateNestedManyWithoutEquipmentInput
+}
+
+export type EquipmentUncheckedCreateWithoutLocationInput = {
+  id?: number
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEquipmentInput
+  permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEquipmentInput
+  maintenances?: Prisma.MaintenanceUncheckedCreateNestedManyWithoutEquipmentInput
+}
+
+export type EquipmentCreateOrConnectWithoutLocationInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput>
+}
+
+export type EquipmentCreateManyLocationInputEnvelope = {
+  data: Prisma.EquipmentCreateManyLocationInput | Prisma.EquipmentCreateManyLocationInput[]
+  skipDuplicates?: boolean
+}
+
+export type EquipmentUpsertWithWhereUniqueWithoutLocationInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  update: Prisma.XOR<Prisma.EquipmentUpdateWithoutLocationInput, Prisma.EquipmentUncheckedUpdateWithoutLocationInput>
+  create: Prisma.XOR<Prisma.EquipmentCreateWithoutLocationInput, Prisma.EquipmentUncheckedCreateWithoutLocationInput>
+}
+
+export type EquipmentUpdateWithWhereUniqueWithoutLocationInput = {
+  where: Prisma.EquipmentWhereUniqueInput
+  data: Prisma.XOR<Prisma.EquipmentUpdateWithoutLocationInput, Prisma.EquipmentUncheckedUpdateWithoutLocationInput>
+}
+
+export type EquipmentUpdateManyWithWhereWithoutLocationInput = {
+  where: Prisma.EquipmentScalarWhereInput
+  data: Prisma.XOR<Prisma.EquipmentUpdateManyMutationInput, Prisma.EquipmentUncheckedUpdateManyWithoutLocationInput>
+}
+
+export type EquipmentCreateManyResponsibleDepartmentInput = {
+  id?: number
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  locationId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+}
+
+export type EquipmentUpdateWithoutResponsibleDepartmentInput = {
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.LocationUpdateOneWithoutEquipmentNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
+  permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
+  maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
+}
+
+export type EquipmentUncheckedUpdateWithoutResponsibleDepartmentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
+  permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
+  maintenances?: Prisma.MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput
+}
+
+export type EquipmentUncheckedUpdateManyWithoutResponsibleDepartmentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  locationId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type EquipmentCreateManyLocationInput = {
+  id?: number
+  assetTag?: string | null
+  barcode?: string | null
+  type?: $Enums.EquipmentType | null
+  inventoryNumber?: string | null
+  serialNumber?: string | null
+  brand?: string | null
+  model?: string | null
+  status: $Enums.EquipmentStatus
+  responsibleDepartmentId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownership?: $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Date | string | null
+}
+
+export type EquipmentUpdateWithoutLocationInput = {
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  responsibleDepartment?: Prisma.DepartmentUpdateOneWithoutResponsibleEquipmentNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutEquipmentNestedInput
+  permits?: Prisma.PermitUpdateManyWithoutEquipmentNestedInput
+  maintenances?: Prisma.MaintenanceUpdateManyWithoutEquipmentNestedInput
+}
+
+export type EquipmentUncheckedUpdateWithoutLocationInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEquipmentNestedInput
+  permits?: Prisma.PermitUncheckedUpdateManyWithoutEquipmentNestedInput
+  maintenances?: Prisma.MaintenanceUncheckedUpdateManyWithoutEquipmentNestedInput
+}
+
+export type EquipmentUncheckedUpdateManyWithoutLocationInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumEquipmentTypeFieldUpdateOperationsInput | $Enums.EquipmentType | null
+  inventoryNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEquipmentStatusFieldUpdateOperationsInput | $Enums.EquipmentStatus
+  responsibleDepartmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownership?: Prisma.EnumEquipmentOwnershipFieldUpdateOperationsInput | $Enums.EquipmentOwnership
+  warrantyExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -958,10 +1425,14 @@ export type EquipmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   model?: boolean
   company?: boolean
   status?: boolean
+  responsibleDepartmentId?: boolean
+  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownership?: boolean
   warrantyExpiresAt?: boolean
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
   assignments?: boolean | Prisma.Equipment$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Equipment$permitsArgs<ExtArgs>
   maintenances?: boolean | Prisma.Equipment$maintenancesArgs<ExtArgs>
@@ -979,10 +1450,14 @@ export type EquipmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   model?: boolean
   company?: boolean
   status?: boolean
+  responsibleDepartmentId?: boolean
+  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownership?: boolean
   warrantyExpiresAt?: boolean
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
 }, ExtArgs["result"]["equipment"]>
 
 export type EquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -996,10 +1471,14 @@ export type EquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   model?: boolean
   company?: boolean
   status?: boolean
+  responsibleDepartmentId?: boolean
+  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownership?: boolean
   warrantyExpiresAt?: boolean
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
 }, ExtArgs["result"]["equipment"]>
 
 export type EquipmentSelectScalar = {
@@ -1013,25 +1492,37 @@ export type EquipmentSelectScalar = {
   model?: boolean
   company?: boolean
   status?: boolean
+  responsibleDepartmentId?: boolean
+  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownership?: boolean
   warrantyExpiresAt?: boolean
 }
 
-export type EquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "assetTag" | "barcode" | "type" | "inventoryNumber" | "serialNumber" | "brand" | "model" | "company" | "status" | "createdAt" | "updatedAt" | "ownership" | "warrantyExpiresAt", ExtArgs["result"]["equipment"]>
+export type EquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "assetTag" | "barcode" | "type" | "inventoryNumber" | "serialNumber" | "brand" | "model" | "company" | "status" | "responsibleDepartmentId" | "locationId" | "createdAt" | "updatedAt" | "ownership" | "warrantyExpiresAt", ExtArgs["result"]["equipment"]>
 export type EquipmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
   assignments?: boolean | Prisma.Equipment$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Equipment$permitsArgs<ExtArgs>
   maintenances?: boolean | Prisma.Equipment$maintenancesArgs<ExtArgs>
   _count?: boolean | Prisma.EquipmentCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type EquipmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type EquipmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type EquipmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
+}
+export type EquipmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  responsibleDepartment?: boolean | Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>
+  location?: boolean | Prisma.Equipment$locationArgs<ExtArgs>
+}
 
 export type $EquipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Equipment"
   objects: {
+    responsibleDepartment: Prisma.$DepartmentPayload<ExtArgs> | null
+    location: Prisma.$LocationPayload<ExtArgs> | null
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     permits: Prisma.$PermitPayload<ExtArgs>[]
     maintenances: Prisma.$MaintenancePayload<ExtArgs>[]
@@ -1047,6 +1538,8 @@ export type $EquipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     model: string | null
     company: $Enums.Company
     status: $Enums.EquipmentStatus
+    responsibleDepartmentId: number | null
+    locationId: number | null
     createdAt: Date
     updatedAt: Date
     ownership: $Enums.EquipmentOwnership
@@ -1445,6 +1938,8 @@ readonly fields: EquipmentFieldRefs;
  */
 export interface Prisma__EquipmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  responsibleDepartment<T extends Prisma.Equipment$responsibleDepartmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Equipment$responsibleDepartmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  location<T extends Prisma.Equipment$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Equipment$locationArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignments<T extends Prisma.Equipment$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Equipment$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permits<T extends Prisma.Equipment$permitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Equipment$permitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   maintenances<T extends Prisma.Equipment$maintenancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Equipment$maintenancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1487,6 +1982,8 @@ export interface EquipmentFieldRefs {
   readonly model: Prisma.FieldRef<"Equipment", 'String'>
   readonly company: Prisma.FieldRef<"Equipment", 'Company'>
   readonly status: Prisma.FieldRef<"Equipment", 'EquipmentStatus'>
+  readonly responsibleDepartmentId: Prisma.FieldRef<"Equipment", 'Int'>
+  readonly locationId: Prisma.FieldRef<"Equipment", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Equipment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Equipment", 'DateTime'>
   readonly ownership: Prisma.FieldRef<"Equipment", 'EquipmentOwnership'>
@@ -1745,6 +2242,10 @@ export type EquipmentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    */
   data: Prisma.EquipmentCreateManyInput | Prisma.EquipmentCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EquipmentIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1815,6 +2316,10 @@ export type EquipmentUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * Limit how many Equipment to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EquipmentIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1881,6 +2386,44 @@ export type EquipmentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Equipment to delete.
    */
   limit?: number
+}
+
+/**
+ * Equipment.responsibleDepartment
+ */
+export type Equipment$responsibleDepartmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Department
+   */
+  select?: Prisma.DepartmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Department
+   */
+  omit?: Prisma.DepartmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentInclude<ExtArgs> | null
+  where?: Prisma.DepartmentWhereInput
+}
+
+/**
+ * Equipment.location
+ */
+export type Equipment$locationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Location
+   */
+  select?: Prisma.LocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Location
+   */
+  omit?: Prisma.LocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocationInclude<ExtArgs> | null
+  where?: Prisma.LocationWhereInput
 }
 
 /**

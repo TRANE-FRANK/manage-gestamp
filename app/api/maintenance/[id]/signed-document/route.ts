@@ -1,6 +1,6 @@
 import { handleDocumentError, pdfResponse } from "@/services/document"
 
-import { getMaintenanceSignedDocument } from "@/services/maintenance"
+import { getMaintenanceSignedDocument } from "@/services/maintenance/document"
 
 export async function GET(
   _request: Request,

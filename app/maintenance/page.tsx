@@ -27,6 +27,7 @@ export default async function MaintenancePage({
     historyFrom?: string
     historyTo?: string
     historyProvider?: string
+    historyStatus?: string
   }>
 }) {
   await requirePageRole("ADMIN", "IT")
@@ -43,6 +44,7 @@ export default async function MaintenancePage({
     historyFrom,
     historyTo,
     historyProvider,
+    historyStatus,
   } = await searchParams
   const parsedPage = Number(page)
   const currentPage =
@@ -67,6 +69,12 @@ export default async function MaintenancePage({
       from: historyFrom,
       to: historyTo,
       provider: historyProvider,
+      status: historyStatus as
+        | "all"
+        | "signed"
+        | "pending"
+        | "not-generated"
+        | undefined,
     }),
   ])
   const hasHistoryFilters = Boolean(
@@ -98,7 +106,7 @@ export default async function MaintenancePage({
       </Card>
 
       <Card>
-        <div className="mb-3">
+        <div id="maintenance-history" className="mb-3">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">
               Historial de mantenimientos
@@ -113,6 +121,8 @@ export default async function MaintenancePage({
         <MaintenanceHistorySearch
           providers={history.providers}
           error={history.filterError}
+          statusCounts={history.statusCounts}
+          currentStatus={historyStatus ?? "all"}
         />
         <MaintenanceHistoryTable
           records={history.data}
@@ -120,8 +130,8 @@ export default async function MaintenancePage({
             history.filterError
               ? "Corrige los filtros para consultar el historial."
               : hasHistoryFilters
-              ? "No hay resultados para los filtros actuales."
-              : "No hay mantenimientos registrados."
+                ? "No hay resultados para los filtros actuales."
+                : "No hay mantenimientos registrados."
           }
         />
         <MaintenanceHistoryPagination
@@ -133,6 +143,7 @@ export default async function MaintenancePage({
           from={historyFrom}
           to={historyTo}
           provider={historyProvider}
+          status={historyStatus}
           equipmentPage={page}
           equipmentSearch={search}
         />

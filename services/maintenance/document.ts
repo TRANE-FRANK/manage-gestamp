@@ -15,7 +15,7 @@ import { convertExcelToPdf } from "@/services/shared/pdf"
 import { BusinessError, NotFoundError } from "@/services/shared/errors"
 
 const TEMPLATE_PATH = path.join(
-  process.cwd(),
+  /*turbopackIgnore: true*/ process.cwd(),
   "storage",
   "templates",
   "maintenance",

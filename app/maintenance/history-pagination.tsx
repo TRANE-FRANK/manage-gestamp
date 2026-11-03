@@ -11,6 +11,7 @@ export default function MaintenanceHistoryPagination({
   provider,
   equipmentPage,
   equipmentSearch,
+  status,
 }: {
   page: number
   totalPages: number
@@ -22,6 +23,7 @@ export default function MaintenanceHistoryPagination({
   provider?: string
   equipmentPage?: string
   equipmentSearch?: string
+  status?: string
 }) {
   function href(nextPage: number) {
     const params = new URLSearchParams()
@@ -31,8 +33,9 @@ export default function MaintenanceHistoryPagination({
     if (from) params.set("historyFrom", from)
     if (to) params.set("historyTo", to)
     if (provider) params.set("historyProvider", provider)
+    if (status && status !== "all") params.set("historyStatus", status)
     params.set("historyPage", String(nextPage))
-    return `/maintenance?${params.toString()}`
+    return `/maintenance?${params.toString()}#maintenance-history`
   }
 
   const start = total === 0 ? 0 : (page - 1) * pageSize + 1
@@ -45,12 +48,38 @@ export default function MaintenanceHistoryPagination({
       </p>
       {totalPages > 1 ? (
         <div className="flex items-center gap-2">
-          {page > 1 ? <Link href={href(page - 1)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">Anterior</Link> : <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-400">Anterior</span>}
-          <span className="px-3 text-sm text-slate-600">Página {page} de {totalPages}</span>
-          {page < totalPages ? <Link href={href(page + 1)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">Siguiente</Link> : <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-400">Siguiente</span>}
+          {page > 1 ? (
+            <Link
+              href={href(page - 1)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            >
+              Anterior
+            </Link>
+          ) : (
+            <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-400">
+              Anterior
+            </span>
+          )}
+          <span className="px-3 text-sm text-slate-600">
+            Página {page} de {totalPages}
+          </span>
+          {page < totalPages ? (
+            <Link
+              href={href(page + 1)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            >
+              Siguiente
+            </Link>
+          ) : (
+            <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-400">
+              Siguiente
+            </span>
+          )}
         </div>
       ) : (
-        <p className="text-sm text-slate-600">Página {page} de {totalPages}</p>
+        <p className="text-sm text-slate-600">
+          Página {page} de {totalPages}
+        </p>
       )}
     </div>
   )

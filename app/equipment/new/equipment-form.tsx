@@ -4,7 +4,11 @@ import { useActionState, useState } from "react"
 
 import { equipmentTypeConfig } from "@/lib/equipment/config"
 
-import type { Equipment, EquipmentType } from "@/generated/prisma/client"
+import type {
+  Company,
+  Equipment,
+  EquipmentType,
+} from "@/generated/prisma/client"
 
 import {
   createEquipment,
@@ -27,13 +31,32 @@ type EditableEquipment = Pick<
   | "status"
   | "ownership"
   | "warrantyExpiresAt"
+  | "responsibleDepartmentId"
+  | "locationId"
 >
+
+type EquipmentFormCatalogs = {
+  departments: {
+    id: number
+    name: string
+    company: Company
+  }[]
+  locations: {
+    id: number
+    company: Company
+    label: string
+  }[]
+}
 
 interface EquipmentFormProps {
   equipment?: EditableEquipment
+  catalogs: EquipmentFormCatalogs
 }
 
-export default function EquipmentForm({ equipment }: EquipmentFormProps) {
+export default function EquipmentForm({
+  equipment,
+  catalogs,
+}: EquipmentFormProps) {
   const equipmentAction = equipment
     ? updateEquipment.bind(null, equipment.id)
     : createEquipment
@@ -45,6 +68,24 @@ export default function EquipmentForm({ equipment }: EquipmentFormProps) {
 
   const [equipmentType, setEquipmentType] = useState<EquipmentType | "">(
     equipment?.type ?? "",
+  )
+
+  const [company, setCompany] = useState<Company>(equipment?.company ?? "GP2")
+
+  const [departmentId, setDepartmentId] = useState(
+    String(equipment?.responsibleDepartmentId ?? ""),
+  )
+
+  const [locationId, setLocationId] = useState(
+    String(equipment?.locationId ?? ""),
+  )
+
+  const filteredDepartments = catalogs.departments.filter(
+    (department) => department.company === company,
+  )
+
+  const filteredLocations = catalogs.locations.filter(
+    (location) => location.company === company,
   )
 
   const typeConfig =
@@ -182,7 +223,14 @@ export default function EquipmentForm({ equipment }: EquipmentFormProps) {
 
           <select
             name="company"
-            defaultValue={equipment?.company ?? "ORM"}
+            value={company}
+            onChange={(event) => {
+              const nextCompany = event.target.value as Company
+
+              setCompany(nextCompany)
+              setDepartmentId("")
+              setLocationId("")
+            }}
             className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
             required
           >
@@ -208,6 +256,69 @@ export default function EquipmentForm({ equipment }: EquipmentFormProps) {
             <option value="MAINTENANCE">Mantenimiento</option>
             <option value="RETIRED">Retirado</option>
           </select>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Departamento responsable
+            <span className="ml-1 text-xs text-red-600">*</span>
+          </label>
+
+          <select
+            name="responsibleDepartmentId"
+            value={departmentId}
+            onChange={(event) => setDepartmentId(event.target.value)}
+            className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
+            required
+          >
+            <option value="">Seleccionar departamento</option>
+
+            {filteredDepartments.map((department) => (
+              <option key={department.id} value={department.id}>
+                {department.name}
+              </option>
+            ))}
+          </select>
+          {state.errors?.responsibleDepartmentId && (
+            <p className="mt-1 text-sm text-red-600">
+              {state.errors.responsibleDepartmentId}
+            </p>  
+          )}
+
+          {filteredDepartments.length === 0 && (
+            <p className="mt-1 text-sm text-amber-600">
+              Esta compañía todavía no tiene departamentos activos registrados.
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Ubicación física
+            <span className="ml-1 text-xs text-slate-500">(Opcional)</span>
+          </label>
+
+          <select
+            name="locationId"
+            value={locationId}
+            onChange={(event) => setLocationId(event.target.value)}
+            className="w-full rounded-xl border border-slate-300 p-3 focus:border-blue-500 focus:outline-none"
+          >
+            <option value="">Sin ubicación asignada</option>
+
+            {filteredLocations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.label}
+              </option>
+            ))}
+          </select>
+          {state.errors?.locationId && (
+            <p className="mt-1 text-sm text-red-600">
+              {state.errors.locationId}
+            </p>
+          )}
         </div>
       </div>
 

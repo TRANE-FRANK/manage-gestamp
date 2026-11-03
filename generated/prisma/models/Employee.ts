@@ -28,10 +28,12 @@ export type AggregateEmployee = {
 
 export type EmployeeAvgAggregateOutputType = {
   id: number | null
+  departmentId: number | null
 }
 
 export type EmployeeSumAggregateOutputType = {
   id: number | null
+  departmentId: number | null
 }
 
 export type EmployeeMinAggregateOutputType = {
@@ -40,6 +42,7 @@ export type EmployeeMinAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   department: string | null
+  departmentId: number | null
   position: string | null
   company: $Enums.Company | null
   photoPath: string | null
@@ -53,6 +56,7 @@ export type EmployeeMaxAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   department: string | null
+  departmentId: number | null
   position: string | null
   company: $Enums.Company | null
   photoPath: string | null
@@ -66,6 +70,7 @@ export type EmployeeCountAggregateOutputType = {
   firstName: number
   lastName: number
   department: number
+  departmentId: number
   position: number
   company: number
   photoPath: number
@@ -77,10 +82,12 @@ export type EmployeeCountAggregateOutputType = {
 
 export type EmployeeAvgAggregateInputType = {
   id?: true
+  departmentId?: true
 }
 
 export type EmployeeSumAggregateInputType = {
   id?: true
+  departmentId?: true
 }
 
 export type EmployeeMinAggregateInputType = {
@@ -89,6 +96,7 @@ export type EmployeeMinAggregateInputType = {
   firstName?: true
   lastName?: true
   department?: true
+  departmentId?: true
   position?: true
   company?: true
   photoPath?: true
@@ -102,6 +110,7 @@ export type EmployeeMaxAggregateInputType = {
   firstName?: true
   lastName?: true
   department?: true
+  departmentId?: true
   position?: true
   company?: true
   photoPath?: true
@@ -115,6 +124,7 @@ export type EmployeeCountAggregateInputType = {
   firstName?: true
   lastName?: true
   department?: true
+  departmentId?: true
   position?: true
   company?: true
   photoPath?: true
@@ -215,6 +225,7 @@ export type EmployeeGroupByOutputType = {
   firstName: string
   lastName: string
   department: string | null
+  departmentId: number | null
   position: string | null
   company: $Enums.Company
   photoPath: string | null
@@ -251,11 +262,13 @@ export type EmployeeWhereInput = {
   firstName?: Prisma.StringFilter<"Employee"> | string
   lastName?: Prisma.StringFilter<"Employee"> | string
   department?: Prisma.StringNullableFilter<"Employee"> | string | null
+  departmentId?: Prisma.IntNullableFilter<"Employee"> | number | null
   position?: Prisma.StringNullableFilter<"Employee"> | string | null
   company?: Prisma.EnumCompanyFilter<"Employee"> | $Enums.Company
   photoPath?: Prisma.StringNullableFilter<"Employee"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
+  departmentRef?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
 }
@@ -266,11 +279,13 @@ export type EmployeeOrderByWithRelationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
+  departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrder
   photoPath?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  departmentRef?: Prisma.DepartmentOrderByWithRelationInput
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   permits?: Prisma.PermitOrderByRelationAggregateInput
 }
@@ -284,11 +299,13 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   firstName?: Prisma.StringFilter<"Employee"> | string
   lastName?: Prisma.StringFilter<"Employee"> | string
   department?: Prisma.StringNullableFilter<"Employee"> | string | null
+  departmentId?: Prisma.IntNullableFilter<"Employee"> | number | null
   position?: Prisma.StringNullableFilter<"Employee"> | string | null
   company?: Prisma.EnumCompanyFilter<"Employee"> | $Enums.Company
   photoPath?: Prisma.StringNullableFilter<"Employee"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
+  departmentRef?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   assignments?: Prisma.AssignmentListRelationFilter
   permits?: Prisma.PermitListRelationFilter
 }, "id" | "sapNumber">
@@ -299,6 +316,7 @@ export type EmployeeOrderByWithAggregationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
+  departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrder
   photoPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -320,6 +338,7 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   firstName?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   lastName?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   department?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
+  departmentId?: Prisma.IntNullableWithAggregatesFilter<"Employee"> | number | null
   position?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
   company?: Prisma.EnumCompanyWithAggregatesFilter<"Employee"> | $Enums.Company
   photoPath?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
@@ -333,10 +352,10 @@ export type EmployeeCreateInput = {
   lastName: string
   department?: string | null
   position?: string | null
-  company: $Enums.Company
   photoPath?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  departmentRef?: Prisma.DepartmentCreateNestedOneWithoutEmployeesInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEmployeeInput
   permits?: Prisma.PermitCreateNestedManyWithoutEmployeeInput
 }
@@ -347,6 +366,7 @@ export type EmployeeUncheckedCreateInput = {
   firstName: string
   lastName: string
   department?: string | null
+  departmentId?: number | null
   position?: string | null
   company: $Enums.Company
   photoPath?: string | null
@@ -362,10 +382,10 @@ export type EmployeeUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departmentRef?: Prisma.DepartmentUpdateOneWithoutEmployeesNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutEmployeeNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEmployeeNestedInput
 }
@@ -376,6 +396,7 @@ export type EmployeeUncheckedUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -391,6 +412,7 @@ export type EmployeeCreateManyInput = {
   firstName: string
   lastName: string
   department?: string | null
+  departmentId?: number | null
   position?: string | null
   company: $Enums.Company
   photoPath?: string | null
@@ -404,7 +426,6 @@ export type EmployeeUpdateManyMutationInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +437,7 @@ export type EmployeeUncheckedUpdateManyInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -429,6 +451,7 @@ export type EmployeeCountOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   department?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   position?: Prisma.SortOrder
   company?: Prisma.SortOrder
   photoPath?: Prisma.SortOrder
@@ -438,6 +461,7 @@ export type EmployeeCountOrderByAggregateInput = {
 
 export type EmployeeAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
 }
 
 export type EmployeeMaxOrderByAggregateInput = {
@@ -446,6 +470,7 @@ export type EmployeeMaxOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   department?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   position?: Prisma.SortOrder
   company?: Prisma.SortOrder
   photoPath?: Prisma.SortOrder
@@ -459,6 +484,7 @@ export type EmployeeMinOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   department?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   position?: Prisma.SortOrder
   company?: Prisma.SortOrder
   photoPath?: Prisma.SortOrder
@@ -468,11 +494,22 @@ export type EmployeeMinOrderByAggregateInput = {
 
 export type EmployeeSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
 }
 
 export type EmployeeScalarRelationFilter = {
   is?: Prisma.EmployeeWhereInput
   isNot?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeListRelationFilter = {
+  every?: Prisma.EmployeeWhereInput
+  some?: Prisma.EmployeeWhereInput
+  none?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type EnumCompanyFieldUpdateOperationsInput = {
@@ -507,16 +544,58 @@ export type EmployeeUpdateOneRequiredWithoutPermitsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutPermitsInput, Prisma.EmployeeUpdateWithoutPermitsInput>, Prisma.EmployeeUncheckedUpdateWithoutPermitsInput>
 }
 
+export type EmployeeCreateNestedManyWithoutDepartmentRefInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput> | Prisma.EmployeeCreateWithoutDepartmentRefInput[] | Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput[]
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput | Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput[]
+  createMany?: Prisma.EmployeeCreateManyDepartmentRefInputEnvelope
+  connect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+}
+
+export type EmployeeUncheckedCreateNestedManyWithoutDepartmentRefInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput> | Prisma.EmployeeCreateWithoutDepartmentRefInput[] | Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput[]
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput | Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput[]
+  createMany?: Prisma.EmployeeCreateManyDepartmentRefInputEnvelope
+  connect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+}
+
+export type EmployeeUpdateManyWithoutDepartmentRefNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput> | Prisma.EmployeeCreateWithoutDepartmentRefInput[] | Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput[]
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput | Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput[]
+  upsert?: Prisma.EmployeeUpsertWithWhereUniqueWithoutDepartmentRefInput | Prisma.EmployeeUpsertWithWhereUniqueWithoutDepartmentRefInput[]
+  createMany?: Prisma.EmployeeCreateManyDepartmentRefInputEnvelope
+  set?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  delete?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  connect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  update?: Prisma.EmployeeUpdateWithWhereUniqueWithoutDepartmentRefInput | Prisma.EmployeeUpdateWithWhereUniqueWithoutDepartmentRefInput[]
+  updateMany?: Prisma.EmployeeUpdateManyWithWhereWithoutDepartmentRefInput | Prisma.EmployeeUpdateManyWithWhereWithoutDepartmentRefInput[]
+  deleteMany?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
+}
+
+export type EmployeeUncheckedUpdateManyWithoutDepartmentRefNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput> | Prisma.EmployeeCreateWithoutDepartmentRefInput[] | Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput[]
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput | Prisma.EmployeeCreateOrConnectWithoutDepartmentRefInput[]
+  upsert?: Prisma.EmployeeUpsertWithWhereUniqueWithoutDepartmentRefInput | Prisma.EmployeeUpsertWithWhereUniqueWithoutDepartmentRefInput[]
+  createMany?: Prisma.EmployeeCreateManyDepartmentRefInputEnvelope
+  set?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  delete?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  connect?: Prisma.EmployeeWhereUniqueInput | Prisma.EmployeeWhereUniqueInput[]
+  update?: Prisma.EmployeeUpdateWithWhereUniqueWithoutDepartmentRefInput | Prisma.EmployeeUpdateWithWhereUniqueWithoutDepartmentRefInput[]
+  updateMany?: Prisma.EmployeeUpdateManyWithWhereWithoutDepartmentRefInput | Prisma.EmployeeUpdateManyWithWhereWithoutDepartmentRefInput[]
+  deleteMany?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
+}
+
 export type EmployeeCreateWithoutAssignmentsInput = {
   sapNumber: string
   firstName: string
   lastName: string
   department?: string | null
   position?: string | null
-  company: $Enums.Company
   photoPath?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  departmentRef?: Prisma.DepartmentCreateNestedOneWithoutEmployeesInput
   permits?: Prisma.PermitCreateNestedManyWithoutEmployeeInput
 }
 
@@ -526,6 +605,7 @@ export type EmployeeUncheckedCreateWithoutAssignmentsInput = {
   firstName: string
   lastName: string
   department?: string | null
+  departmentId?: number | null
   position?: string | null
   company: $Enums.Company
   photoPath?: string | null
@@ -556,10 +636,10 @@ export type EmployeeUpdateWithoutAssignmentsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departmentRef?: Prisma.DepartmentUpdateOneWithoutEmployeesNestedInput
   permits?: Prisma.PermitUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -569,6 +649,7 @@ export type EmployeeUncheckedUpdateWithoutAssignmentsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -583,10 +664,10 @@ export type EmployeeCreateWithoutPermitsInput = {
   lastName: string
   department?: string | null
   position?: string | null
-  company: $Enums.Company
   photoPath?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  departmentRef?: Prisma.DepartmentCreateNestedOneWithoutEmployeesInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutEmployeeInput
 }
 
@@ -596,6 +677,7 @@ export type EmployeeUncheckedCreateWithoutPermitsInput = {
   firstName: string
   lastName: string
   department?: string | null
+  departmentId?: number | null
   position?: string | null
   company: $Enums.Company
   photoPath?: string | null
@@ -626,10 +708,10 @@ export type EmployeeUpdateWithoutPermitsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departmentRef?: Prisma.DepartmentUpdateOneWithoutEmployeesNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -639,12 +721,134 @@ export type EmployeeUncheckedUpdateWithoutPermitsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.EnumCompanyFieldUpdateOperationsInput | $Enums.Company
   photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeCreateWithoutDepartmentRefInput = {
+  sapNumber: string
+  firstName: string
+  lastName: string
+  department?: string | null
+  position?: string | null
+  photoPath?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutEmployeeInput
+  permits?: Prisma.PermitCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutDepartmentRefInput = {
+  id?: number
+  sapNumber: string
+  firstName: string
+  lastName: string
+  department?: string | null
+  position?: string | null
+  photoPath?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutEmployeeInput
+  permits?: Prisma.PermitUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutDepartmentRefInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput>
+}
+
+export type EmployeeCreateManyDepartmentRefInputEnvelope = {
+  data: Prisma.EmployeeCreateManyDepartmentRefInput | Prisma.EmployeeCreateManyDepartmentRefInput[]
+  skipDuplicates?: boolean
+}
+
+export type EmployeeUpsertWithWhereUniqueWithoutDepartmentRefInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedUpdateWithoutDepartmentRefInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedCreateWithoutDepartmentRefInput>
+}
+
+export type EmployeeUpdateWithWhereUniqueWithoutDepartmentRefInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutDepartmentRefInput, Prisma.EmployeeUncheckedUpdateWithoutDepartmentRefInput>
+}
+
+export type EmployeeUpdateManyWithWhereWithoutDepartmentRefInput = {
+  where: Prisma.EmployeeScalarWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateManyMutationInput, Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentRefInput>
+}
+
+export type EmployeeScalarWhereInput = {
+  AND?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
+  OR?: Prisma.EmployeeScalarWhereInput[]
+  NOT?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
+  id?: Prisma.IntFilter<"Employee"> | number
+  sapNumber?: Prisma.StringFilter<"Employee"> | string
+  firstName?: Prisma.StringFilter<"Employee"> | string
+  lastName?: Prisma.StringFilter<"Employee"> | string
+  department?: Prisma.StringNullableFilter<"Employee"> | string | null
+  departmentId?: Prisma.IntNullableFilter<"Employee"> | number | null
+  position?: Prisma.StringNullableFilter<"Employee"> | string | null
+  company?: Prisma.EnumCompanyFilter<"Employee"> | $Enums.Company
+  photoPath?: Prisma.StringNullableFilter<"Employee"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
+}
+
+export type EmployeeCreateManyDepartmentRefInput = {
+  id?: number
+  sapNumber: string
+  firstName: string
+  lastName: string
+  department?: string | null
+  position?: string | null
+  photoPath?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type EmployeeUpdateWithoutDepartmentRefInput = {
+  sapNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.AssignmentUpdateManyWithoutEmployeeNestedInput
+  permits?: Prisma.PermitUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutDepartmentRefInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sapNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  permits?: Prisma.PermitUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateManyWithoutDepartmentRefInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sapNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -693,11 +897,13 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   firstName?: boolean
   lastName?: boolean
   department?: boolean
+  departmentId?: boolean
   position?: boolean
   company?: boolean
   photoPath?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
   assignments?: boolean | Prisma.Employee$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Employee$permitsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -709,11 +915,13 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   firstName?: boolean
   lastName?: boolean
   department?: boolean
+  departmentId?: boolean
   position?: boolean
   company?: boolean
   photoPath?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -722,11 +930,13 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   firstName?: boolean
   lastName?: boolean
   department?: boolean
+  departmentId?: boolean
   position?: boolean
   company?: boolean
   photoPath?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectScalar = {
@@ -735,6 +945,7 @@ export type EmployeeSelectScalar = {
   firstName?: boolean
   lastName?: boolean
   department?: boolean
+  departmentId?: boolean
   position?: boolean
   company?: boolean
   photoPath?: boolean
@@ -742,18 +953,24 @@ export type EmployeeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sapNumber" | "firstName" | "lastName" | "department" | "position" | "company" | "photoPath" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sapNumber" | "firstName" | "lastName" | "department" | "departmentId" | "position" | "company" | "photoPath" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
   assignments?: boolean | Prisma.Employee$assignmentsArgs<ExtArgs>
   permits?: boolean | Prisma.Employee$permitsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type EmployeeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
+}
+export type EmployeeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  departmentRef?: boolean | Prisma.Employee$departmentRefArgs<ExtArgs>
+}
 
 export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Employee"
   objects: {
+    departmentRef: Prisma.$DepartmentPayload<ExtArgs> | null
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     permits: Prisma.$PermitPayload<ExtArgs>[]
   }
@@ -763,6 +980,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     firstName: string
     lastName: string
     department: string | null
+    departmentId: number | null
     position: string | null
     company: $Enums.Company
     photoPath: string | null
@@ -1162,6 +1380,7 @@ readonly fields: EmployeeFieldRefs;
  */
 export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  departmentRef<T extends Prisma.Employee$departmentRefArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$departmentRefArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignments<T extends Prisma.Employee$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permits<T extends Prisma.Employee$permitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$permitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1198,6 +1417,7 @@ export interface EmployeeFieldRefs {
   readonly firstName: Prisma.FieldRef<"Employee", 'String'>
   readonly lastName: Prisma.FieldRef<"Employee", 'String'>
   readonly department: Prisma.FieldRef<"Employee", 'String'>
+  readonly departmentId: Prisma.FieldRef<"Employee", 'Int'>
   readonly position: Prisma.FieldRef<"Employee", 'String'>
   readonly company: Prisma.FieldRef<"Employee", 'Company'>
   readonly photoPath: Prisma.FieldRef<"Employee", 'String'>
@@ -1457,6 +1677,10 @@ export type EmployeeCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    */
   data: Prisma.EmployeeCreateManyInput | Prisma.EmployeeCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeeIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1527,6 +1751,10 @@ export type EmployeeUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many Employees to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeeIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1593,6 +1821,25 @@ export type EmployeeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Employees to delete.
    */
   limit?: number
+}
+
+/**
+ * Employee.departmentRef
+ */
+export type Employee$departmentRefArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Department
+   */
+  select?: Prisma.DepartmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Department
+   */
+  omit?: Prisma.DepartmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentInclude<ExtArgs> | null
+  where?: Prisma.DepartmentWhereInput
 }
 
 /**

@@ -11,10 +11,13 @@
         "indisunique",
         "indisvalid",
         "libreoffice",
+        "Matricería",
+        "Matricero",
         "MTTO",
         "outdir",
         "postgresql",
         "regclass",
-        "tailwindcss"
+        "tailwindcss",
+        "turbopack"
     ]
 }

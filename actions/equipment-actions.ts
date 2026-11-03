@@ -28,6 +28,8 @@ export type EquipmentFormState = {
     assetTag?: string
     inventoryNumber?: string
     serialNumber?: string
+    responsibleDepartmentId?: string
+    locationId?: string
     general?: string
   }
 }
@@ -38,6 +40,8 @@ type EquipmentFormData = {
   type: EquipmentType
   inventoryNumber: string | null
   serialNumber: string | null
+  responsibleDepartmentId: number
+  locationId: number | null
   brand: string | null
   model: string | null
   company: Company
@@ -53,6 +57,8 @@ const equipmentAuditSelect = {
   type: true,
   inventoryNumber: true,
   serialNumber: true,
+  responsibleDepartmentId: true,
+  locationId: true,
   brand: true,
   model: true,
   company: true,
@@ -72,6 +78,8 @@ function equipmentAuditSnapshot(equipment: EquipmentAuditRecord) {
     type: equipment.type,
     inventoryNumber: equipment.inventoryNumber,
     serialNumber: equipment.serialNumber,
+    responsibleDepartmentId: equipment.responsibleDepartmentId,
+    locationId: equipment.locationId,
     brand: equipment.brand,
     model: equipment.model,
     company: equipment.company,
@@ -100,25 +108,45 @@ function getEquipmentFormData(
   }
 
   const assetTag = rawAssetTag || null
-
-  // Regla de negocio: barcode = assetTag
   const barcode = assetTag
-
   const inventoryNumber =
     String(formData.get("inventoryNumber") ?? "").trim() || null
-
   const serialNumber = String(formData.get("serialNumber") ?? "").trim() || null
-
   const brand = String(formData.get("brand") ?? "").trim() || null
-
   const model = String(formData.get("model") ?? "").trim() || null
-
   const company = formData.get("company") as Company
+  const responsibleDepartmentId = Number(
+    formData.get("responsibleDepartmentId"),
+  )
+
+  const rawLocationId = String(formData.get("locationId") ?? "").trim()
+  const locationId = rawLocationId ? Number(rawLocationId) : null
+
+  if (
+    !Number.isInteger(responsibleDepartmentId) ||
+    responsibleDepartmentId <= 0
+  ) {
+    return {
+      errors: {
+        responsibleDepartmentId:
+          "Selecciona un departamento responsable válido.",
+      },
+    }
+  }
+
+  if (
+    locationId !== null &&
+    (!Number.isInteger(locationId) || locationId <= 0)
+  ) {
+    return {
+      errors: {
+        locationId: "Selecciona una ubicación válida.",
+      },
+    }
+  }
   const status = formData.get("status") as EquipmentStatus
   const ownership = formData.get("ownership") as EquipmentOwnership
-
   const hasWarranty = typeConfig.hasWarranty
-
   const warrantyExpiresAtValue = hasWarranty
     ? String(formData.get("warrantyExpiresAt") ?? "").trim()
     : ""
@@ -133,6 +161,8 @@ function getEquipmentFormData(
     type,
     inventoryNumber,
     serialNumber,
+    responsibleDepartmentId,
+    locationId,
     brand,
     model,
     company,
@@ -146,6 +176,50 @@ function hasErrors(
   value: EquipmentFormData | EquipmentFormState,
 ): value is EquipmentFormState {
   return "errors" in value
+}
+
+async function validateEquipmentRelations(
+  data: EquipmentFormData,
+): Promise<EquipmentFormState | null> {
+  const department = await prisma.department.findFirst({
+    where: {
+      id: data.responsibleDepartmentId,
+      company: data.company,
+      isActive: true,
+    },
+    select: { id: true },
+  })
+
+  if (!department) {
+    return {
+      errors: {
+        responsibleDepartmentId:
+          "El departamento seleccionado no existe, está inactivo o pertenece a otra compañía.",
+      },
+    }
+  }
+
+  if (data.locationId !== null) {
+    const location = await prisma.location.findFirst({
+      where: {
+        id: data.locationId,
+        company: data.company,
+        isActive: true,
+      },
+      select: { id: true },
+    })
+
+    if (!location) {
+      return {
+        errors: {
+          locationId:
+            "La ubicación seleccionada no existe, está inactiva o pertenece a otra compañía.",
+        },
+      }
+    }
+  }
+
+  return null
 }
 
 function getUniqueConstraintError(error: unknown): EquipmentFormState | null {
@@ -239,7 +313,9 @@ async function getEquipmentAuthorizationError(
       }
     }
 
-    console.error("No se pudo verificar el acceso para " + operation + " equipos.")
+    console.error(
+      "No se pudo verificar el acceso para " + operation + " equipos.",
+    )
     return { error: getUnexpectedError() }
   }
 }
@@ -256,6 +332,12 @@ export async function createEquipment(
 
   if (hasErrors(data)) {
     return data
+  }
+
+  const relationErrors = await validateEquipmentRelations(data)
+
+  if (relationErrors) {
+    return relationErrors
   }
 
   try {
@@ -323,7 +405,6 @@ export async function updateEquipment(
       })
 
       if (!existing) {
-        // Preserve Prisma's existing not-found error behavior for the action.
         await tx.equipment.update({
           where: { id: equipmentId },
           data,

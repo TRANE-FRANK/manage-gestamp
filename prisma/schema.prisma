@@ -80,8 +80,8 @@ model User {
 }
 
 model AuditEvent {
-    id                    Int         @id @default(autoincrement())
-    occurredAt            DateTime    @default(now())
+    id                    Int          @id @default(autoincrement())
+    occurredAt            DateTime     @default(now())
     actorUserIdSnapshot   Int?
     actorUsernameSnapshot String?
     actorRoleSnapshot     UserRole?
@@ -101,11 +101,15 @@ model AuditEvent {
 }
 
 model Employee {
-    id          Int          @id @default(autoincrement())
-    sapNumber   String       @unique
-    firstName   String
-    lastName    String
-    department  String?
+    id        Int    @id @default(autoincrement())
+    sapNumber String @unique
+    firstName String
+    lastName  String
+
+    department    String?
+    departmentId  Int?
+    departmentRef Department? @relation("EmployeeDepartment", fields: [departmentId, company], references: [id, company], onDelete: Restrict)
+
     position    String?
     company     Company
     photoPath   String?
@@ -116,16 +120,23 @@ model Employee {
 }
 
 model Equipment {
-    id                Int                @id @default(autoincrement())
-    assetTag          String?            @unique
-    barcode           String?            @unique
-    type              EquipmentType?
-    inventoryNumber   String?            @unique
-    serialNumber      String?            @unique
-    brand             String?
-    model             String?
-    company           Company
-    status            EquipmentStatus
+    id              Int             @id @default(autoincrement())
+    assetTag        String?         @unique
+    barcode         String?         @unique
+    type            EquipmentType?
+    inventoryNumber String?         @unique
+    serialNumber    String?         @unique
+    brand           String?
+    model           String?
+    company         Company
+    status          EquipmentStatus
+
+    responsibleDepartmentId Int?
+    responsibleDepartment   Department? @relation("EquipmentResponsibleDepartment", fields: [responsibleDepartmentId, company], references: [id, company], onDelete: Restrict)
+
+    locationId Int?
+    location   Location? @relation(fields: [locationId, company], references: [id, company], onDelete: Restrict)
+
     createdAt         DateTime           @default(now())
     updatedAt         DateTime           @updatedAt
     assignments       Assignment[]
@@ -136,19 +147,19 @@ model Equipment {
 }
 
 model Assignment {
-    id                Int       @id @default(autoincrement())
-    employeeId        Int
-    equipmentId       Int
-    assignedAt        DateTime
-    returnedAt        DateTime?
-    cancelledAt       DateTime?
+    id                 Int       @id @default(autoincrement())
+    employeeId         Int
+    equipmentId        Int
+    assignedAt         DateTime
+    returnedAt         DateTime?
+    cancelledAt        DateTime?
     cancellationReason String?
-    replacementReason String?
-    generatedPdfPath  String?
-    signedPdfPath     String?
-    employee          Employee  @relation(fields: [employeeId], references: [id])
-    equipment         Equipment @relation(fields: [equipmentId], references: [id])
-    createdAt         DateTime  @default(now())
+    replacementReason  String?
+    generatedPdfPath   String?
+    signedPdfPath      String?
+    employee           Employee  @relation(fields: [employeeId], references: [id])
+    equipment          Equipment @relation(fields: [equipmentId], references: [id])
+    createdAt          DateTime  @default(now())
 
     @@index([employeeId])
     @@index([equipmentId])
@@ -206,21 +217,57 @@ model MaintenanceBatch {
 }
 
 model Maintenance {
-    id               Int       @id @default(autoincrement())
+    id               Int               @id @default(autoincrement())
     equipmentId      Int
-    maintenanceDate  DateTime  @db.Date
+    maintenanceDate  DateTime          @db.Date
     batchId          Int?
     provider         String?
     folio            String?
     generatedPdfPath String?
     signedPdfPath    String?
     notes            String?
-    equipment        Equipment @relation(fields: [equipmentId], references: [id])
+    equipment        Equipment         @relation(fields: [equipmentId], references: [id])
     batch            MaintenanceBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-    createdAt        DateTime  @default(now())
+    createdAt        DateTime          @default(now())
 
+    @@unique([equipmentId, maintenanceDate])
     @@index([equipmentId])
     @@index([maintenanceDate])
     @@index([batchId])
-    @@unique([equipmentId, maintenanceDate])
+}
+
+model Department {
+    id       Int     @id @default(autoincrement())
+    name     String
+    company  Company
+    isActive Boolean @default(true)
+
+    employees            Employee[]  @relation("EmployeeDepartment")
+    responsibleEquipment Equipment[] @relation("EquipmentResponsibleDepartment")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([id, company])
+    @@unique([company, name])
+    @@index([company, isActive])
+}
+
+model Location {
+    id       Int     @id @default(autoincrement())
+    name     String
+    company  Company @default(GP2)
+    parentId Int?
+
+    parent    Location?   @relation("LocationHierarchy", fields: [parentId, company], references: [id, company], onDelete: Restrict)
+    children  Location[]  @relation("LocationHierarchy")
+    equipment Equipment[]
+
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([id, company])
+    @@unique([company, parentId, name])
+    @@index([company, parentId])
 }

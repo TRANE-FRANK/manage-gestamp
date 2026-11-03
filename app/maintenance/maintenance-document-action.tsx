@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useTransition } from "react"
+import { useRef, useState, useTransition } from "react"
 import Link from "next/link"
 
 import {
@@ -17,20 +17,16 @@ export default function MaintenanceDocumentAction({
   hasGeneratedDocument: boolean
   hasSignedDocument: boolean
 }) {
-  const [available, setAvailable] = useState(hasGeneratedDocument)
-  const [signedAvailable, setSignedAvailable] = useState(hasSignedDocument)
+  const [generated, setGenerated] = useState(false)
+  const [signedUploaded, setSignedUploaded] = useState(false)
+
+  const available = hasGeneratedDocument || generated
+  const signedAvailable = hasSignedDocument || signedUploaded
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    setAvailable(hasGeneratedDocument)
-  }, [hasGeneratedDocument])
-
-  useEffect(() => {
-    setSignedAvailable(hasSignedDocument)
-  }, [hasSignedDocument])
 
   const documentUrl = `/api/maintenance/${maintenanceId}/document`
   const signedDocumentUrl = `/api/maintenance/${maintenanceId}/signed-document`
@@ -43,7 +39,7 @@ export default function MaintenanceDocumentAction({
       const result = await generateMaintenanceDocumentAction(maintenanceId)
 
       if (result.success) {
-        setAvailable(true)
+        setGenerated(true)
         setSuccess("Formato generado correctamente.")
       } else {
         setError(result.message ?? "No se pudo generar el formato.")
@@ -65,7 +61,7 @@ export default function MaintenanceDocumentAction({
       )
 
       if (result.success) {
-        setSignedAvailable(true)
+        setSignedUploaded(true)
         setSuccess("Documento firmado cargado correctamente.")
 
         if (fileInputRef.current) {

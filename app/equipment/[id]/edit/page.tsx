@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation"
 import { requirePageRole } from "@/lib/auth/page-guard"
 
+import { getEquipmentFormCatalogs } from "@/services/equipment/catalogs"
+
 import { getEquipmentDetails } from "@/services/equipment"
 
 import EquipmentForm from "../../new/equipment-form"
@@ -27,6 +29,8 @@ export default async function EditEquipmentPage({
     notFound()
   }
 
+  const catalogs = await getEquipmentFormCatalogs()
+
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
@@ -38,7 +42,7 @@ export default async function EditEquipmentPage({
       </div>
 
       <div className="rounded-2xl bg-white p-8 shadow-sm">
-        <EquipmentForm equipment={equipment} />
+        <EquipmentForm equipment={equipment} catalogs={catalogs} />
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useEffect, useRef, useState } from "react"
+import { useActionState, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
@@ -48,54 +48,58 @@ export default function MaintenanceRegistrationForm({
   lastMaintenanceBefore: string
   filterError: string | null
 }) {
-  const [state, formAction, pending] = useActionState(
-    registerMaintenanceBatchAction,
-    initialState,
-  )
   const [selected, setSelected] = useState(
     () => new Map<number, MaintenanceEquipmentOption>(),
   )
-  const [searchValue, setSearchValue] = useState(search)
-  const [companyValue, setCompanyValue] = useState(company)
-  const [typeValue, setTypeValue] = useState(type)
-  const [historyModeValue, setHistoryModeValue] = useState(historyMode)
-  const [lastMaintenanceBeforeValue, setLastMaintenanceBeforeValue] = useState(
-    lastMaintenanceBefore,
+
+  const [historyModeOverride, setHistoryModeOverride] = useState<string | null>(
+    null,
   )
+
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  useEffect(() => {
-    setSearchValue(search)
-    setCompanyValue(company)
-    setTypeValue(type)
-    setHistoryModeValue(historyMode)
-    setLastMaintenanceBeforeValue(lastMaintenanceBefore)
-  }, [search, company, type, historyMode, lastMaintenanceBefore])
+  const historyModeValue =
+    historyModeOverride ?? searchParams.get("equipmentHistory") ?? historyMode
 
-  useEffect(() => {
-    if (!state.success || !state.batchId) {
-      return
-    }
+  const [state, formAction, pending] = useActionState(
+    async (previousState: MaintenanceRegistrationState, formData: FormData) => {
+      const result = await registerMaintenanceBatchAction(
+        previousState,
+        formData,
+      )
 
-    toast.success(state.message ?? "Mantenimientos registrados correctamente.")
-    formRef.current?.reset()
-    setSelected(new Map())
-    setSearchValue("")
-    router.replace("/maintenance")
-    router.refresh()
-  }, [state.batchId, state.message, state.success, router])
+      if (result.success && result.batchId) {
+        toast.success(
+          result.message ?? "Mantenimientos registrados correctamente.",
+        )
+
+        formRef.current?.reset()
+        setSelected(new Map())
+        setHistoryModeOverride(null)
+
+        router.replace("/maintenance")
+        router.refresh()
+      }
+
+      return result
+    },
+    initialState,
+  )
 
   function handleSearch(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
     const params = new URLSearchParams(searchParams.toString())
+
     const values = {
-      search: searchValue.trim(),
-      equipmentCompany: companyValue,
-      equipmentType: typeValue,
-      equipmentHistory: historyModeValue,
-      equipmentLastDate: lastMaintenanceBeforeValue,
+      search: String(formData.get("search") ?? "").trim(),
+      equipmentCompany: String(formData.get("equipmentCompany") ?? "all"),
+      equipmentType: String(formData.get("equipmentType") ?? "all"),
+      equipmentHistory: String(formData.get("equipmentHistory") ?? "all"),
+      equipmentLastDate: String(formData.get("equipmentLastDate") ?? ""),
     }
 
     for (const [key, value] of Object.entries(values)) {
@@ -107,6 +111,8 @@ export default function MaintenanceRegistrationForm({
     }
 
     params.delete("page")
+    setHistoryModeOverride(null)
+
     router.push(`/maintenance?${params.toString()}`)
   }
 
@@ -143,26 +149,28 @@ export default function MaintenanceRegistrationForm({
         </h2>
 
         <form
+          key={searchParams.toString()}
           onSubmit={handleSearch}
-          className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2 xl:grid-cols-[minmax(18rem,2fr)_repeat(3,minmax(10rem,1fr))_minmax(12rem,1.2fr)_auto]"
+          className="mb-5 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 py-6 sm:grid-cols-2 xl:grid-cols-[minmax(18rem,2fr)_repeat(3,minmax(10rem,1fr))_minmax(12rem,1.2fr)_auto]"
         >
-          <div className="sm:col-span-2 xl:col-span-1">
+          <div className="mt-5 flex items-center align-middle sm:col-span-2 xl:col-span-1">
             <label htmlFor="maintenance-search" className="sr-only">
               Buscar por inventario, etiqueta patrimonial o número de serie
             </label>
             <input
               id="maintenance-search"
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
+              name="search"
+              defaultValue={search}
               placeholder="Buscar por inventario, etiqueta o número de serie..."
               className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
+
           <label className="text-xs font-medium text-slate-600">
             Empresa
             <select
-              value={companyValue}
-              onChange={(event) => setCompanyValue(event.target.value)}
+              name="equipmentCompany"
+              defaultValue={company}
               className="mt-1 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 outline-none focus:border-blue-500"
             >
               <option value="all">Todas</option>
@@ -170,11 +178,12 @@ export default function MaintenanceRegistrationForm({
               <option value="GP2">GP2</option>
             </select>
           </label>
+
           <label className="text-xs font-medium text-slate-600">
             Tipo de equipo
             <select
-              value={typeValue}
-              onChange={(event) => setTypeValue(event.target.value)}
+              name="equipmentType"
+              defaultValue={type}
               className="mt-1 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 outline-none focus:border-blue-500"
             >
               <option value="all">Todos los permitidos</option>
@@ -182,11 +191,13 @@ export default function MaintenanceRegistrationForm({
               <option value="DESKTOP">Desktop</option>
             </select>
           </label>
+
           <label className="text-xs font-medium text-slate-600">
             Historial
             <select
+              name="equipmentHistory"
               value={historyModeValue}
-              onChange={(event) => setHistoryModeValue(event.target.value)}
+              onChange={(event) => setHistoryModeOverride(event.target.value)}
               className="mt-1 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 outline-none focus:border-blue-500"
             >
               <option value="all">Todos los equipos</option>
@@ -196,22 +207,22 @@ export default function MaintenanceRegistrationForm({
               </option>
             </select>
           </label>
+
           {historyModeValue === "last-before" ? (
             <label className="text-xs font-medium text-slate-600">
               Último mantenimiento hasta
               <input
                 type="date"
+                name="equipmentLastDate"
                 required
-                value={lastMaintenanceBeforeValue}
-                onChange={(event) =>
-                  setLastMaintenanceBeforeValue(event.target.value)
-                }
+                defaultValue={lastMaintenanceBefore}
                 className="mt-1 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-900 outline-none focus:border-blue-500"
               />
             </label>
           ) : (
             <div className="hidden xl:block" />
           )}
+
           <button
             type="submit"
             className="h-10 self-end rounded-lg bg-blue-700 px-4 text-sm font-medium text-white transition hover:bg-blue-800"
@@ -252,6 +263,7 @@ export default function MaintenanceRegistrationForm({
                   </th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-slate-200">
                 {equipment.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50">
@@ -266,6 +278,7 @@ export default function MaintenanceRegistrationForm({
                         className="size-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
                       />
                     </td>
+
                     <td className="px-4 py-3 font-medium text-slate-900">
                       {getEquipmentLabel(item)}
                       {item.brand || item.model ? (
@@ -274,12 +287,15 @@ export default function MaintenanceRegistrationForm({
                         </span>
                       ) : null}
                     </td>
+
                     <td className="px-4 py-3">
                       {item.type === "LAPTOP" ? "Laptop" : "Desktop"}
                     </td>
+
                     <td className="px-4 py-3 text-slate-600">
                       {getEquipmentIdentifiers(item).join(" · ") || "—"}
                     </td>
+
                     <td className="px-4 py-3 text-slate-600">{item.company}</td>
                   </tr>
                 ))}
@@ -301,6 +317,7 @@ export default function MaintenanceRegistrationForm({
           >
             Equipos seleccionados ({selected.size})
           </h2>
+
           {selected.size > 0 && (
             <button
               type="button"
@@ -333,6 +350,7 @@ export default function MaintenanceRegistrationForm({
                       .join(" · ") || "—"}
                   </p>
                 </div>
+
                 <button
                   type="button"
                   onClick={() => removeSelectedEquipment(item.id)}
@@ -381,6 +399,7 @@ export default function MaintenanceRegistrationForm({
             >
               Fecha efectiva del mantenimiento
             </label>
+
             <input
               id="maintenance-date"
               type="date"
@@ -398,6 +417,7 @@ export default function MaintenanceRegistrationForm({
               Proveedor{" "}
               <span className="font-normal text-slate-500">(opcional)</span>
             </label>
+
             <input
               id="maintenance-provider"
               name="provider"
@@ -413,6 +433,7 @@ export default function MaintenanceRegistrationForm({
           >
             Notas <span className="font-normal text-slate-500">(opcional)</span>
           </label>
+
           <textarea
             id="maintenance-notes"
             name="notes"

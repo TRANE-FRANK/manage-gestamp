@@ -92,6 +92,7 @@ export async function listMaintenanceHistory({
   to,
   provider,
   equipmentId,
+  status = "all",
   pageSize = PAGE_SIZE,
 }: {
   page?: number
@@ -100,6 +101,7 @@ export async function listMaintenanceHistory({
   to?: string
   provider?: string
   equipmentId?: number
+  status?: "all" | "signed" | "pending" | "not-generated"
   pageSize?: number
 } = {}) {
   await requireRole("ADMIN", "IT")
@@ -130,10 +132,16 @@ export async function listMaintenanceHistory({
       totalPages: 1,
       providers,
       filterError,
+      statusCounts: {
+        all: 0,
+        signed: 0,
+        pending: 0,
+        notGenerated: 0,
+      },
     }
   }
 
-  const where: Prisma.MaintenanceWhereInput = {
+  const baseWhere: Prisma.MaintenanceWhereInput = {
     ...(equipmentId ? { equipmentId } : {}),
     ...(providerFilter ? { provider: providerFilter } : {}),
     ...(parsedFrom.date || parsedTo.date
@@ -178,10 +186,51 @@ export async function listMaintenanceHistory({
         }
       : {}),
   }
+
+  const statusWhere: Prisma.MaintenanceWhereInput =
+    status === "signed"
+      ? { signedPdfPath: { not: null } }
+      : status === "pending"
+        ? {
+            generatedPdfPath: { not: null },
+            signedPdfPath: null,
+          }
+        : status === "not-generated"
+          ? { generatedPdfPath: null }
+          : {}
+
+  const where: Prisma.MaintenanceWhereInput = {
+    AND: [baseWhere, statusWhere],
+  }
+
   const [providers, result] = await Promise.all([
     providersPromise,
     prisma.$transaction(async (tx) => {
-      const total = await tx.maintenance.count({ where })
+      const [total, signed, pending, notGenerated] = await Promise.all([
+        tx.maintenance.count({ where }),
+        tx.maintenance.count({
+          where: {
+            AND: [baseWhere, { signedPdfPath: { not: null } }],
+          },
+        }),
+        tx.maintenance.count({
+          where: {
+            AND: [
+              baseWhere,
+              {
+                generatedPdfPath: { not: null },
+                signedPdfPath: null,
+              },
+            ],
+          },
+        }),
+        tx.maintenance.count({
+          where: {
+            AND: [baseWhere, { generatedPdfPath: null }],
+          },
+        }),
+      ])
+
       const totalPages = Math.max(1, Math.ceil(total / safePageSize))
       const safePage = Math.min(currentPage, totalPages)
       const skip = (safePage - 1) * safePageSize
@@ -197,7 +246,18 @@ export async function listMaintenanceHistory({
         take: safePageSize,
       })
 
-      return { data, page: safePage, total, totalPages }
+      return {
+        data,
+        page: safePage,
+        total,
+        totalPages,
+        statusCounts: {
+          all: signed + pending + notGenerated,
+          signed,
+          pending,
+          notGenerated,
+        },
+      }
     }),
   ])
 
@@ -247,20 +307,21 @@ export async function listEligibleMaintenanceEquipment({
   const typeFilter = type ?? "all"
   const maintenanceHistoryFilter = historyMode ?? "all"
   const historyCutoff = parseHistoryCalendarDate(
-    maintenanceHistoryFilter === "last-before" ? lastMaintenanceBefore : undefined,
+    maintenanceHistoryFilter === "last-before"
+      ? lastMaintenanceBefore
+      : undefined,
     "fecha de último mantenimiento",
   )
-  const filterError =
-    !["all", "ORM", "GP2"].includes(companyFilter)
-      ? "Selecciona una empresa válida."
-      : !["all", "LAPTOP", "DESKTOP"].includes(typeFilter)
-        ? "Selecciona un tipo de equipo válido."
-        : !["all", "none", "last-before"].includes(maintenanceHistoryFilter)
-          ? "Selecciona un filtro de historial válido."
-          : maintenanceHistoryFilter === "last-before" &&
-              !historyCutoff.date &&
-              !("error" in historyCutoff)
-            ? "Selecciona la fecha de último mantenimiento."
+  const filterError = !["all", "ORM", "GP2"].includes(companyFilter)
+    ? "Selecciona una empresa válida."
+    : !["all", "LAPTOP", "DESKTOP"].includes(typeFilter)
+      ? "Selecciona un tipo de equipo válido."
+      : !["all", "none", "last-before"].includes(maintenanceHistoryFilter)
+        ? "Selecciona un filtro de historial válido."
+        : maintenanceHistoryFilter === "last-before" &&
+            !historyCutoff.date &&
+            !("error" in historyCutoff)
+          ? "Selecciona la fecha de último mantenimiento."
           : "error" in historyCutoff
             ? historyCutoff.error
             : null
@@ -440,9 +501,7 @@ export async function registerMaintenanceBatch({
   await ensureMaintenanceMigrationIsApplied()
 
   return prisma.$transaction(async (tx) => {
-      // Lock in stable order so company/type cannot change after validation
-      // while this batch is being written.
-      const lockedEquipment = await tx.$queryRaw<Array<{ id: number }>>`
+    const lockedEquipment = await tx.$queryRaw<Array<{ id: number }>>`
         SELECT "id"
         FROM "Equipment"
         WHERE "id" IN (${Prisma.join(ids)})
@@ -450,120 +509,120 @@ export async function registerMaintenanceBatch({
         FOR UPDATE
       `
 
-      if (lockedEquipment.length !== ids.length) {
-        throw new ValidationError("Uno o más equipos ya no existen.")
-      }
+    if (lockedEquipment.length !== ids.length) {
+      throw new ValidationError("Uno o más equipos ya no existen.")
+    }
 
-      const equipment = await tx.equipment.findMany({
-        where: {
-          id: {
-            in: ids,
-          },
+    const equipment = await tx.equipment.findMany({
+      where: {
+        id: {
+          in: ids,
         },
+      },
+      select: {
+        id: true,
+        company: true,
+        type: true,
+      },
+    })
+
+    if (
+      equipment.length !== ids.length ||
+      equipment.some(
+        (item) =>
+          (item.company !== "ORM" && item.company !== "GP2") ||
+          (item.type !== "LAPTOP" && item.type !== "DESKTOP"),
+      )
+    ) {
+      throw new ValidationError(
+        "Solo se permiten equipos ORM o GP2 de tipo laptop o desktop.",
+      )
+    }
+
+    const existing = await tx.maintenance.findMany({
+      where: {
+        equipmentId: {
+          in: ids,
+        },
+        maintenanceDate,
+      },
+      select: {
+        equipmentId: true,
+      },
+    })
+
+    if (existing.length > 0) {
+      throw new ConflictError(
+        "Uno o más equipos ya tienen un mantenimiento registrado en esa fecha.",
+      )
+    }
+
+    const batch = await tx.maintenanceBatch.create({
+      data: {},
+      select: {
+        id: true,
+      },
+    })
+
+    let created
+    try {
+      created = await tx.maintenance.createManyAndReturn({
+        data: ids.map((equipmentId) => ({
+          equipmentId,
+          maintenanceDate,
+          batchId: batch.id,
+          provider,
+          notes,
+        })),
         select: {
           id: true,
-          company: true,
-          type: true,
-        },
-      })
-
-      if (
-        equipment.length !== ids.length ||
-        equipment.some(
-          (item) =>
-            (item.company !== "ORM" && item.company !== "GP2") ||
-            (item.type !== "LAPTOP" && item.type !== "DESKTOP"),
-        )
-      ) {
-        throw new ValidationError(
-          "Solo se permiten equipos ORM o GP2 de tipo laptop o desktop.",
-        )
-      }
-
-      const existing = await tx.maintenance.findMany({
-        where: {
-          equipmentId: {
-            in: ids,
-          },
-          maintenanceDate,
-        },
-        select: {
           equipmentId: true,
+          maintenanceDate: true,
+          batchId: true,
+          provider: true,
         },
       })
-
-      if (existing.length > 0) {
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
         throw new ConflictError(
           "Uno o más equipos ya tienen un mantenimiento registrado en esa fecha.",
         )
       }
 
-      const batch = await tx.maintenanceBatch.create({
-        data: {},
-        select: {
-          id: true,
+      throw error
+    }
+
+    if (created.length !== ids.length) {
+      throw new BusinessError(
+        "No se pudieron guardar todos los mantenimientos seleccionados.",
+      )
+    }
+
+    for (const maintenance of created) {
+      await writeAuditEvent(tx, {
+        actor,
+        action: "MAINTENANCE_CREATED",
+        entityType: "MAINTENANCE",
+        entityId: String(maintenance.id),
+        outcome: "SUCCESS",
+        source: "maintenance.register-batch",
+        after: {
+          equipmentId: maintenance.equipmentId,
+          maintenanceDate: maintenance.maintenanceDate
+            .toISOString()
+            .slice(0, 10),
+          batchId: maintenance.batchId,
+          provider: maintenance.provider,
         },
       })
+    }
 
-      let created
-      try {
-        created = await tx.maintenance.createManyAndReturn({
-          data: ids.map((equipmentId) => ({
-            equipmentId,
-            maintenanceDate,
-            batchId: batch.id,
-            provider,
-            notes,
-          })),
-          select: {
-            id: true,
-            equipmentId: true,
-            maintenanceDate: true,
-            batchId: true,
-            provider: true,
-          },
-        })
-      } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === "P2002"
-        ) {
-          throw new ConflictError(
-            "Uno o más equipos ya tienen un mantenimiento registrado en esa fecha.",
-          )
-        }
-
-        throw error
-      }
-
-      if (created.length !== ids.length) {
-        throw new BusinessError(
-          "No se pudieron guardar todos los mantenimientos seleccionados.",
-        )
-      }
-
-      for (const maintenance of created) {
-        await writeAuditEvent(tx, {
-          actor,
-          action: "MAINTENANCE_CREATED",
-          entityType: "MAINTENANCE",
-          entityId: String(maintenance.id),
-          outcome: "SUCCESS",
-          source: "maintenance.register-batch",
-          after: {
-            equipmentId: maintenance.equipmentId,
-            maintenanceDate: maintenance.maintenanceDate
-              .toISOString()
-              .slice(0, 10),
-            batchId: maintenance.batchId,
-            provider: maintenance.provider,
-          },
-        })
-      }
-
-      return {
-        batchId: batch.id,
-        count: created.length,
-      }
-    })
+    return {
+      batchId: batch.id,
+      count: created.length,
+    }
+  })
 }

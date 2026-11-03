@@ -86,12 +86,12 @@ function MaintenanceDetail({ record }: { record: MaintenanceHistoryRecord }) {
 
           <div>
             <dt className="text-xs text-slate-500">Proveedor</dt>
-            <dd className="mt-1 break-words">{record.provider ?? "—"}</dd>
+            <dd className="mt-1 wrap-break-word">{record.provider ?? "—"}</dd>
           </div>
 
           <div>
             <dt className="text-xs text-slate-500">Folio</dt>
-            <dd className="mt-1 break-words">{record.folio ?? "—"}</dd>
+            <dd className="mt-1 wrap-break-word">{record.folio ?? "—"}</dd>
           </div>
 
           <div>
@@ -147,7 +147,7 @@ function MaintenanceDetail({ record }: { record: MaintenanceHistoryRecord }) {
       <section className="space-y-2 border-t border-slate-200 pt-4">
         <h3 className="text-sm font-semibold text-slate-900">Notas</h3>
 
-        <p className="whitespace-pre-wrap wrap-break-words text-sm leading-6 text-slate-600">
+        <p className="whitespace-pre-wrap wrap-wrap-break-word text-sm leading-6 text-slate-600">
           {record.notes || "Sin notas registradas."}
         </p>
       </section>
@@ -237,12 +237,12 @@ export default function MaintenanceHistoryTable({
 
               <div>
                 <dt className="text-xs text-slate-500">Proveedor</dt>
-                <dd className="break-words">{record.provider ?? "—"}</dd>
+                <dd className="wrap-break-word">{record.provider ?? "—"}</dd>
               </div>
 
               <div>
                 <dt className="text-xs text-slate-500">Folio</dt>
-                <dd className="break-words">{record.folio ?? "—"}</dd>
+                <dd className="wrap-break-word">{record.folio ?? "—"}</dd>
               </div>
             </dl>
 
@@ -260,7 +260,7 @@ export default function MaintenanceHistoryTable({
 
       {/* Vista escritorio */}
       <div className="hidden overflow-x-auto rounded-xl border border-slate-200 md:block">
-        <table className="w-full min-w-[750px] text-left text-sm">
+        <table className="w-full min-w-187.5text-left text-sm">
           <thead className="bg-slate-50 text-slate-600">
             <tr>
               <th scope="col" className="px-4 py-3">
@@ -295,11 +295,11 @@ export default function MaintenanceHistoryTable({
                   {formatMaintenanceDate(record.maintenanceDate)}
                 </td>
 
-                <td className="max-w-48 whitespace-normal break-words px-4 py-3">
+                <td className="max-w-48 whitespace-normal wrap-break-word px-4 py-3">
                   {record.provider ?? "—"}
                 </td>
 
-                <td className="max-w-40 whitespace-normal break-words px-4 py-3">
+                <td className="max-w-40 whitespace-normal wrap-break-word px-4 py-3">
                   {record.folio ?? "—"}
                 </td>
                 <td className="px-4 py-3 text-right">

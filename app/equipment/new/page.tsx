@@ -1,6 +1,9 @@
 import EquipmentForm from "./equipment-form"
+import { getEquipmentFormCatalogs } from "@/services/equipment/catalogs"
 
-export default function NewEquipmentPage() {
+export default async function NewEquipmentPage() {
+  const catalogs = await getEquipmentFormCatalogs()
+
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
@@ -12,7 +15,7 @@ export default function NewEquipmentPage() {
       </div>
 
       <div className="rounded-2xl bg-white p-8 shadow-sm">
-        <EquipmentForm />
+        <EquipmentForm  catalogs={catalogs} />
       </div>
     </div>
   )
